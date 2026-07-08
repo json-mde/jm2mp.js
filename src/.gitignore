@@ -1,0 +1,34 @@
+# Dependencias instaladas
+node_modules/
+
+# Logs de npm/yarn/pnpm
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Resultados de cobertura (generados por `npm run test:coverage*`)
+coverage/
+coverage.lcov
+.nyc_output/
+
+# Editores e IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Sistemas operativos
+.DS_Store
+Thumbs.db
+
+# Archivos de entorno locales
+.env
+.env.local
+.env.*.local
+
+# Bloqueo de versiones (descomenta según política del proyecto)
+# package-lock.json
+# yarn.lock
+# pnpm-lock.yaml

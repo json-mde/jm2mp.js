@@ -1,0 +1,43 @@
+{
+  "name": "jm2mp",
+  "version": "0.3.0",
+  "description": "Lenguaje declarativo de proyecciones JSON con álgebra de operadores y soporte multi-sintaxis (nativa, JSONPath, JSONata, JSON Query, JSON Pointer, JMESPath).",
+  "type": "module",
+  "main": "./index.js",
+  "exports": {
+    ".": "./index.js",
+    "./schema": "./schema/projection-module.schema.json"
+  },
+  "engines": {
+    "node": ">=22.0.0"
+  },
+  "scripts": {
+    "test": "node --test \"./test/**/*test*.js\"",
+    "test:watch": "node --test --watch ./test/",
+    "test:coverage": "node --test --experimental-test-coverage --test-coverage-include='./**/*.js' ./test/",
+    "test:coverage-lcov": "node --test --experimental-test-coverage --test-reporter=lcov --test-reporter-destination=coverage.lcov --test-coverage-include='./**/*.js' ./test/"
+  },
+  "optionalDependencies": {
+    "jsonpath-plus": "10.x",
+    "jsonata": "2.x",
+    "@jsonquerylang/jsonquery": "4.x",
+    "json-pointer": "0.6.x",
+    "jmespath": "0.16.x"
+  },
+  "keywords": [
+    "jm2mp",
+    "json",
+    "projection",
+    "transformation",
+    "declarative",
+    "jsonpath",
+    "jsonata",
+    "jsonquery",
+    "jsonpointer",
+    "rfc6901",
+    "jmespath",
+    "algebra",
+    "functional"
+  ],
+  "license": "MIT"
+}

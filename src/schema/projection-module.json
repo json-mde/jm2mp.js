@@ -1,0 +1,474 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.org/schemas/projection-module.json",
+  "title": "Projection Module",
+  "description": "Módulo de proyecciones JSON. Un módulo es un objeto con plantillas, donde la plantilla raíz '@' es el punto de entrada de la transformación. Las plantillas con nombre son funciones invocables vía $call. Las claves $options y $schema son metadata del módulo.",
+
+  "$ref": "#/$defs/Module",
+
+  "$defs": {
+
+    "Module": {
+      "type": "object",
+      "properties": {
+        "$options": { "$ref": "#/$defs/Options" },
+        "$schema":  { "type": "string" },
+        "@":        { "$ref": "#/$defs/Projection" }
+      },
+      "patternProperties": {
+        "^(?![\\$@%])(?!$).*$": { "$ref": "#/$defs/Projection" }
+      },
+      "additionalProperties": false
+    },
+
+    "Options": {
+      "type": "object",
+      "properties": {
+        "$depends-on": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 }
+        },
+        "$default-query-language": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "patternProperties": {
+        "^\\$": true
+      },
+      "additionalProperties": false
+    },
+
+    "Projection": {
+      "description": "Cualquier valor JSON: literal, array de proyecciones, objeto literal o objeto-operación.",
+      "oneOf": [
+        { "type": "null" },
+        { "type": "boolean" },
+        { "type": "number" },
+        { "type": "string" },
+        { "$ref": "#/$defs/ArrayProjection" },
+        { "$ref": "#/$defs/Operation" },
+        { "$ref": "#/$defs/LiteralObject" }
+      ]
+    },
+
+    "ArrayProjection": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/Projection" }
+    },
+
+    "LiteralObject": {
+      "description": "Objeto sin claves operacionales. Las claves que comienzan por '$' deben escaparse con '\\$'.",
+      "type": "object",
+      "patternProperties": {
+        "^(?!\\$)": { "$ref": "#/$defs/Projection" },
+        "^\\\\\\$": { "$ref": "#/$defs/Projection" }
+      },
+      "additionalProperties": false
+    },
+
+    "Operation": {
+      "description": "Objeto-operación: tiene una clave $op con string discriminador y argumentos prefijados con '$'.",
+      "type": "object",
+      "required": ["$op"],
+      "properties": {
+        "$op": { "type": "string" }
+      },
+      "oneOf": [
+        { "$ref": "#/$defs/Op_pipe" },
+        { "$ref": "#/$defs/Op_get" },
+        { "$ref": "#/$defs/Op_if" },
+        { "$ref": "#/$defs/Op_fold" },
+        { "$ref": "#/$defs/Op_foldObj" },
+        { "$ref": "#/$defs/Op_cons" },
+        { "$ref": "#/$defs/Op_insert" },
+        { "$ref": "#/$defs/Op_let" },
+        { "$ref": "#/$defs/Op_call" },
+        { "$ref": "#/$defs/Op_eq" },
+        { "$ref": "#/$defs/Op_lt" },
+        { "$ref": "#/$defs/Op_gt" },
+        { "$ref": "#/$defs/Op_lte" },
+        { "$ref": "#/$defs/Op_gte" },
+        { "$ref": "#/$defs/Op_neq" },
+        { "$ref": "#/$defs/Op_not" },
+        { "$ref": "#/$defs/Op_and" },
+        { "$ref": "#/$defs/Op_or" },
+        { "$ref": "#/$defs/Op_add" },
+        { "$ref": "#/$defs/Op_sub" },
+        { "$ref": "#/$defs/Op_mul" },
+        { "$ref": "#/$defs/Op_div" },
+        { "$ref": "#/$defs/Op_mod" },
+        { "$ref": "#/$defs/Op_neg" },
+        { "$ref": "#/$defs/Op_abs" },
+        { "$ref": "#/$defs/Op_concat" },
+        { "$ref": "#/$defs/Op_length" },
+        { "$ref": "#/$defs/Op_substring" },
+        { "$ref": "#/$defs/Op_upper" },
+        { "$ref": "#/$defs/Op_lower" },
+        { "$ref": "#/$defs/Op_typeof" },
+        { "$ref": "#/$defs/Op_coalesce" },
+        { "$ref": "#/$defs/Op_has" },
+        { "$ref": "#/$defs/Op_sort" },
+        { "$ref": "#/$defs/Op_lookup" },
+        { "$ref": "#/$defs/Op_merge" }
+      ]
+    },
+
+    "_BinaryOp": {
+      "description": "Plantilla para operadores binarios con $left y $right.",
+      "type": "object",
+      "required": ["$op", "$left", "$right"],
+      "properties": {
+        "$op":    { "type": "string" },
+        "$left":  { "$ref": "#/$defs/Projection" },
+        "$right": { "$ref": "#/$defs/Projection" }
+      },
+      "additionalProperties": false
+    },
+
+    "_UnaryOp": {
+      "description": "Plantilla para operadores unarios con $value.",
+      "type": "object",
+      "required": ["$op", "$value"],
+      "properties": {
+        "$op":    { "type": "string" },
+        "$value": { "$ref": "#/$defs/Projection" }
+      },
+      "additionalProperties": false
+    },
+
+    "Op_pipe": {
+      "type": "object",
+      "required": ["$op", "$stages"],
+      "properties": {
+        "$op": { "const": "pipe" },
+        "$stages": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/Projection" }
+        }
+      },
+      "additionalProperties": false
+    },
+
+    "Op_get": {
+      "type": "object",
+      "required": ["$op", "$path"],
+      "properties": {
+        "$op": { "const": "get" },
+        "$path": {
+          "oneOf": [
+            {
+              "type": "array",
+              "items": {
+                "oneOf": [
+                  { "type": "string" },
+                  { "type": "integer", "minimum": 0 }
+                ]
+              }
+            },
+            { "type": "string" }
+          ]
+        },
+        "$syntax": {
+          "type": "string",
+          "minLength": 1
+        },
+        "$from": { "$ref": "#/$defs/Projection" }
+      },
+      "additionalProperties": false
+    },
+
+    "Op_if": {
+      "type": "object",
+      "required": ["$op", "$cond", "$then", "$else"],
+      "properties": {
+        "$op":    { "const": "if" },
+        "$cond":  { "$ref": "#/$defs/Projection" },
+        "$then":  { "$ref": "#/$defs/Projection" },
+        "$else": { "$ref": "#/$defs/Projection" }
+      },
+      "additionalProperties": false
+    },
+
+    "Op_fold": {
+      "type": "object",
+      "required": ["$op", "$over", "$init", "$step"],
+      "properties": {
+        "$op":   { "const": "fold" },
+        "$over": { "$ref": "#/$defs/Projection" },
+        "$init": { "$ref": "#/$defs/Projection" },
+        "$step": { "$ref": "#/$defs/Projection" }
+      },
+      "additionalProperties": false
+    },
+
+    "Op_foldObj": {
+      "type": "object",
+      "required": ["$op", "$over", "$init", "$step"],
+      "properties": {
+        "$op":   { "const": "foldObj" },
+        "$over": { "$ref": "#/$defs/Projection" },
+        "$init": { "$ref": "#/$defs/Projection" },
+        "$step": { "$ref": "#/$defs/Projection" }
+      },
+      "additionalProperties": false
+    },
+
+    "Op_cons": {
+      "type": "object",
+      "required": ["$op", "$head", "$tail"],
+      "properties": {
+        "$op":   { "const": "cons" },
+        "$head": { "$ref": "#/$defs/Projection" },
+        "$tail": { "$ref": "#/$defs/Projection" }
+      },
+      "additionalProperties": false
+    },
+
+    "Op_insert": {
+      "type": "object",
+      "required": ["$op", "$key", "$value", "$into"],
+      "properties": {
+        "$op":    { "const": "insert" },
+        "$key":   { "$ref": "#/$defs/Projection" },
+        "$value": { "$ref": "#/$defs/Projection" },
+        "$into":  { "$ref": "#/$defs/Projection" }
+      },
+      "additionalProperties": false
+    },
+
+    "Op_let": {
+      "type": "object",
+      "required": ["$op", "$bindings", "$in"],
+      "properties": {
+        "$op": { "const": "let" },
+        "$bindings": {
+          "type": "object",
+          "propertyNames": {
+            "pattern": "^(?![\\$@%])(?!$).*$"
+          },
+          "additionalProperties": { "$ref": "#/$defs/Projection" }
+        },
+        "$in": { "$ref": "#/$defs/Projection" }
+      },
+      "additionalProperties": false
+    },
+
+    "Op_call": {
+      "type": "object",
+      "required": ["$op", "$ref"],
+      "properties": {
+        "$op":  { "const": "call" },
+        "$ref": {
+          "type": "string",
+          "pattern": "^(?![\\$@%])(?!$).*$"
+        },
+        "$at":  { "$ref": "#/$defs/Projection" }
+      },
+      "additionalProperties": false
+    },
+
+    "Op_eq": {
+      "allOf": [
+        { "$ref": "#/$defs/_BinaryOp" },
+        { "properties": { "$op": { "const": "eq" } } }
+      ]
+    },
+    "Op_lt": {
+      "allOf": [
+        { "$ref": "#/$defs/_BinaryOp" },
+        { "properties": { "$op": { "const": "lt" } } }
+      ]
+    },
+    "Op_gt": {
+      "allOf": [
+        { "$ref": "#/$defs/_BinaryOp" },
+        { "properties": { "$op": { "const": "gt" } } }
+      ]
+    },
+    "Op_lte": {
+      "allOf": [
+        { "$ref": "#/$defs/_BinaryOp" },
+        { "properties": { "$op": { "const": "lte" } } }
+      ]
+    },
+    "Op_gte": {
+      "allOf": [
+        { "$ref": "#/$defs/_BinaryOp" },
+        { "properties": { "$op": { "const": "gte" } } }
+      ]
+    },
+    "Op_neq": {
+      "allOf": [
+        { "$ref": "#/$defs/_BinaryOp" },
+        { "properties": { "$op": { "const": "neq" } } }
+      ]
+    },
+
+    "Op_not": {
+      "allOf": [
+        { "$ref": "#/$defs/_UnaryOp" },
+        { "properties": { "$op": { "const": "not" } } }
+      ]
+    },
+    "Op_and": {
+      "allOf": [
+        { "$ref": "#/$defs/_BinaryOp" },
+        { "properties": { "$op": { "const": "and" } } }
+      ]
+    },
+    "Op_or": {
+      "allOf": [
+        { "$ref": "#/$defs/_BinaryOp" },
+        { "properties": { "$op": { "const": "or" } } }
+      ]
+    },
+
+    "Op_add": {
+      "allOf": [
+        { "$ref": "#/$defs/_BinaryOp" },
+        { "properties": { "$op": { "const": "add" } } }
+      ]
+    },
+    "Op_sub": {
+      "allOf": [
+        { "$ref": "#/$defs/_BinaryOp" },
+        { "properties": { "$op": { "const": "sub" } } }
+      ]
+    },
+    "Op_mul": {
+      "allOf": [
+        { "$ref": "#/$defs/_BinaryOp" },
+        { "properties": { "$op": { "const": "mul" } } }
+      ]
+    },
+    "Op_div": {
+      "allOf": [
+        { "$ref": "#/$defs/_BinaryOp" },
+        { "properties": { "$op": { "const": "div" } } }
+      ]
+    },
+    "Op_mod": {
+      "allOf": [
+        { "$ref": "#/$defs/_BinaryOp" },
+        { "properties": { "$op": { "const": "mod" } } }
+      ]
+    },
+    "Op_neg": {
+      "allOf": [
+        { "$ref": "#/$defs/_UnaryOp" },
+        { "properties": { "$op": { "const": "neg" } } }
+      ]
+    },
+    "Op_abs": {
+      "allOf": [
+        { "$ref": "#/$defs/_UnaryOp" },
+        { "properties": { "$op": { "const": "abs" } } }
+      ]
+    },
+
+    "Op_concat": {
+      "type": "object",
+      "required": ["$op", "$parts"],
+      "properties": {
+        "$op":    { "const": "concat" },
+        "$parts": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/Projection" }
+        }
+      },
+      "additionalProperties": false
+    },
+
+    "Op_length": {
+      "allOf": [
+        { "$ref": "#/$defs/_UnaryOp" },
+        { "properties": { "$op": { "const": "length" } } }
+      ]
+    },
+
+    "Op_substring": {
+      "type": "object",
+      "required": ["$op", "$value", "$start"],
+      "properties": {
+        "$op":     { "const": "substring" },
+        "$value":  { "$ref": "#/$defs/Projection" },
+        "$start":  { "$ref": "#/$defs/Projection" },
+        "$end":    { "$ref": "#/$defs/Projection" }
+      },
+      "additionalProperties": false
+    },
+
+    "Op_upper": {
+      "allOf": [
+        { "$ref": "#/$defs/_UnaryOp" },
+        { "properties": { "$op": { "const": "upper" } } }
+      ]
+    },
+    "Op_lower": {
+      "allOf": [
+        { "$ref": "#/$defs/_UnaryOp" },
+        { "properties": { "$op": { "const": "lower" } } }
+      ]
+    },
+
+    "Op_typeof": {
+      "allOf": [
+        { "$ref": "#/$defs/_UnaryOp" },
+        { "properties": { "$op": { "const": "typeof" } } }
+      ]
+    },
+
+    "Op_coalesce": {
+      "type": "object",
+      "required": ["$op", "$value", "$default"],
+      "properties": {
+        "$op":       { "const": "coalesce" },
+        "$value":    { "$ref": "#/$defs/Projection" },
+        "$default":  { "$ref": "#/$defs/Projection" }
+      },
+      "additionalProperties": false
+    },
+
+    "Op_has": {
+      "type": "object",
+      "required": ["$op", "$key", "$in"],
+      "properties": {
+        "$op":  { "const": "has" },
+        "$key": { "$ref": "#/$defs/Projection" },
+        "$in":  { "$ref": "#/$defs/Projection" }
+      },
+      "additionalProperties": false
+    },
+
+    "Op_sort": {
+      "type": "object",
+      "required": ["$op", "$value"],
+      "properties": {
+        "$op":    { "const": "sort" },
+        "$value": { "$ref": "#/$defs/Projection" },
+        "$by":    { "$ref": "#/$defs/Projection" },
+        "$desc":  { "$ref": "#/$defs/Projection" }
+      },
+      "additionalProperties": false
+    },
+
+    "Op_lookup": {
+      "type": "object",
+      "required": ["$op", "$key", "$in"],
+      "properties": {
+        "$op":  { "const": "lookup" },
+        "$key": { "$ref": "#/$defs/Projection" },
+        "$in":  { "$ref": "#/$defs/Projection" }
+      },
+      "additionalProperties": false
+    },
+
+    "Op_merge": {
+      "allOf": [
+        { "$ref": "#/$defs/_BinaryOp" },
+        { "properties": { "$op": { "const": "merge" } } }
+      ]
+    }
+  }
+}
