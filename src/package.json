@@ -1,8 +1,11 @@
 {
-  "name": "jm2mp",
-  "version": "0.3.0",
-  "description": "Lenguaje declarativo de proyecciones JSON con álgebra de operadores y soporte multi-sintaxis (nativa, JSONPath, JSONata, JSON Query, JSON Pointer, JMESPath).",
+  "name": "@lcamara8-uned/jm2mp",
+  "version": "1.0.0",
+  "description": "JSON Mode-to-Model Projections (JM2MP).",
+  "author": "lcamara8@alumno.uned.es",
+  "license": "MIT",
   "type": "module",
+  "private": true,
   "main": "./index.js",
   "exports": {
     ".": "./index.js",
@@ -17,12 +20,20 @@
     "test:coverage": "node --test --experimental-test-coverage --test-coverage-include='./**/*.js' ./test/",
     "test:coverage-lcov": "node --test --experimental-test-coverage --test-reporter=lcov --test-reporter-destination=coverage.lcov --test-coverage-include='./**/*.js' ./test/"
   },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/LCamara8-UNED/paper-jm2mp-js"
+  },
   "optionalDependencies": {
     "jsonpath-plus": "10.x",
     "jsonata": "2.x",
     "@jsonquerylang/jsonquery": "4.x",
     "json-pointer": "0.6.x",
     "jmespath": "0.16.x"
+  },
+  "homepage": "https://github.com/LCamara8-UNED/paper-jm2mp-js#readme",
+  "bugs": {
+    "url": "https://github.com/LCamara8-UNED/paper-jm2mp-js/issues"
   },
   "keywords": [
     "jm2mp",
@@ -38,6 +49,5 @@
     "jmespath",
     "algebra",
     "functional"
-  ],
-  "license": "MIT"
+  ]
 }
