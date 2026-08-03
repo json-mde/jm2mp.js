@@ -1,0 +1,35 @@
+{
+    "centro": "Academia Madrid",
+    "periodo": "2026-Q1",
+    "nota_aprobado": 5.0,
+    "cursos": {
+      "ALG-101": {
+        "titulo": "Álgebra lineal",
+        "creditos": 6,
+        "inscripciones": [
+          { "alumno": "Luis María", "nota": 7.5 },
+          { "alumno": "Inés",       "nota": 4.0 },
+          { "alumno": "Marta",      "nota": 8.5 },
+          { "alumno": "Pedro",      "nota": null }
+        ]
+      },
+      "PROG-201": {
+        "titulo": "Programación funcional",
+        "creditos": 9,
+        "inscripciones": [
+          { "alumno": "Luis María", "nota": 9.0 },
+          { "alumno": "Marta",      "nota": 6.5 },
+          { "alumno": "Pedro",      "nota": 5.5 }
+        ]
+      },
+      "BD-301": {
+        "titulo": "Bases de datos",
+        "creditos": 6,
+        "inscripciones": [
+          { "alumno": "Inés",  "nota": 7.0 },
+          { "alumno": "Marta", "nota": 3.0 },
+          { "alumno": "Pedro", "nota": 8.0 }
+        ]
+      }
+    }
+  }

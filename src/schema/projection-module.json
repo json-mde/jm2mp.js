@@ -1,8 +1,8 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://example.org/schemas/projection-module.json",
-  "title": "Projection Module",
-  "description": "Módulo de proyecciones JSON. Un módulo es un objeto con plantillas, donde la plantilla raíz '@' es el punto de entrada de la transformación. Las plantillas con nombre son funciones invocables vía $call. Las claves $options y $schema son metadata del módulo.",
+  "$id": "https://json-mde.tech/schemas/jm2mp.json",
+  "title": "JSON Model-to-Model Projection (JM2MP) v1.0.0 JSON Schema (Draft 2020-12).",
+  "description": "JSON Schema for JM2MP projection modules. A module is an object with named templates (like callable functions), a root template (named '@' as entry point for transformations), and optional properties '$options' and '$schema' for metadata.",
 
   "$ref": "#/$defs/Module",
 
@@ -40,25 +40,26 @@
     },
 
     "Projection": {
-      "description": "Cualquier valor JSON: literal, array de proyecciones, objeto literal o objeto-operación.",
+      "description": "A projection is any JSON value: a literal constant (scalar, array or object) or an operation.",
       "oneOf": [
         { "type": "null" },
         { "type": "boolean" },
         { "type": "number" },
         { "type": "string" },
         { "$ref": "#/$defs/ArrayProjection" },
-        { "$ref": "#/$defs/Operation" },
-        { "$ref": "#/$defs/LiteralObject" }
+        { "$ref": "#/$defs/LiteralObject" },
+        { "$ref": "#/$defs/Operation" }
       ]
     },
 
     "ArrayProjection": {
+      "description": "A literal array, where all its items are always considered as projections.",
       "type": "array",
       "items": { "$ref": "#/$defs/Projection" }
     },
 
     "LiteralObject": {
-      "description": "Objeto sin claves operacionales. Las claves que comienzan por '$' deben escaparse con '\\$'.",
+      "description": "A literal object without operations. Keys that wanted to start by '$' must be escaped using '\\$'.",
       "type": "object",
       "patternProperties": {
         "^(?!\\$)": { "$ref": "#/$defs/Projection" },
@@ -68,7 +69,7 @@
     },
 
     "Operation": {
-      "description": "Objeto-operación: tiene una clave $op con string discriminador y argumentos prefijados con '$'.",
+      "description": "A template command that represents an JM2MP operation: its '$op' key names the operator and every argument starts always by prefix '$'.",
       "type": "object",
       "required": ["$op"],
       "properties": {
@@ -115,7 +116,7 @@
     },
 
     "_BinaryOp": {
-      "description": "Plantilla para operadores binarios con $left y $right.",
+      "description": "Schema template used for binary operators: {$op,$left,$right}.",
       "type": "object",
       "required": ["$op", "$left", "$right"],
       "properties": {
@@ -127,7 +128,7 @@
     },
 
     "_UnaryOp": {
-      "description": "Plantilla para operadores unarios con $value.",
+      "description": "Schema template used for unary operators: {$op,$value}.",
       "type": "object",
       "required": ["$op", "$value"],
       "properties": {
@@ -138,6 +139,7 @@
     },
 
     "Op_pipe": {
+      "description": "PIPE template command: sequential projection composition.",
       "type": "object",
       "required": ["$op", "$stages"],
       "properties": {
@@ -151,12 +153,14 @@
     },
 
     "Op_get": {
+      "description": "GET template command: value accesor by path.",
       "type": "object",
       "required": ["$op", "$path"],
       "properties": {
         "$op": { "const": "get" },
         "$path": {
           "oneOf": [
+            { "type": "string" },
             {
               "type": "array",
               "items": {
@@ -165,8 +169,7 @@
                   { "type": "integer", "minimum": 0 }
                 ]
               }
-            },
-            { "type": "string" }
+            }
           ]
         },
         "$syntax": {
@@ -179,18 +182,20 @@
     },
 
     "Op_if": {
+      "description": "IF template command: conditional projection (boolean anhilitation).",
       "type": "object",
       "required": ["$op", "$cond", "$then", "$else"],
       "properties": {
-        "$op":    { "const": "if" },
-        "$cond":  { "$ref": "#/$defs/Projection" },
-        "$then":  { "$ref": "#/$defs/Projection" },
+        "$op":   { "const": "if" },
+        "$cond": { "$ref": "#/$defs/Projection" },
+        "$then": { "$ref": "#/$defs/Projection" },
         "$else": { "$ref": "#/$defs/Projection" }
       },
       "additionalProperties": false
     },
 
     "Op_fold": {
+      "description": "FOLDARR template command: catamorphism of arrays.",
       "type": "object",
       "required": ["$op", "$over", "$init", "$step"],
       "properties": {
@@ -203,6 +208,7 @@
     },
 
     "Op_foldObj": {
+      "description": "FOLDOBJ template command: catamorphism of objects.",
       "type": "object",
       "required": ["$op", "$over", "$init", "$step"],
       "properties": {
@@ -215,6 +221,7 @@
     },
 
     "Op_cons": {
+      "description": "CONS template command: dynamic insertion of new items into existing arrays.",
       "type": "object",
       "required": ["$op", "$head", "$tail"],
       "properties": {
@@ -226,6 +233,7 @@
     },
 
     "Op_insert": {
+      "description": "INSERT template command: dynamic addition of new propierties into existing objects.",
       "type": "object",
       "required": ["$op", "$key", "$value", "$into"],
       "properties": {
@@ -238,6 +246,7 @@
     },
 
     "Op_let": {
+      "description": "LET template command: value bindings for aliases.",
       "type": "object",
       "required": ["$op", "$bindings", "$in"],
       "properties": {
@@ -255,6 +264,7 @@
     },
 
     "Op_call": {
+      "description": "CALL template command: for invoking named templates.",
       "type": "object",
       "required": ["$op", "$ref"],
       "properties": {
@@ -268,99 +278,128 @@
       "additionalProperties": false
     },
 
-    "Op_eq": {
-      "allOf": [
-        { "$ref": "#/$defs/_BinaryOp" },
-        { "properties": { "$op": { "const": "eq" } } }
-      ]
-    },
-    "Op_lt": {
-      "allOf": [
-        { "$ref": "#/$defs/_BinaryOp" },
-        { "properties": { "$op": { "const": "lt" } } }
-      ]
-    },
-    "Op_gt": {
-      "allOf": [
-        { "$ref": "#/$defs/_BinaryOp" },
-        { "properties": { "$op": { "const": "gt" } } }
-      ]
-    },
-    "Op_lte": {
-      "allOf": [
-        { "$ref": "#/$defs/_BinaryOp" },
-        { "properties": { "$op": { "const": "lte" } } }
-      ]
-    },
-    "Op_gte": {
-      "allOf": [
-        { "$ref": "#/$defs/_BinaryOp" },
-        { "properties": { "$op": { "const": "gte" } } }
-      ]
-    },
-    "Op_neq": {
-      "allOf": [
-        { "$ref": "#/$defs/_BinaryOp" },
-        { "properties": { "$op": { "const": "neq" } } }
-      ]
-    },
-
     "Op_not": {
+      "description": "Logic predicate NOT: negation of a boolean value.",
       "allOf": [
         { "$ref": "#/$defs/_UnaryOp" },
         { "properties": { "$op": { "const": "not" } } }
       ]
     },
+
     "Op_and": {
+      "description": "Logic predicate AND: disjuntion of two boolean values.",
       "allOf": [
         { "$ref": "#/$defs/_BinaryOp" },
         { "properties": { "$op": { "const": "and" } } }
       ]
     },
+
     "Op_or": {
+      "description": "Logic predicate OR: conjuntion of two boolean values.",
       "allOf": [
         { "$ref": "#/$defs/_BinaryOp" },
         { "properties": { "$op": { "const": "or" } } }
       ]
     },
 
+    "Op_eq": {
+      "description": "Logic predicate EQ: (deep) equality of values.",
+      "allOf": [
+        { "$ref": "#/$defs/_BinaryOp" },
+        { "properties": { "$op": { "const": "eq" } } }
+      ]
+    },
+
+    "Op_lt": {
+      "description": "Logic predicate LT: less-than operation between two scalar values.",
+      "allOf": [
+        { "$ref": "#/$defs/_BinaryOp" },
+        { "properties": { "$op": { "const": "lt" } } }
+      ]
+    },
+
+    "Op_gt": {
+      "description": "Logic predicate LT: greater-than operation between two scalar values.",
+      "allOf": [
+        { "$ref": "#/$defs/_BinaryOp" },
+        { "properties": { "$op": { "const": "gt" } } }
+      ]
+    },
+
+    "Op_lte": {
+      "description": "Logic predicate LTE: less-than-or-equal operation between two scalar values.",
+      "allOf": [
+        { "$ref": "#/$defs/_BinaryOp" },
+        { "properties": { "$op": { "const": "lte" } } }
+      ]
+    },
+
+    "Op_gte": {
+      "description": "Logic predicate GTE: greater-than-or-equal operation between two scalar values.",
+      "allOf": [
+        { "$ref": "#/$defs/_BinaryOp" },
+        { "properties": { "$op": { "const": "gte" } } }
+      ]
+    },
+
+    "Op_neq": {
+      "description": "Logic predicate NEQ: not-equal operation between two scalar values.",
+      "allOf": [
+        { "$ref": "#/$defs/_BinaryOp" },
+        { "properties": { "$op": { "const": "neq" } } }
+      ]
+    },
+
     "Op_add": {
+      "description": "ADD operator: addition operation between two scalar values of the same type.",
       "allOf": [
         { "$ref": "#/$defs/_BinaryOp" },
         { "properties": { "$op": { "const": "add" } } }
       ]
     },
+
     "Op_sub": {
+      "description": "SUB operator: substraction operation between two scalar values of the same type.",
       "allOf": [
         { "$ref": "#/$defs/_BinaryOp" },
         { "properties": { "$op": { "const": "sub" } } }
       ]
     },
+
     "Op_mul": {
+      "description": "MUL operator: multiplication operation between two scalar values of the same type.",
       "allOf": [
         { "$ref": "#/$defs/_BinaryOp" },
         { "properties": { "$op": { "const": "mul" } } }
       ]
     },
+
     "Op_div": {
+      "description": "DIV operator: division operation between two scalar values of the same type.",
       "allOf": [
         { "$ref": "#/$defs/_BinaryOp" },
         { "properties": { "$op": { "const": "div" } } }
       ]
     },
+
     "Op_mod": {
+      "description": "MOD operator: modulus operation between two scalar values of the same type.",
       "allOf": [
         { "$ref": "#/$defs/_BinaryOp" },
         { "properties": { "$op": { "const": "mod" } } }
       ]
     },
+
     "Op_neg": {
+      "description": "NEG operator: negation operation of a boolean or numeric scalar value.",
       "allOf": [
         { "$ref": "#/$defs/_UnaryOp" },
         { "properties": { "$op": { "const": "neg" } } }
       ]
     },
+
     "Op_abs": {
+      "description": "ABS operator: absolute operation of a numeric scalar value.",
       "allOf": [
         { "$ref": "#/$defs/_UnaryOp" },
         { "properties": { "$op": { "const": "abs" } } }
@@ -368,6 +407,7 @@
     },
 
     "Op_concat": {
+      "description": "CONCAT operator: string concatenation of scalar values.",
       "type": "object",
       "required": ["$op", "$parts"],
       "properties": {
@@ -381,6 +421,7 @@
     },
 
     "Op_length": {
+      "description": "LENGHT operator: get string's length of a scalar value.",
       "allOf": [
         { "$ref": "#/$defs/_UnaryOp" },
         { "properties": { "$op": { "const": "length" } } }
@@ -388,6 +429,7 @@
     },
 
     "Op_substring": {
+      "description": "SUBSTRING operator: it gets a sub-string from specified start up to an end of a scalar value.",
       "type": "object",
       "required": ["$op", "$value", "$start"],
       "properties": {
@@ -400,12 +442,15 @@
     },
 
     "Op_upper": {
+      "description": "UPPER operator: it gets a string with all its characters as upper letters from a scalar value.",
       "allOf": [
         { "$ref": "#/$defs/_UnaryOp" },
         { "properties": { "$op": { "const": "upper" } } }
       ]
     },
+
     "Op_lower": {
+      "description": "LOWER operator: it gets a string with all its characters as lower letters from a scalar value.",
       "allOf": [
         { "$ref": "#/$defs/_UnaryOp" },
         { "properties": { "$op": { "const": "lower" } } }
@@ -413,6 +458,7 @@
     },
 
     "Op_typeof": {
+      "description": "TYPEOF operator: it gets the data type a JSON value.",
       "allOf": [
         { "$ref": "#/$defs/_UnaryOp" },
         { "properties": { "$op": { "const": "typeof" } } }
@@ -420,6 +466,7 @@
     },
 
     "Op_coalesce": {
+      "description": "COALESCE operator: it gets a value if it is not null; otherwise, it returns a default value.",
       "type": "object",
       "required": ["$op", "$value", "$default"],
       "properties": {
@@ -431,6 +478,7 @@
     },
 
     "Op_has": {
+      "description": "HAS operator: it determines if an object value has the specified key.",
       "type": "object",
       "required": ["$op", "$key", "$in"],
       "properties": {
@@ -442,6 +490,7 @@
     },
 
     "Op_sort": {
+      "description": "SORT operator: it sorts complex types (array's items or object's keys) using an ascending or descending criteria.",
       "type": "object",
       "required": ["$op", "$value"],
       "properties": {
@@ -454,6 +503,7 @@
     },
 
     "Op_lookup": {
+      "description": "LOOKUP operator: it gets the specified key's value of an object (without traversing entire object using FOLDOBJ).",
       "type": "object",
       "required": ["$op", "$key", "$in"],
       "properties": {
@@ -465,6 +515,7 @@
     },
 
     "Op_merge": {
+      "description": "MERGE operator: it merges two complex types (array's items or object's keys) avoiding traversal calculations (FOLDARR or FOLDOBJ).",
       "allOf": [
         { "$ref": "#/$defs/_BinaryOp" },
         { "properties": { "$op": { "const": "merge" } } }

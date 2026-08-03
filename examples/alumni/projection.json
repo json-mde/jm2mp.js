@@ -1,0 +1,123 @@
+{
+    "@": {
+        "centro":  { "$op": "get", "$path": "$.centro"  },
+        "periodo": { "$op": "get", "$path": "$.periodo" },
+        "alumnos": {
+            "$op": "foldObj",
+            "$over": {
+                "$op": "foldObj",
+                "$over": { "$op": "get", "$path": "$.cursos" },
+                "$init": {},
+                "$step": {
+                    "$op": "let",
+                    "$bindings": {
+                        "creditos": { "$op": "get", "$path": "@.value.creditos" }
+                    },
+                    "$in": {
+                        "$op": "fold",
+                        "$over": { "$op": "get", "$path": "@.value.inscripciones" },
+                        "$init": { "$op": "get", "$path": "@.acc" },
+                        "$step": {
+                            "$op": "if",
+                            "$cond": {
+                                "$op": "eq",
+                                "$left": { "$op": "get", "$path": "@.item.nota" },
+                                "$right": null
+                            },
+                            "$then": { "$op": "get", "$path": "@.acc" },
+                            "$else": {
+                                "$op": "let",
+                                "$bindings": {
+                                    "alumno": { "$op": "get", "$path": "@.item.alumno" },
+                                    "nota":   { "$op": "get", "$path": "@.item.nota" },
+                                    "accI":   { "$op": "get", "$path": "@.acc" }
+                                },
+                                "$in": {
+                                    "$op": "let",
+                                    "$bindings": {
+                                        "previo": {
+                                            "$op": "lookup",
+                                            "$key": { "$op": "get", "$path": "%alumno" },
+                                            "$in": { "$op": "get", "$path": "%accI" }
+                                        }
+                                    },
+                                    "$in": {
+                                        "$op": "insert",
+                                        "$key": { "$op": "get", "$path": "%alumno" },
+                                        "$value": {
+                                            "creditos_aprobados": {
+                                                "$op": "add",
+                                                "$left": {
+                                                    "$op": "coalesce",
+                                                    "$value": {
+                                                        "$op": "lookup",
+                                                        "$key": "creditos_aprobados",
+                                                        "$in": { "$op": "get", "$path": "%previo" }
+                                                    },
+                                                    "$default": 0
+                                                },
+                                                "$right": {
+                                                    "$op": "if",
+                                                    "$cond": {
+                                                        "$op": "gte",
+                                                        "$left":  { "$op": "get", "$path": "%nota" },
+                                                        "$right": { "$op": "get", "$path": "$.nota_aprobado" }
+                                                    },
+                                                    "$then": { "$op": "get", "$path": "%creditos" },
+                                                    "$else": 0
+                                                }
+                                            },
+                                            "suma_notas": {
+                                                "$op": "add",
+                                                "$left": {
+                                                    "$op": "coalesce",
+                                                    "$value": {
+                                                        "$op": "lookup",
+                                                        "$key": "suma_notas",
+                                                        "$in": { "$op": "get", "$path": "%previo" }
+                                                    },
+                                                    "$default": 0
+                                                },
+                                                "$right": { "$op": "get", "$path": "%nota" }
+                                            },
+                                            "cursos_terminados": {
+                                                "$op": "add",
+                                                "$left": {
+                                                    "$op": "coalesce",
+                                                    "$value": {
+                                                        "$op": "lookup",
+                                                        "$key": "cursos_terminados",
+                                                        "$in": { "$op": "get", "$path": "%previo" }
+                                                    },
+                                                    "$default": 0
+                                                },
+                                                "$right": 1
+                                            }
+                                        },
+                                        "$into": { "$op": "get", "$path": "%accI" }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "$init": {},
+            "$step": {
+                "$op": "insert",
+                "$key": { "$op": "get", "$path": "@.key" },
+                "$value": {
+                    "creditos_aprobados": { "$op": "get", "$path": "@.value.creditos_aprobados" },
+                    "suma_notas": { "$op": "get", "$path": "@.value.suma_notas" },
+                    "cursos_terminados": { "$op": "get", "$path": "@.value.cursos_terminados" },
+                    "nota_media": {
+                        "$op": "div",
+                        "$left":  { "$op": "get", "$path": "@.value.suma_notas" },
+                        "$right": { "$op": "get", "$path": "@.value.cursos_terminados" }
+                    }
+                },
+                "$into": { "$op": "get", "$path": "@.acc" }
+            }
+        }
+    }
+}

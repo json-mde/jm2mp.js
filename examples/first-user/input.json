@@ -1,0 +1,6 @@
+{
+    "Users": [
+        { "name": "Luis Maria", "emails": ["Uno", "Dos"] },
+        { "name": "Inés",       "emails": ["Tres", "Cuatro"] }
+    ]
+}

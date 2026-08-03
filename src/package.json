@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "JSON Mode-to-Model Projections (JM2MP).",
   "author": "lcamara8@alumno.uned.es",
-  "license": "MIT",
+  "license": "BSD-3-Clause",
   "type": "module",
   "private": true,
   "main": "./index.js",
@@ -25,29 +25,33 @@
     "url": "git+https://github.com/LCamara8-UNED/paper-jm2mp-js"
   },
   "optionalDependencies": {
-    "jsonpath-plus": "10.x",
-    "jsonata": "2.x",
     "@jsonquerylang/jsonquery": "4.x",
+    "jmespath": "0.16.x",
     "json-pointer": "0.6.x",
-    "jmespath": "0.16.x"
+    "jsonata": "2.x",
+    "jsonpath-plus": "10.x"
   },
-  "homepage": "https://github.com/LCamara8-UNED/paper-jm2mp-js#readme",
+  "homepage": "https://github.com/JSON-MDE/SoftwareX-2026-JM2MP.JS#readme",
   "bugs": {
-    "url": "https://github.com/LCamara8-UNED/paper-jm2mp-js/issues"
+    "url": "https://github.com/JSON-MDE/SoftwareX-2026-JM2MP.JS/issues"
   },
   "keywords": [
     "jm2mp",
     "json",
     "projection",
     "transformation",
+    "algebra",
+    "algebraic",
     "declarative",
+    "functional",
     "jsonpath",
     "jsonata",
     "jsonquery",
     "jsonpointer",
     "rfc6901",
-    "jmespath",
-    "algebra",
-    "functional"
-  ]
+    "jmespath"
+  ],
+  "devDependencies": {
+    "jsdoc": "4.0.x"
+  }
 }

@@ -1,0 +1,65 @@
+{
+    "@": {
+        "almacen": { "$op": "get", "$path": "$.almacen" },
+        "valor_total_inventario": {
+            "$op": "foldObj",
+            "$over": { "$op": "get", "$path": "$.productos" },
+            "$init": 0,
+            "$step": {
+                "$op": "add",
+                "$left": { "$op": "get", "$path": "@.acc" },
+                "$right": {
+                    "$op": "mul",
+                    "$left":  { "$op": "get", "$path": "@.value.stock" },
+                    "$right": { "$op": "get", "$path": "@.value.precio" }
+                }
+            }
+        },
+        "productos_criticos": {
+            "$op": "foldObj",
+            "$over": { "$op": "get", "$path": "$.productos" },
+            "$init": {},
+            "$step": {
+                "$op": "if",
+                "$cond": {
+                    "$op": "lte",
+                    "$left": { "$op": "get", "$path": "@.value.stock" },
+                    "$right": { "$op": "get", "$path": "$.umbral_critico" }
+                },
+                "$then": {
+                    "$op": "insert",
+                    "$key": { "$op": "get", "$path": "@.key" },
+                    "$value": {
+                        "nombre": { "$op": "get", "$path": "@.value.nombre" },
+                        "stock": { "$op": "get", "$path": "@.value.stock" }
+                    },
+                    "$into": { "$op": "get", "$path": "@.acc" }
+                },
+                "$else": { "$op": "get", "$path": "@.acc" }
+            }
+        },
+        "stock_por_categoria": {
+            "$op": "foldObj",
+            "$over": { "$op": "get", "$path": "$.productos" },
+            "$init": {},
+            "$step": {
+                "$op": "insert",
+                "$key": { "$op": "get", "$path": "@.value.categoria" },
+                "$value": {
+                    "$op": "add",
+                    "$left": {
+                        "$op": "coalesce",
+                        "$value": {
+                            "$op": "lookup",
+                            "$key": { "$op": "get", "$path": "@.value.categoria" },
+                            "$in": { "$op": "get", "$path": "@.acc" }
+                        },
+                        "$default": 0
+                    },
+                    "$right": { "$op": "get", "$path": "@.value.stock" }
+                },
+                "$into": { "$op": "get", "$path": "@.acc" }
+            }
+        }
+    }
+}

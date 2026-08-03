@@ -1,0 +1,12 @@
+{
+  "almacen": "Madrid-01",
+  "umbral_critico": 10,
+  "productos": {
+    "SKU-A100": { "nombre": "Teclado mecánico",      "categoria": "perifericos", "stock": 45, "precio":  89.90 },
+    "SKU-A101": { "nombre": "Ratón inalámbrico",     "categoria": "perifericos", "stock":  8, "precio":  35.00 },
+    "SKU-B200": { "nombre": "Monitor 27 pulgadas",   "categoria": "pantallas",   "stock": 12, "precio": 320.00 },
+    "SKU-B201": { "nombre": "Monitor 32 pulgadas",   "categoria": "pantallas",   "stock":  3, "precio": 480.00 },
+    "SKU-C300": { "nombre": "Webcam HD",             "categoria": "perifericos", "stock":  0, "precio":  65.00 },
+    "SKU-D400": { "nombre": "Auriculares Bluetooth", "categoria": "audio",       "stock": 25, "precio": 120.00 }
+  }
+}
