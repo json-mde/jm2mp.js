@@ -113,13 +113,18 @@ export function isValidName(name)
 }
 
 /**
+ * *typedef {import("./adapters/registry.js").AdapterRegistry} AdapterRegistry
+ * @typedef {object} AdapterRegistry
+ **/
+
+/**
  * Valida un módulo resuelto y todas sus plantillas.
  *
  * Esta función es ASÍNCRONA porque internamente puede invocar
  * adapter.validate() de adaptadores que son async.
  *
  * @param {object} module - Módulo resuelto.
- * @param {import("./adapters/registry.js").AdapterRegistry} registry
+ * @param {AdapterRegistry} registry
  * @returns {Promise<void>}
  */
 export async function validateModule(module, registry)

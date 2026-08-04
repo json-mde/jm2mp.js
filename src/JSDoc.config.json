@@ -13,12 +13,13 @@
     "recurse": true,
     "tutorials": "./doc/tutorials/",
     "readme": "./README.md",
-    "package": "./src/package.json"
+    "package": "./src/package.json",
+    "verbose": true
   },
   "recurseDepth": 100,
   "source": {
-    "includePattern": ".+\\.js(doc|x)?$",
-    "excludePattern": "(^|\\/|\\\\)_"
+    "includePattern": ".+\\.(c|m)?js(doc|x)?$",
+    "excludePattern": "(node_modules)|(test)|((^|\\/|\\\\)_)"
   },
   "tags": {
     "allowUnknownTags": true,
