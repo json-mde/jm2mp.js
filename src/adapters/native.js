@@ -1,4 +1,8 @@
 /**
+ * @author Luis Maria CAMARA ROSSI
+ * @copyright Universidad Nacional de Educación a Distancia (U.N.E.D.) 2026
+ * @license BSD-3-Clause
+ * @module adapters/native
  * @file Adaptador para la sintaxis nativa del lenguaje.
  *
  * Es el adaptador de REFERENCIA: define el contrato de comportamiento
@@ -23,7 +27,7 @@ import { parsePath, navigate } from "../paths.js";
 /**
  * Crea el adaptador para la sintaxis nativa.
  *
- * @returns {import("./registry.js").QueryAdapter}
+ * @returns {module:registry.QueryAdapter}
  */
 export function createNativeAdapter() {
   return {

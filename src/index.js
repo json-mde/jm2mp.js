@@ -1,4 +1,8 @@
 /**
+ * @author Luis Maria CAMARA ROSSI
+ * @copyright Universidad Nacional de Educación a Distancia (U.N.E.D.) 2026
+ * @license BSD-3-Clause
+ * @module index
  * @file API pública del sistema de proyecciones.
  *
  * Exporta:
@@ -115,7 +119,8 @@ import { createNativeAdapter } from "./adapters/native.js";
  *   Registrar JSON Pointer / RFC 6901 (requiere `json-pointer`).
  * @param {boolean} [defaultAdaptersToLoad.jmespath=false]
  *   Registrar JMESPath (requiere `jmespath`).
- * @param {...(import("./adapters/registry.js").QueryAdapter | Function)} otherAdaptersToLoad
+ * @param {...(QueryAdapter | Function)} otherAdaptersToLoad
+ * *param {...(import("./adapters/registry.js").QueryAdapter | Function)} otherAdaptersToLoad
  *   Adaptadores adicionales: objetos ya construidos o funciones que los crean.
  * @returns {Promise<AdapterRegistry>}
  */
@@ -168,6 +173,10 @@ export async function createAdapterRegistry(
   return registry;
 }
 
+/**
+ * *typedef {(name: string) => Promise<object>} AsyncLoaderFunction
+ * @typedef {Function} AsyncLoaderFunction
+ **/
 
 /**
  * Función de conveniencia (NIVEL ALTO): resuelve, valida y evalúa.
@@ -177,7 +186,7 @@ export async function createAdapterRegistry(
  *
  * @param {object} params
  * @param {string} params.rootName - Nombre del módulo raíz.
- * @param {(name: string) => Promise<object>} params.loader - Loader de módulos.
+ * @param {AsyncLoaderFunction} params.loader - Loader de módulos.
  * @param {*} params.document - Documento JSON de origen.
  * @param {AdapterRegistry} [params.registry] - Si se omite, se crea uno con
  *   solo el adaptador nativo.

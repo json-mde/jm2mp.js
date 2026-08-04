@@ -1,4 +1,8 @@
 /**
+ * @author Luis Maria CAMARA ROSSI
+ * @copyright Universidad Nacional de Educación a Distancia (U.N.E.D.) 2026
+ * @license BSD-3-Clause
+ * @module test/integration/cursos_alumnos
  * @file Test de integración: ejercicio 3 (cursos × alumnos con $let).
  *
  * Reproduce el ejercicio donde la información dispersa en cursos × inscripciones

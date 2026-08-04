@@ -1,4 +1,8 @@
 /**
+ * @author Luis Maria CAMARA ROSSI
+ * @copyright Universidad Nacional de Educación a Distancia (U.N.E.D.) 2026
+ * @license BSD-3-Clause
+ * @module test/unit/adapter/jmespath
  * @file Tests específicos del adaptador JMESPath.
  *
  * Estos tests son COMPLEMENTARIOS al de contrato

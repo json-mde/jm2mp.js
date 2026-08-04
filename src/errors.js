@@ -1,4 +1,8 @@
 /**
+ * @author Luis Maria CAMARA ROSSI
+ * @copyright Universidad Nacional de Educación a Distancia (U.N.E.D.) 2026
+ * @license BSD-3-Clause
+ * @module errors
  * @file Jerarquía de errores específicos del dominio del lenguaje de proyecciones.
  *
  * Todos los errores derivan de ProjectionError, lo que permite a los consumidores

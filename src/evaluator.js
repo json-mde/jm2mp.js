@@ -1,4 +1,8 @@
 /**
+ * @author Luis Maria CAMARA ROSSI
+ * @copyright Universidad Nacional de Educación a Distancia (U.N.E.D.) 2026
+ * @license BSD-3-Clause
+ * @module evaluator
  * @file Evaluador del lenguaje de proyecciones.
  *
  * Dado un módulo resuelto y normalizado, evalúa la plantilla raíz "@" sobre
@@ -42,7 +46,8 @@ const DEFAULT_MAX_DEPTH = 1000;
  * @param {object} module - Módulo resuelto y normalizado.
  * @param {*} document - Documento JSON de origen.
  * @param {object} options
- * @param {import("./adapters/registry.js").AdapterRegistry} options.registry
+ * @param {AdapterRegistry} options.registry
+ * *param {import("./adapters/registry.js").AdapterRegistry} options.registry
  * @param {number} [options.maxDepth=1000]
  * @returns {Promise<*>} Resultado de aplicar la plantilla raíz.
  */

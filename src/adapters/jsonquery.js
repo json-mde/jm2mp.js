@@ -1,4 +1,8 @@
 /**
+ * @author Luis Maria CAMARA ROSSI
+ * @copyright Universidad Nacional de Educación a Distancia (U.N.E.D.) 2026
+ * @license BSD-3-Clause
+ * @module adapters/jsonquery
  * @file Adaptador para sintaxis JSON Query.
  *
  * Versión soportada: @jsonquerylang/jsonquery 4.x EXCLUSIVAMENTE.
@@ -23,7 +27,7 @@ import { AdapterError, ValidationError, EvaluationError } from "../errors.js";
  *
  * Versión soportada: @jsonquerylang/jsonquery 4.x EXCLUSIVAMENTE.
  *
- * @returns {Promise<import("./registry.js").QueryAdapter>}
+ * @returns {Promise<module:registry.QueryAdapter>}
  */
 export async function createJsonQueryAdapter() {
   let jsonquery, parse;

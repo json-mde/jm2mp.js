@@ -1,4 +1,8 @@
 /**
+ * @author Luis Maria CAMARA ROSSI
+ * @copyright Universidad Nacional de Educación a Distancia (U.N.E.D.) 2026
+ * @license BSD-3-Clause
+ * @module adapters/registry
  * @file Registro central de adaptadores de sintaxis.
  *
  * Sistema de extensibilidad por patrón Adapter. Cada sintaxis (nativa,
@@ -21,6 +25,16 @@
 import { AdapterError } from "../errors.js";
 
 /**
+ * @description FallbackPolicyObject
+ *   Objeto descriptivo con documentación legible por humanos del comportamiento del adaptador.
+ * @typedef {object} FallbackPolicyObject
+ * @property {!string} missing
+ * @property {!string} multipleMatches
+ * @property {!string} typeError
+ * @property {!string} nullInput
+ *
+**/
+/**
  * Contrato que todo adaptador de sintaxis debe implementar.
  *
  * @typedef {object} QueryAdapter
@@ -31,11 +45,15 @@ import { AdapterError } from "../errors.js";
  * @property {string} description
  *   Descripción breve para documentación.
  *
- * @property {(path: any) => Promise<void>} validate
+ * *typedef {(path: any) => Promise<void>} ValidateFunction
+ * @typedef {Function} ValidateFunction
+ * @property {ValidateFunction} validate
  *   Valida una expresión $path estáticamente. Lanza ValidationError si
  *   es inválida. Es async para permitir adaptadores cuyo parser es async.
  *
- * @property {(path: any, input: any, cache: Map<string, any>, env: object) => Promise<any>} evaluate
+ * *typedef {(path: any, input: any, cache: Map<string, any>, env: object) => Promise<any>} EvaluateFunction
+ * @typedef {Function} EvaluateFunction
+ * @property {EvaluateFunction} evaluate
  *   Evalúa la expresión sobre el input proporcionado. SIEMPRE async.
  *
  *   Garantías que todo adaptador debe satisfacer (contrato uniforme):
@@ -53,7 +71,7 @@ import { AdapterError } from "../errors.js";
  *   El parámetro `env` es el entorno completo del lenguaje. El adaptador
  *   nativo lo necesita para resolver $/@/%alias; los demás lo ignoran.
  *
- * @property {object} fallbackPolicy
+ * @property {FallbackPolicyObject} fallbackPolicy
  *   Documentación legible por humanos del comportamiento del adaptador.
  *   Campos requeridos: missing, multipleMatches, typeError, nullInput.
  */

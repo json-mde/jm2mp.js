@@ -1,4 +1,4 @@
-Copyright (c) 2026 Luis Maria CAMARA ROSSI.
+Copyright (C) 2026 Luis Maria CAMARA ROSSI.
 Trademark (TM) Copyright (C) 2026 Universidad Nacional de Educación a Distancia (U.N.E.D.).
 
 Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:

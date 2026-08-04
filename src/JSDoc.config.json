@@ -1,0 +1,31 @@
+{
+  "plugins": [
+    "plugins/markdown",
+    "plugins/summarize"
+  ],
+  "sourceType": "module",
+  "opts": {
+    "access": "all",
+    "private": true,
+    "template": "templates/default",
+    "encoding": "utf8",
+    "destination": "./doc/jsdoc-out/",
+    "recurse": true,
+    "tutorials": "./doc/tutorials/",
+    "readme": "./README.md",
+    "package": "./src/package.json"
+  },
+  "recurseDepth": 100,
+  "source": {
+    "includePattern": ".+\\.js(doc|x)?$",
+    "excludePattern": "(^|\\/|\\\\)_"
+  },
+  "tags": {
+    "allowUnknownTags": true,
+    "dictionaries": [ "jsdoc", "closure" ]
+  },
+  "templates": {
+    "cleverLinks": false,
+    "monospaceLinks": false
+  }
+}

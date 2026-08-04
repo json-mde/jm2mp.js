@@ -1,4 +1,8 @@
 /**
+ * @author Luis Maria CAMARA ROSSI
+ * @copyright Universidad Nacional de Educación a Distancia (U.N.E.D.) 2026
+ * @license BSD-3-Clause
+ * @module modules/resolver
  * @file Resolución de módulos: carga, detección de ciclos, normalización
  * por módulo, fusión por importación.
  *
@@ -58,10 +62,15 @@ function importInto(m1, m2) {
 }
 
 /**
+ * *typedef {(name: string) => Promise<object>} LoaderFunction
+ * @typedef {Function} LoaderFunction
+**/
+
+/**
  * Resuelve un módulo a partir de su nombre raíz, usando un loader inyectado.
  *
  * @param {string} rootName - Nombre del módulo raíz.
- * @param {(name: string) => Promise<object>} loader - Función que carga
+ * @param {LoaderFunction} loader - Función que carga
  *   un módulo por nombre. El loader recibe el nombre ORIGINAL (no normalizado)
  *   tal y como apareció en $depends-on.
  * @param {object} [options]

@@ -1,4 +1,8 @@
 /**
+ * @author Luis Maria CAMARA ROSSI
+ * @copyright Universidad Nacional de Educación a Distancia (U.N.E.D.) 2026
+ * @license BSD-3-Clause
+ * @module modules/loaders
  * @file Implementaciones del loader de módulos.
  *
  * Tres loaders predefinidos que satisfacen la interfaz inyectable
@@ -13,12 +17,17 @@
 import { ResolutionError } from "../errors.js";
 
 /**
+ * *typedef {(name: string) => Promise<object>} StringLoaderResult
+ * @typedef {Function} StringLoaderResult
+**/
+
+/**
  * Loader basado en un mapa nombre → string-JSON.
  *
  * Útil para tests y para escenarios donde los módulos están embebidos en código.
  *
  * @param {Object<string, string>} stringMap - Mapa nombre → JSON serializado.
- * @returns {(name: string) => Promise<object>}
+ * @returns {StringLoaderResult}
  */
 export function createStringLoader(stringMap) {
   if (typeof stringMap !== "object" || stringMap === null) {
@@ -48,6 +57,11 @@ export function createStringLoader(stringMap) {
 }
 
 /**
+ * *typedef {Promise<(name: string) => Promise<object>>} FileLoaderResult
+ * @typedef {Function} FileLoaderResult
+**/
+
+/**
  * Loader basado en sistema de ficheros (solo Node.js).
  *
  * Cada nombre se interpreta como ruta relativa al `baseDir` o absoluta.
@@ -57,7 +71,7 @@ export function createStringLoader(stringMap) {
  * @param {object} [options]
  * @param {string} [options.baseDir] - Directorio base. Default: process.cwd().
  * @param {string} [options.encoding="utf8"]
- * @returns {Promise<(name: string) => Promise<object>>}
+ * @returns {FileLoaderResult}
  */
 export async function createFileLoader(options = {}) {
   let fs, path;
@@ -97,6 +111,11 @@ export async function createFileLoader(options = {}) {
 }
 
 /**
+ * *typedef {(name: string) => Promise<object>} UrlLoaderResult
+ * @typedef {Function} UrlLoaderResult
+**/
+
+/**
  * Loader basado en `fetch` (navegador moderno o Node.js 18+).
  *
  * Cada nombre se interpreta como URL absoluta, o relativa a `baseUrl` si se proporciona.
@@ -104,7 +123,7 @@ export async function createFileLoader(options = {}) {
  * @param {object} [options]
  * @param {string} [options.baseUrl] - URL base para resolver nombres relativos.
  * @param {RequestInit} [options.fetchOptions] - Opciones para fetch (headers, credentials, etc.).
- * @returns {(name: string) => Promise<object>}
+ * @returns {UrlLoaderResult}
  */
 export function createUrlLoader(options = {}) {
   if (typeof fetch !== "function") {

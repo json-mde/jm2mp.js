@@ -1,4 +1,8 @@
 /**
+ * @author Luis Maria CAMARA ROSSI
+ * @copyright Universidad Nacional de Educación a Distancia (U.N.E.D.) 2026
+ * @license BSD-3-Clause
+ * @module adapters/jsonata
  * @file Adaptador para sintaxis JSONata.
  *
  * Versión soportada: jsonata 2.x EXCLUSIVAMENTE. Versiones 1.x no están
@@ -36,7 +40,7 @@ import { AdapterError, ParseError, ValidationError, EvaluationError } from "../e
  * @param {number} [options.timeout] - Timeout en milisegundos para cada
  *     evaluación. Si > 0, las evaluaciones que excedan este tiempo lanzan
  *     EvaluationError. Si se omite o es <= 0, no hay timeout.
- * @returns {Promise<import("./registry.js").QueryAdapter>}
+ * @returns {Promise<module:registry.QueryAdapter>}
  */
 export async function createJsonataAdapter(options = {}) {
   let jsonata;

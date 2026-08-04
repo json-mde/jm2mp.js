@@ -1,5 +1,9 @@
 /**
- * JSON Pointer (RFC 6901) — implementación de referencia.
+ * @author Luis Maria CAMARA ROSSI
+ * @copyright Universidad Nacional de Educación a Distancia (U.N.E.D.) 2026
+ * @license BSD-3-Clause
+ * @module adapters/json_pointer_rfc6901_processor
+ * @file JSON Pointer (RFC 6901) — implementación de referencia.
  *
  * Un puntero es una cadena Unicode formada por cero o más "reference tokens"
  * precedidos cada uno por '/'. La cadena vacía referencia el documento raíz.
@@ -8,7 +12,7 @@
  *   '~' -> '~0'
  *   '/' -> '~1'
  * La decodificación debe procesar '~1' antes que '~0' (o equivalente).
- */
+**/
 
 class JsonPointerError extends Error {
   constructor(message, pointer) {

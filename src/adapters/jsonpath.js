@@ -1,4 +1,8 @@
 /**
+ * @author Luis Maria CAMARA ROSSI
+ * @copyright Universidad Nacional de Educación a Distancia (U.N.E.D.) 2026
+ * @license BSD-3-Clause
+ * @module adapters/jsonpath
  * @file Adaptador para sintaxis JSONPath.
  *
  * Versión soportada: jsonpath-plus 10.x EXCLUSIVAMENTE. Otras versiones
@@ -24,7 +28,7 @@ import { AdapterError, ValidationError, EvaluationError } from "../errors.js";
  * Versión soportada: 10.x. Otras versiones (anteriores o posteriores)
  * pueden funcionar pero NO están oficialmente soportadas.
  *
- * @returns {Promise<import("./registry.js").QueryAdapter>}
+ * @returns {Promise<module:registry.QueryAdapter>}
  */
 export async function createJsonPathAdapter() {
   let JSONPath;

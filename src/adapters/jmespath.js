@@ -1,4 +1,8 @@
 /**
+ * @author Luis Maria CAMARA ROSSI
+ * @copyright Universidad Nacional de Educación a Distancia (U.N.E.D.) 2026
+ * @license BSD-3-Clause
+ * @module adapters/jmespath
  * @file Adaptador para sintaxis JMESPath (https://jmespath.org).
  *
  * JMESPath es un lenguaje de consulta declarativo con especificación
@@ -41,16 +45,25 @@
  * mantenemos aquí guarda solo el marcador de "validado al menos una vez"
  * para evitar re-llamar a `compile` desde `evaluate`. No es una cache de
  * AST en sentido estricto.
- */
+**/
 
 import { AdapterError, ValidationError, EvaluationError } from "../errors.js";
+
+/**
+ * @description **jmespath.js** is a JavaScript implementation of **JMESPath**,
+ *              which is a query language for JSON. It will take a JSON document
+ *              and transform it into another JSON document through a JMESPath
+ *              expression.
+ * @external jmespath
+ * @see {@link https://www.npmjs.com/package/jmespath}
+**/
 
 /**
  * Crea el adaptador JMESPath. Carga 'jmespath' dinámicamente.
  *
  * Versión soportada: jmespath 0.16.x.
  *
- * @returns {Promise<import("./registry.js").QueryAdapter>}
+ * @returns {Promise<module:registry.QueryAdapter>}
  */
 export async function createJmesPathAdapter() {
   let jmespath;

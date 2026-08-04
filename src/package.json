@@ -1,18 +1,43 @@
 {
-  "name": "@lcamara8-uned/jm2mp",
+  "name": "@json-mde/jm2mp",
   "version": "1.0.0",
   "description": "JSON Mode-to-Model Projections (JM2MP).",
-  "author": "lcamara8@alumno.uned.es",
   "license": "BSD-3-Clause",
+  "author": {
+    "name": "Luis Maria CAMARA ROSSI",
+    "email": "lcamara8@alumno.uned.es",
+    "url": "https://github.com/LCamara8-UNED/"
+  },
+  "contributors": [
+    {
+      "name": "Elena RUIZ LARROCHA",
+      "email": "elena@issi.uned.es",
+      "url": "https://www.uned.es/universidad/docentes/informatica/elena-ruiz-larrocha.html"
+    },
+    {
+      "name": "Jose Antonio CERRADA SOMOLINOS",
+      "email": "jcerrada@issi.uned.es",
+      "url": "https://www.uned.es/universidad/docentes/informatica/jose-antonio-cerrada-somolinos.html"
+    }
+  ],
+  "homepage": "https://github.com/JSON-MDE/JM2MP.JS#readme",
+  "bugs": {
+    "url": "https://github.com/JSON-MDE/JM2MP.JS/issues"
+  },
   "type": "module",
   "private": true,
-  "main": "./index.js",
-  "exports": {
-    ".": "./index.js",
-    "./schema": "./schema/projection-module.schema.json"
-  },
   "engines": {
     "node": ">=22.0.0"
+  },
+  "main": "./index.js",
+  "bin": {
+    "jm2mp-cli": "cli.js"
+  },
+  "browser": "./web/index.html",
+  "exports": {
+    ".": "./index.js",
+    "./schema": "./schemas/JM2MP-v1.0.0--JSON-Schema-Draft-2020-12.json",
+    "./cli": "./cli.js"
   },
   "scripts": {
     "test": "node --test \"./test/**/*test*.js\"",
@@ -22,7 +47,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/LCamara8-UNED/paper-jm2mp-js"
+    "url": "git+https://github.com/JSON-MDE/SoftwareX-2026-JM2MP.JS.git"
   },
   "optionalDependencies": {
     "@jsonquerylang/jsonquery": "4.x",
@@ -31,15 +56,18 @@
     "jsonata": "2.x",
     "jsonpath-plus": "10.x"
   },
-  "homepage": "https://github.com/JSON-MDE/SoftwareX-2026-JM2MP.JS#readme",
-  "bugs": {
-    "url": "https://github.com/JSON-MDE/SoftwareX-2026-JM2MP.JS/issues"
+  "devDependencies": {
+    "jsdoc": "4.0.x"
   },
   "keywords": [
     "jm2mp",
     "json",
+    "model",
+    "models",
     "projection",
+    "projections",
     "transformation",
+    "transformations",
     "algebra",
     "algebraic",
     "declarative",
@@ -51,7 +79,14 @@
     "rfc6901",
     "jmespath"
   ],
-  "devDependencies": {
-    "jsdoc": "4.0.x"
-  }
+  "funding":[
+    {
+      "type" : "Aldeas Infantiles SOS de España",
+      "url"  : "https://www.aldeasinfantiles.es/colabora/"
+    },
+    {
+      "type" : "SOS Children's Villages (International)",
+      "url"  : "https://www.sos-childrensvillages.org/take-action"
+    }
+  ]
 }
