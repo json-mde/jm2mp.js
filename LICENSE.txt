@@ -1,5 +1,5 @@
-Copyright (C) 2026 Luis Maria CAMARA ROSSI.
-Trademark (TM) Copyright (C) 2026 Universidad Nacional de Educación a Distancia (U.N.E.D.).
+Copyright (C) 2026 Luis Maria CAMARA ROSSI, All rights reserved.
+Trademark (TM) Copyright (C) 2026 Universidad Nacional de Educación a Distancia (U.N.E.D.), All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
 
@@ -13,4 +13,3 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 
 https://opensource.org/license/bsd-3-clause
 https://spdx.org/licenses/BSD-3-Clause.html
-

@@ -2,24 +2,37 @@
 
 ## Introduction
 
-**JSON Model-to-Model Projections (JM2MP)** is...
+**JSON Model-to-Model Projections (JM2MP)** is both a JSON-based format to transform
+algebraically any input JSON document into another output JSON document, and a
+library to execute such transformations.
 
-## Publishing
+## Authoring
 
-ACM JECT Journal
+### Main author
+
+  - Luis Maria CAMARA ROSSI
+    - Ph.D. Student
+    - [lcamara8@alumno.uned.es](mailto:lcamara8@alumno.uned.es)
+    - [https://www.uned.es/universidad/facultades/en/departamentos/ingenieria-del-softw-y-sist-informaticos.html](https://www.uned.es/universidad/facultades/en/departamentos/ingenieria-del-softw-y-sist-informaticos.html)
+
+### Contributors
+
+  - Elena RUIZ LARROCHA
+    - Ph.D. Tutor
+    - [https://www.uned.es/universidad/docentes/informatica/elena-ruiz-larrocha.html](https://www.uned.es/universidad/docentes/informatica/elena-ruiz-larrocha.html)
+  - Jose Antonio CERRADA SOMOLINOS
+    - Ph.D. Director
+    - [https://www.uned.es/universidad/docentes/informatica/jose-antonio-cerrada-somolinos.html](https://www.uned.es/universidad/docentes/informatica/jose-antonio-cerrada-somolinos.html)
 
 ## Licensing
 
-**JM2MP** is licensed via Massachusetts Institute of Technology (MIT) license:
+**JM2MP** is licensed via *BSD-3-Clause* license:
 
-- (MIT license)[./LICENSE.txt]
+  - [BSD-3-Clause license](./LICENSE.txt)
+
 
 ## Source code
 
 Source code for **JM2MP** can be retrieved from:
 
-- JavaScript (ES2024): (GitHub @LCamara-UNED / paper-jm2mp-js)[https://GitHub.com/LCamara8-UNED/paper-jm2mp-js]
-- Python 3.12: (GitHub @LCamara-UNED / paper-jm2mp-py)[https://GitHub.com/LCamara8-UNED/paper-jm2mp-py]
-
-
-## End of file
+  - JavaScript (ES2024 & Node.JS v22+): [https://GitHub.com/JSON-MDE/JM2MP.JS](https://GitHub.com/JSON-MDE/JM2MP.JS)

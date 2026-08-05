@@ -6,17 +6,15 @@
   "author": {
     "name": "Luis Maria CAMARA ROSSI",
     "email": "lcamara8@alumno.uned.es",
-    "url": "https://github.com/LCamara8-UNED/"
+    "url": "https://www.uned.es/universidad/facultades/en/departamentos/ingenieria-del-softw-y-sist-informaticos.html"
   },
   "contributors": [
     {
       "name": "Elena RUIZ LARROCHA",
-      "email": "elena@issi.uned.es",
       "url": "https://www.uned.es/universidad/docentes/informatica/elena-ruiz-larrocha.html"
     },
     {
       "name": "Jose Antonio CERRADA SOMOLINOS",
-      "email": "jcerrada@issi.uned.es",
       "url": "https://www.uned.es/universidad/docentes/informatica/jose-antonio-cerrada-somolinos.html"
     }
   ],
@@ -40,14 +38,19 @@
     "./cli": "./cli.js"
   },
   "scripts": {
+    "jm2mp-cli": "node ./cli.js",
     "test": "node --test \"./test/**/*test*.js\"",
     "test:watch": "node --test --watch ./test/",
     "test:coverage": "node --test --experimental-test-coverage --test-coverage-include='./**/*.js' ./test/",
-    "test:coverage-lcov": "node --test --experimental-test-coverage --test-reporter=lcov --test-reporter-destination=coverage.lcov --test-coverage-include='./**/*.js' ./test/"
+    "test:coverage-lcov": "node --test --experimental-test-coverage --test-reporter=lcov --test-reporter-destination=coverage.lcov --test-coverage-include='./**/*.js' ./test/",
+    "jsdoc@windows": ".\\node_modules\\.bin\\jsdoc.cmd --configure .\\JSDoc.config.json",
+    "jsdoc@linux": "./node_modules/.bin/jsdoc --configure ./JSDoc.config.json",
+    "ajv@windows": "npx -- ajv-cli --spec=draft2020 -s .\\schemas\\JM2MP-v1.0.0--JSON-Schema-Draft-2020-12.json -d ..\\examples\\alumni\\projection.json",
+    "ajv@linux": "npx -- ajv-cli --spec=draft2020 -s ./schemas/JM2MP-v1.0.0--JSON-Schema-Draft-2020-12.json -d ../examples/alumni/projection.json"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/JSON-MDE/SoftwareX-2026-JM2MP.JS.git"
+    "url": "git+https://github.com/JSON-MDE/JM2MP.JS.git"
   },
   "optionalDependencies": {
     "@jsonquerylang/jsonquery": "4.x",
@@ -78,15 +81,5 @@
     "jsonpointer",
     "rfc6901",
     "jmespath"
-  ],
-  "funding":[
-    {
-      "type" : "Aldeas Infantiles SOS de España",
-      "url"  : "https://www.aldeasinfantiles.es/colabora/"
-    },
-    {
-      "type" : "SOS Children's Villages (International)",
-      "url"  : "https://www.sos-childrensvillages.org/take-action"
-    }
   ]
 }

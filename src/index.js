@@ -15,7 +15,7 @@
  * El adaptador nativo está disponible siempre; los foráneos (jsonpath,
  * jsonata, jsonquery, jsonpointer, jmespath) se cargan dinámicamente solo
  * al solicitarlos.
- */
+**/
 
 // ----------------------------------------------------------------------------
 // Errores.

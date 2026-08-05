@@ -9,15 +9,17 @@
     "private": true,
     "template": "templates/default",
     "encoding": "utf8",
-    "destination": "./doc/jsdoc-out/",
+    "destination": "../doc/jsdoc-out/",
     "recurse": true,
-    "tutorials": "./doc/tutorials/",
-    "readme": "./README.md",
-    "package": "./src/package.json",
+    "tutorials": "../doc/tutorials/",
+    "readme": "../README.md",
+    "package": "./package.json",
     "verbose": true
   },
   "recurseDepth": 100,
   "source": {
+    "include": [ "./" ],
+    "exclude": [ "./node_modules/", "./test/" ],
     "includePattern": ".+\\.(c|m)?js(doc|x)?$",
     "excludePattern": "(node_modules)|(test)|((^|\\/|\\\\)_)"
   },
@@ -27,6 +29,15 @@
   },
   "templates": {
     "cleverLinks": false,
-    "monospaceLinks": false
+    "monospaceLinks": false,
+    "default": {
+      "layoutFile": "../doc/layout.tmpl",
+      "staticFiles": {
+        "include": [
+          "../doc/static/",
+          "../LICENSE.txt"
+        ]
+      }
+    }
   }
 }
