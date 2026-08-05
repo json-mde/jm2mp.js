@@ -402,7 +402,9 @@ const OPERATORS = {
     expectType(l, "number", "div", "$left");
     expectType(r, "number", "div", "$right");
     if (r === 0) throw new EvaluationError("div: división por cero.");
-    return l / r;
+    const result = ( l / r );
+    if ( ! Number.isFinite(result) ) throw EvaluationError("div: resultado no finito.");
+    return result;
   },
   async mod(op, env) {
     const l = await evalProjection(op.$left, deepen(env));
@@ -410,12 +412,14 @@ const OPERATORS = {
     expectType(l, "number", "mod", "$left");
     expectType(r, "number", "mod", "$right");
     if (r === 0) throw new EvaluationError("mod: módulo con divisor cero.");
-    return l % r;
+    const result = ( l % r );
+    if ( ! Number.isFinite(result) ) throw EvaluationError("mod: resultado no finito.");
+    return result;
   },
   async neg(op, env) {
     const v = await evalProjection(op.$value, deepen(env));
     expectType(v, "number", "neg", "$value");
-    return -v;
+    return (-v);
   },
   async abs(op, env) {
     const v = await evalProjection(op.$value, deepen(env));
@@ -454,14 +458,14 @@ const OPERATORS = {
     expectType(v, "string", "substring", "$value");
     const start = await evalProjection(op.$start, deepen(env));
     if (!Number.isInteger(start) || start < 0) {
-      throw new EvaluationError("substring: $start debe ser entero ≥ 0.");
+      throw new EvaluationError("substring: $start debe ser entero >= 0.");
     }
     const codepoints = Array.from(v);
     let end;
     if (Object.hasOwn(op, "$end")) {
       end = await evalProjection(op.$end, deepen(env));
       if (!Number.isInteger(end) || end < 0) {
-        throw new EvaluationError("substring: $end debe ser entero ≥ 0.");
+        throw new EvaluationError("substring: $end debe ser entero >= 0.");
       }
     } else {
       end = codepoints.length;
@@ -514,10 +518,10 @@ const OPERATORS = {
   /* Listas (extensión) */
 
   async sort(op, env) {
-    const xs = await evalProjection(op.$value, deepen(env));
+    const xs = await evalProjection(op.$over, deepen(env));
     if (xs === null) return null;
     if (!Array.isArray(xs)) {
-      throw new EvaluationError("sort: $value debe ser array o null.");
+      throw new EvaluationError("sort: $over debe ser array o null.");
     }
     let desc = false;
     if (Object.hasOwn(op, "$desc")) {

@@ -135,6 +135,7 @@ export async function createJsonPointerAdapter() {
      * El parámetro `env` se ignora: JSON Pointer no tiene concepto de
      * alias léxicos ni de raíz/contexto distintos del input.
      */
+    /* eslint-disable-next-line no-unused-vars -- _env */
     async evaluate(path, input, cache, _env) {
       // Validación perezosa con cache de "ya validado".
       if (!cache.has(path)) {

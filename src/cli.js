@@ -7,13 +7,16 @@
  * @module cli
 **/
 
-import {project} from "./index.js" ;
+'use strict';
+
+import { project } from "./index.js" ;
 
 const rootName = null;
 const loader = null;
 const document = null;
 const registry = null;
 const options = {};
-return await project(rootName, loader, document, registry, options) ;
+const result = await project({rootName, loader, document, registry, options}) ;
+console.log(result);
 
 // EoF

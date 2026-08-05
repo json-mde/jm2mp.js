@@ -50,6 +50,7 @@ describe("resolve: caso simple sin dependencias", () => {
   });
 
   it("propaga error del loader como ResolutionError", async () => {
+    /* eslint-disable-next-line no-unused-vars -- _name */
     const loader = async (_name) => { throw new Error("falla I/O"); };
     await assert.rejects(
       resolve("main", loader),
@@ -58,6 +59,7 @@ describe("resolve: caso simple sin dependencias", () => {
   });
 
   it("rechaza módulo que no es objeto", async () => {
+    /* eslint-disable-next-line no-unused-vars -- _name */
     const loader = async (_name) => [1, 2, 3];
     await assert.rejects(
       resolve("main", loader),
@@ -211,6 +213,7 @@ describe("resolve: cache normalizada a minúsculas", () => {
 describe("resolve: maxModules", () => {
   it("rechaza cadena de dependencias muy larga si excede maxModules", async () => {
     let count = 0;
+    /* eslint-disable-next-line no-unused-vars -- _name */
     const loader = async (_name) => {
       count++;
       return {

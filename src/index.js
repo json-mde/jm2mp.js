@@ -32,10 +32,10 @@ export {
 // ----------------------------------------------------------------------------
 // Pipeline.
 // ----------------------------------------------------------------------------
-export { resolve } from "./resolver.js";
+export { resolve } from "./modules/resolver.js";
 export { validateModule } from "./validator.js";
 export { evaluate } from "./evaluator.js";
-export { normalizeModule } from "./normalizer.js";
+export { normalizeModule } from "./modules/normalizer.js";
 
 // ----------------------------------------------------------------------------
 // Adaptadores: contrato y factorías individuales.
@@ -55,12 +55,12 @@ export {
   createStringLoader,
   createFileLoader,
   createUrlLoader,
-} from "./loaders.js";
+} from "./modules/loaders.js";
 
 // ----------------------------------------------------------------------------
 // Imports internos para las funciones de alto nivel.
 // ----------------------------------------------------------------------------
-import { resolve as _resolve } from "./resolver.js";
+import { resolve as _resolve } from "./modules/resolver.js";
 import { validateModule as _validate } from "./validator.js";
 import { evaluate as _evaluate } from "./evaluator.js";
 import { AdapterRegistry } from "./adapters/registry.js";

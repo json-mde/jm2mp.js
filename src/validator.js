@@ -75,7 +75,7 @@ const OP_ARGS = {
   typeof:    { required: ["$value"],                  optional: [] },
   coalesce:  { required: ["$value", "$default"],      optional: [] },
   has:       { required: ["$key", "$in"],             optional: [] },
-  sort:      { required: ["$value"],                  optional: ["$by", "$desc"] },
+  sort:      { required: ["$over"],                   optional: ["$by", "$desc"] },
   lookup:    { required: ["$key", "$in"],             optional: [] },
   merge:     { required: ["$left", "$right"],         optional: [] },
 };

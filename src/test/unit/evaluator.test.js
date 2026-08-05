@@ -572,36 +572,36 @@ describe("evaluator: typeof, coalesce, has", () => {
 
 describe("evaluator: sort", () => {
   it("ordena ascendentemente por defecto", async () => {
-    const proj = { "$op": "sort", "$value": [3, 1, 2] };
+    const proj = { "$op": "sort", "$over": [3, 1, 2] };
     assert.deepEqual(await run(proj, null), [1, 2, 3]);
   });
 
   it("ordena descendentemente con $desc", async () => {
-    const proj = { "$op": "sort", "$value": [1, 2, 3], "$desc": true };
+    const proj = { "$op": "sort", "$over": [1, 2, 3], "$desc": true };
     assert.deepEqual(await run(proj, null), [3, 2, 1]);
   });
 
   it("ordena con clave $by", async () => {
     const proj = {
       "$op": "sort",
-      "$value": [{ n: 3 }, { n: 1 }, { n: 2 }],
+      "$over": [{ n: 3 }, { n: 1 }, { n: 2 }],
       "$by": { "$op": "get", "$path": "@.n" }
     };
     assert.deepEqual(await run(proj, null), [{ n: 1 }, { n: 2 }, { n: 3 }]);
   });
 
   it("$value null devuelve null", async () => {
-    assert.equal(await run({ "$op": "sort", "$value": null }, null), null);
+    assert.equal(await run({ "$op": "sort", "$over": null }, null), null);
   });
 
   it("array vacío devuelve array vacío", async () => {
-    assert.deepEqual(await run({ "$op": "sort", "$value": [] }, null), []);
+    assert.deepEqual(await run({ "$op": "sort", "$over": [] }, null), []);
   });
 
   it("orden estable preserva relativo de claves iguales", async () => {
     const proj = {
       "$op": "sort",
-      "$value": [{ k: 1, t: "a" }, { k: 1, t: "b" }, { k: 1, t: "c" }],
+      "$over": [{ k: 1, t: "a" }, { k: 1, t: "b" }, { k: 1, t: "c" }],
       "$by": { "$op": "get", "$path": "@.k" }
     };
     const r = await run(proj, null);

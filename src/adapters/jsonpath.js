@@ -75,6 +75,7 @@ export async function createJsonPathAdapter() {
     /**
      * Evalúa una expresión JSONPath y uniformiza el resultado al contrato.
      */
+    /* eslint-disable-next-line no-unused-vars -- _env */
     async evaluate(path, input, cache, _env) {
       // Propagación absorbente: input null → null sin invocar.
       if (input === null || input === undefined) return null;

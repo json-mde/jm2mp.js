@@ -86,6 +86,7 @@ export async function createJsonQueryAdapter() {
      * Evalúa una expresión JSON Query.
      * Cachea la forma parseada cuando $path es string.
      */
+    /* eslint-disable-next-line no-unused-vars -- _env */
     async evaluate(path, input, cache, _env) {
       // Propagación absorbente.
       if (input === null || input === undefined) return null;

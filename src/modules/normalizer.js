@@ -22,7 +22,7 @@
  * del documento JSON. El normalizador las preserva sin recorrer su contenido.
  */
 
-import { ValidationError } from "../errors.js";
+//// import { ValidationError } from "../errors.js";
 import { ThrowsValidationErrorWhenIsNotAModule } from "./helpers.js";
 
 /**

@@ -43,6 +43,7 @@
     "test:watch": "node --test --watch ./test/",
     "test:coverage": "node --test --experimental-test-coverage --test-coverage-include='./**/*.js' ./test/",
     "test:coverage-lcov": "node --test --experimental-test-coverage --test-reporter=lcov --test-reporter-destination=coverage.lcov --test-coverage-include='./**/*.js' ./test/",
+    "eslint": "npx -- eslint",
     "jsdoc@windows": ".\\node_modules\\.bin\\jsdoc.cmd --configure .\\JSDoc.config.json",
     "jsdoc@linux": "./node_modules/.bin/jsdoc --configure ./JSDoc.config.json",
     "ajv@windows": "npx -- ajv-cli --spec=draft2020 -s .\\schemas\\JM2MP-v1.0.0--JSON-Schema-Draft-2020-12.json -d ..\\examples\\alumni\\projection.json",
@@ -56,10 +57,17 @@
     "@jsonquerylang/jsonquery": "4.x",
     "jmespath": "0.16.x",
     "json-pointer": "0.6.x",
-    "jsonata": "2.x",
-    "jsonpath-plus": "10.x"
+    "jsonata": "^2.0.4",
+    "jsonpath-plus": "^10.3.0"
   },
   "devDependencies": {
+    "@eslint/css": "^1.4.0",
+    "@eslint/js": "^10.0.1",
+    "@eslint/json": "^2.0.1",
+    "@eslint/markdown": "^8.0.3",
+    "@stylistic/eslint-plugin": "^5.10.0",
+    "eslint": "^10.8.0",
+    "globals": "^17.9.0",
     "jsdoc": "4.0.x"
   },
   "keywords": [

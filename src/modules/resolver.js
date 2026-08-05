@@ -100,6 +100,9 @@ export async function resolve(rootName, loader, options = {}) {
    * @returns {Promise<object>}
    */
   async function load(name) {
+    // ¿Se pueden/deben normalizar todos los nombres a, por ejemplo, minúsculas?
+    // Esto podría provocar colisiones cuando la única distinción sean mayúsculas, minúsculas y tildes.
+    //// const cacheKey = name;
     const cacheKey = name.toLowerCase();
     // Si ya está en cache, devolver directamente.
     if (loadedCache.has(cacheKey)) {

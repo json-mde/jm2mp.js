@@ -115,6 +115,7 @@ export async function createJsonataAdapter(options = {}) {
      * NOTA: la evaluación JSONata sigue ejecutándose en background hasta
      * terminar; solo se descarta el resultado.
      */
+    /* eslint-disable-next-line no-unused-vars -- _env */
     async evaluate(path, input, cache, _env) {
       // Propagación absorbente.
       if (input === null || input === undefined) return null;

@@ -120,7 +120,8 @@ export async function createJmesPathAdapter() {
      * El parámetro `env` se ignora: JMESPath no tiene concepto de alias
      * léxicos ni de raíz/contexto distintos del input. La expresión
      * siempre se evalúa contra `input`.
-     */
+    **/
+    /* eslint-disable-next-line no-unused-vars -- _env */
     async evaluate(path, input, cache, _env) {
       // Propagación absorbente: input null → null sin invocar.
       if (input === null || input === undefined) return null;
