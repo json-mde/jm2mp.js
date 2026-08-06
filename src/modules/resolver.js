@@ -2,10 +2,9 @@
  * @author Luis Maria CAMARA ROSSI
  * @copyright Universidad Nacional de Educación a Distancia (U.N.E.D.) 2026
  * @license BSD-3-Clause
- * @module modules/resolver
  * @file Resolución de módulos: carga, detección de ciclos, normalización
- * por módulo, fusión por importación.
- *
+ *       por módulo, fusión por importación.
+ * @description
  * PROTECCIÓN CONTRA CARGA EXCESIVA:
  *  - Detección de ciclos (DFS con conjunto 'visiting').
  *  - Cache de módulos ya cargados (clave normalizada a minúsculas).
@@ -28,12 +27,23 @@
  * lo omitan) según el $default-query-language de ESE módulo, ANTES de fusionar.
  * Esto preserva la sintaxis original de cada plantilla incluso al combinar
  * módulos con sintaxis distintas.
- */
+**/
+
+/**
+ * @module module:jm2mp/modules/resolver
+ * @description
+ * Resolución de módulos: carga, detección de ciclos, normalización por
+ * módulo, fusión por importación.
+**/
 
 import { ResolutionError } from "../errors.js";
 import { normalizeModule } from "./normalizer.js";
 
-/** Valor por defecto para maxModules. */
+/**
+ * @description
+ * Valor por defecto para maxModules.
+ * @type {integer}
+**/
 const DEFAULT_MAX_MODULES = 1000;
 
 /**

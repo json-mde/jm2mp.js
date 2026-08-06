@@ -2,9 +2,9 @@
  * @author Luis Maria CAMARA ROSSI
  * @copyright Universidad Nacional de Educación a Distancia (U.N.E.D.) 2026
  * @license BSD-3-Clause
- * @module modules/loaders
+ * @module jm2mp/modules/loaders
  * @file Implementaciones del loader de módulos.
- *
+ * @description
  * Tres loaders predefinidos que satisfacen la interfaz inyectable
  * (name: string) => Promise<object>:
  *  - createStringLoader: carga desde mapa en memoria. Útil para tests.

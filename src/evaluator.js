@@ -2,7 +2,6 @@
  * @author Luis Maria CAMARA ROSSI
  * @copyright Universidad Nacional de Educación a Distancia (U.N.E.D.) 2026
  * @license BSD-3-Clause
- * @module evaluator
  * @file Evaluador del lenguaje de proyecciones.
  *
  * Dado un módulo resuelto y normalizado, evalúa la plantilla raíz "@" sobre
@@ -28,7 +27,13 @@
  * evaluaciones concurrentes; dos `evaluate()` ejecutándose en paralelo
  * no se contaminan mutuamente. Esto permite uso seguro en servidores
  * concurrentes sin sincronización adicional.
- */
+**/
+
+/**
+ * @module jm2mp/evaluator
+ * @description
+ * Evaluador del lenguaje de proyecciones.
+**/
 
 import { ProjectionError, EvaluationError } from "./errors.js";
 import { isOperation } from "./validator.js";

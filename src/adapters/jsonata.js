@@ -2,7 +2,6 @@
  * @author Luis Maria CAMARA ROSSI
  * @copyright Universidad Nacional de Educación a Distancia (U.N.E.D.) 2026
  * @license BSD-3-Clause
- * @module adapters/jsonata
  * @file Adaptador para sintaxis JSONata.
  *
  * Versión soportada: jsonata 2.x EXCLUSIVAMENTE. Versiones 1.x no están
@@ -29,7 +28,22 @@
  * potencialmente maliciosas, considere también limitar entradas.
  */
 
+/**
+ * @module jm2mp/adapters/jsonata
+**/
+
 import { AdapterError, ParseError, ValidationError, EvaluationError } from "../errors.js";
+
+/**
+ * @description
+ * **JSONata** is a JavaScript implementation of **JSONata**,
+ * which is a JSON query and transformation language.
+ * This packages is the reference implementation of the JSONata query and transformation language.
+ * @external JSONata
+ * @see {@link https://www.npmjs.com/package/jsonata}
+ * @see {@link http://jsonata.org/}
+ * @see {@link https://github.com/jsonata-js/jsonata}
+**/
 
 /**
  * Crea el adaptador JSONata.

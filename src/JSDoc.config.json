@@ -1,17 +1,19 @@
 {
   "plugins": [
     "plugins/markdown",
-    "plugins/summarize"
+    "____plugins/summarize"
   ],
   "sourceType": "module",
   "opts": {
     "access": "all",
     "private": true,
-    "template": "templates/default",
+    "___template": "templates/default",
+    "template": "./node_modules/tidy-jsdoc",
+    "prism-theme": "prism-default",
     "encoding": "utf8",
     "destination": "../doc/jsdoc-out/",
     "recurse": true,
-    "tutorials": "../doc/tutorials/",
+    "tutorials": "../doc/jsdoc/tutorials/",
     "readme": "../README.md",
     "package": "./package.json",
     "verbose": true
@@ -21,7 +23,7 @@
     "include": [ "./" ],
     "exclude": [ "./node_modules/", "./test/" ],
     "includePattern": ".+\\.(c|m)?js(doc|x)?$",
-    "excludePattern": "(node_modules)|(test)|((^|\\/|\\\\)_)"
+    "excludePattern": "(node_modules/)|(test/)|((^|\\/|\\\\)_)"
   },
   "tags": {
     "allowUnknownTags": true,
@@ -31,13 +33,19 @@
     "cleverLinks": false,
     "monospaceLinks": false,
     "default": {
-      "layoutFile": "../doc/layout.tmpl",
+      "___layoutFile": "../doc/layout.tmpl",
+      "includeDate": true,
+      "LCamara8_Footer": true,
       "staticFiles": {
         "include": [
-          "../doc/static/",
+          "../doc/jsdoc/static/",
           "../LICENSE.txt"
         ]
       }
     }
+  },
+  "metadata": {
+    "title": "JSON Model-to-Model Projection (JM2MP) Documentation",
+    "logo": "./images/JM2MP-Logo.png"
   }
 }

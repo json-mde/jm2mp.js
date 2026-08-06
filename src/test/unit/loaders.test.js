@@ -2,13 +2,18 @@
  * @author Luis Maria CAMARA ROSSI
  * @copyright Universidad Nacional de Educación a Distancia (U.N.E.D.) 2026
  * @license BSD-3-Clause
- * @module test/unit/loaders
  * @file Tests de los tres loaders predefinidos.
  *
  * createStringLoader: tests directos siempre.
  * createFileLoader:   tests condicionales (solo en Node), usando ficheros temporales.
  * createUrlLoader:    tests limitados sin servidor (validación de URLs y comportamiento de fallos de red).
  */
+
+/**
+ * @module jm2mp/test/unit/loaders
+ * @description
+ * Tests de los tres loaders predefinidos.
+**/
 
 import { describe, it } from "node:test";
 import { strict as assert } from "node:assert";

@@ -2,9 +2,14 @@
  * @author Luis Maria CAMARA ROSSI
  * @copyright Universidad Nacional de Educación a Distancia (U.N.E.D.) 2026
  * @license BSD-3-Clause
- * @module test/unit/paths
  * @file Tests del parser EBNF de rutas nativas y la función navigate.
  */
+
+/**
+ * @module jm2mp/test/unit/paths
+ * @description
+ * Tests del parser EBNF de rutas nativas y la función navigate.
+**/
 
 import { describe, it } from "node:test";
 import { strict as assert } from "node:assert";

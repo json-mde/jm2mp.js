@@ -2,7 +2,6 @@
  * @author Luis Maria CAMARA ROSSI
  * @copyright Universidad Nacional de Educación a Distancia (U.N.E.D.) 2026
  * @license BSD-3-Clause
- * @module adapters/jsonpointer
  * @file Adaptador para sintaxis JSON Pointer (RFC 6901).
  *
  * JSON Pointer es una sintaxis de direccionamiento estandarizada que
@@ -41,7 +40,22 @@
  * con la RFC quede en manos del paquete dedicado y su suite de tests.
  */
 
+/**
+ * @module jm2mp/adapters/jsonpointer
+**/
+
 import { AdapterError, ValidationError, EvaluationError } from "../errors.js";
+
+/**
+ * @description
+ * **json-pointer** offers some utilities for JSON pointers described by RFC 6901.
+ * It provides some additional stuff needed but is not included in
+ * [node-jsonpointer](https://github.com/janl/node-jsonpointer).
+ * @external json-pointer
+ * @see {@link https://www.npmjs.com/package/json-pointer}
+ * @see {@link https://github.com/manuelstofer/json-pointer}
+ * @see {@link https://www.rfc-editor.org/info/rfc6901/}
+**/
 
 /**
  * Crea el adaptador JSON Pointer. Carga 'json-pointer' dinámicamente.

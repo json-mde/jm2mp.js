@@ -38,14 +38,17 @@
     "./cli": "./cli.js"
   },
   "scripts": {
+    "all": "npm run test:coverage && npm run eslint && npm run jsdoc",
     "jm2mp-cli": "node ./cli.js",
-    "test": "node --test \"./test/**/*test*.js\"",
-    "test:watch": "node --test --watch ./test/",
-    "test:coverage": "node --test --experimental-test-coverage --test-coverage-include='./**/*.js' ./test/",
-    "test:coverage-lcov": "node --test --experimental-test-coverage --test-reporter=lcov --test-reporter-destination=coverage.lcov --test-coverage-include='./**/*.js' ./test/",
+    "test": "node --test",
+    "test:watch": "node --test --watch",
+    "test:coverage": "node --test --experimental-test-coverage",
+    "test:coverage-lcov": "node --test --experimental-test-coverage --test-reporter=lcov --test-reporter-destination=coverage.lcov",
     "eslint": "npx -- eslint",
-    "jsdoc@windows": ".\\node_modules\\.bin\\jsdoc.cmd --configure .\\JSDoc.config.json",
+    "jsdoc": "npm run jsdoc@windows",
+    "jsdoc@windows": "DEL /Q /F /S ..\\doc\\jsdoc-out\\ && .\\node_modules\\.bin\\jsdoc.cmd --configure .\\JSDoc.config.json",
     "jsdoc@linux": "./node_modules/.bin/jsdoc --configure ./JSDoc.config.json",
+    "ajv": "npm run ajv@windows",
     "ajv@windows": "npx -- ajv-cli --spec=draft2020 -s .\\schemas\\JM2MP-v1.0.0--JSON-Schema-Draft-2020-12.json -d ..\\examples\\alumni\\projection.json",
     "ajv@linux": "npx -- ajv-cli --spec=draft2020 -s ./schemas/JM2MP-v1.0.0--JSON-Schema-Draft-2020-12.json -d ../examples/alumni/projection.json"
   },
@@ -68,7 +71,8 @@
     "@stylistic/eslint-plugin": "^5.10.0",
     "eslint": "^10.8.0",
     "globals": "^17.9.0",
-    "jsdoc": "4.0.x"
+    "jsdoc": "4.0.x",
+    "tidy-jsdoc": "^1.4.1"
   },
   "keywords": [
     "jm2mp",

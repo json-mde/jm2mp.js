@@ -34,6 +34,7 @@ import { AdapterError } from "../errors.js";
  * @property {!string} nullInput
  *
 **/
+
 /**
  * Contrato que todo adaptador de sintaxis debe implementar.
  *

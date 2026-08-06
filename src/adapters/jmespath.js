@@ -2,7 +2,6 @@
  * @author Luis Maria CAMARA ROSSI
  * @copyright Universidad Nacional de Educación a Distancia (U.N.E.D.) 2026
  * @license BSD-3-Clause
- * @module adapters/jmespath
  * @file Adaptador para sintaxis JMESPath (https://jmespath.org).
  *
  * JMESPath es un lenguaje de consulta declarativo con especificación
@@ -47,15 +46,21 @@
  * AST en sentido estricto.
 **/
 
+/**
+ * @module jm2mp/adapters/jmespath
+**/
+
 import { AdapterError, ValidationError, EvaluationError } from "../errors.js";
 
 /**
- * @description **jmespath.js** is a JavaScript implementation of **JMESPath**,
- *              which is a query language for JSON. It will take a JSON document
- *              and transform it into another JSON document through a JMESPath
- *              expression.
+ * @description
+ *   **jmespath.js** is a JavaScript implementation of **JMESPath**,
+ *   which is a query language for JSON. It will take a JSON document
+ *   and transform it into another JSON document through a JMESPath
+ *   expression.
  * @external jmespath
  * @see {@link https://www.npmjs.com/package/jmespath}
+ * @see {@link https://github.com/jmespath/jmespath.js}
 **/
 
 /**

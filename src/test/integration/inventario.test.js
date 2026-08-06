@@ -2,7 +2,6 @@
  * @author Luis Maria CAMARA ROSSI
  * @copyright Universidad Nacional de Educación a Distancia (U.N.E.D.) 2026
  * @license BSD-3-Clause
- * @module test/integration/inventario
  * @file Test de integración: ejercicio 2 (inventario completo).
  *
  * Reproduce íntegramente el ejercicio diseñado durante el modelado:
@@ -15,6 +14,12 @@
  * por una clave calculada. Lo expresamos con la extensión `lookup`, que provee
  * acceso O(1) por clave string a un objeto.
  */
+
+/**
+ * @module jm2mp/test/integration/inventario
+ * @description
+ * Test de integración: ejercicio 2 (inventario completo).
+**/
 
 import { describe, it } from "node:test";
 import { strict as assert } from "node:assert";

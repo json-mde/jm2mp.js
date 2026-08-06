@@ -2,9 +2,14 @@
  * @author Luis Maria CAMARA ROSSI
  * @copyright Universidad Nacional de Educación a Distancia (U.N.E.D.) 2026
  * @license BSD-3-Clause
- * @module test/unit/normalizer
  * @file Tests de la normalización de módulos.
- */
+**/
+
+/**
+ * @module jm2mp/test/unit/normalizer
+ * @description
+ * Tests de la normalización de módulos.
+**/
 
 import { describe, it } from "node:test";
 import { strict as assert } from "node:assert";

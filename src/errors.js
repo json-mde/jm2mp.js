@@ -2,7 +2,6 @@
  * @author Luis Maria CAMARA ROSSI
  * @copyright Universidad Nacional de Educación a Distancia (U.N.E.D.) 2026
  * @license BSD-3-Clause
- * @module errors
  * @file Jerarquía de errores específicos del dominio del lenguaje de proyecciones.
  *
  * Todos los errores derivan de ProjectionError, lo que permite a los consumidores
@@ -14,7 +13,13 @@
  *  - ValidationError: errores semánticos previos a la evaluación (alcance, referencias).
  *  - EvaluationError: errores en tiempo de evaluación (tipos, división por cero, etc.).
  *  - AdapterError: errores específicos de un adaptador de sintaxis (registro, librería).
- */
+**/
+
+/**
+ * @module jm2mp/errors
+ * @description
+ * Jerarquía de errores específicos del dominio del lenguaje de proyecciones.
+**/
 
 /**
  * Error raíz de la jerarquía. Todos los demás errores del sistema heredan de esta clase.

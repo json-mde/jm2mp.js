@@ -2,8 +2,10 @@
  * @author Luis Maria CAMARA ROSSI
  * @copyright Universidad Nacional de Educación a Distancia (U.N.E.D.) 2026
  * @license BSD-3-Clause
- * @module index
- * @file API pública del sistema de proyecciones.
+ * @module jm2mp/index
+ * @file
+ * @description
+ * API pública del sistema de proyecciones.
  *
  * Exporta:
  *   - Jerarquía de errores.

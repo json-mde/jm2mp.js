@@ -2,7 +2,6 @@
  * @author Luis Maria CAMARA ROSSI
  * @copyright Universidad Nacional de Educación a Distancia (U.N.E.D.) 2026
  * @license BSD-3-Clause
- * @module adapters/jsonquery
  * @file Adaptador para sintaxis JSON Query.
  *
  * Versión soportada: @jsonquerylang/jsonquery 4.x EXCLUSIVAMENTE.
@@ -18,9 +17,22 @@
  *  - undefined del motor → null.
  *  - Errores del motor → EvaluationError envolviendo causa.
  *  - Input null → null sin invocar la librería.
- */
+**/
+
+/**
+ * @module jm2mp/adapters/jsonquery
+**/
 
 import { AdapterError, ValidationError, EvaluationError } from "../errors.js";
+
+/**
+ * @description
+ * **JSON Query**: a small, flexible, and expandable JSON query language.
+ * @external @jsonquerylang/jsonquery
+ * @see {@link https://www.npmjs.com/package/@jsonquerylang/jsonquery}
+ * @see {@link https://github.com/jsonquerylang/jsonquery}
+ * @see {@link https://jsonquerylang.org/}
+**/
 
 /**
  * Crea el adaptador JSON Query.

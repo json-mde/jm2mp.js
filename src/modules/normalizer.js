@@ -2,9 +2,9 @@
  * @author Luis Maria CAMARA ROSSI
  * @copyright Universidad Nacional de Educación a Distancia (U.N.E.D.) 2026
  * @license BSD-3-Clause
- * @module modules/normalizer
+ * @module jm2mp/modules/normalizer
  * @file Normalización de módulos durante la fase de resolución.
- *
+ * @description
  * Cada módulo declara una sintaxis por defecto (en $options.$default-query-language)
  * que se aplica a las operaciones $get que omiten $syntax. La normalización
  * recorre cada plantilla del módulo y, para cada $get sin $syntax, le añade
@@ -20,7 +20,7 @@
  *
  * Estas dos propiedades NO son plantillas con nombre; son metadatos
  * del documento JSON. El normalizador las preserva sin recorrer su contenido.
- */
+**/
 
 //// import { ValidationError } from "../errors.js";
 import { ThrowsValidationErrorWhenIsNotAModule } from "./helpers.js";

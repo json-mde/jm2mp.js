@@ -1,4 +1,4 @@
-# JSON Model-to-Model Projections (JM2MP).
+# JSON Model-to-Model Projections (JM2MP)
 
 ## Introduction
 
@@ -26,13 +26,14 @@ library to execute such transformations.
 
 ## Licensing
 
-**JM2MP** is licensed via *BSD-3-Clause* license:
+The **JM2MP** format and this **JM2MP.JS** library are both licensed
+under the *BSD-3-Clause* license:
 
   - [BSD-3-Clause license](./LICENSE.txt)
 
 
 ## Source code
 
-Source code for **JM2MP** can be retrieved from:
+The source code for this **JM2MP.JS** library can be retrieved from:
 
   - JavaScript (ES2024 & Node.JS v22+): [https://GitHub.com/JSON-MDE/JM2MP.JS](https://GitHub.com/JSON-MDE/JM2MP.JS)

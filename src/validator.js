@@ -2,9 +2,9 @@
  * @author Luis Maria CAMARA ROSSI
  * @copyright Universidad Nacional de Educación a Distancia (U.N.E.D.) 2026
  * @license BSD-3-Clause
- * @module validator
+ * @module jm2mp/validator
  * @file Validación estructural y semántica de módulos resueltos.
- *
+ * @description
  * Recorre cada plantilla validando:
  *  - Que cada operador sea conocido y tenga los argumentos requeridos.
  *  - Que no haya argumentos no reconocidos.

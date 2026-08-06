@@ -2,7 +2,6 @@
  * @author Luis Maria CAMARA ROSSI
  * @copyright Universidad Nacional de Educación a Distancia (U.N.E.D.) 2026
  * @license BSD-3-Clause
- * @module adapters/jsonpath
  * @file Adaptador para sintaxis JSONPath.
  *
  * Versión soportada: jsonpath-plus 10.x EXCLUSIVAMENTE. Otras versiones
@@ -20,7 +19,25 @@
  * adaptador. Si no está instalada, lanza AdapterError con mensaje claro.
  */
 
+/**
+ * @module jm2mp/adapters/jsonpath
+**/
+
 import { AdapterError, ValidationError, EvaluationError } from "../errors.js";
+
+/**
+ * @description
+ *   **jsonpath-plus** analyses, transforms, and selectively extracts data
+ *   from JSON documents (and JavaScript objects).
+ *   
+ *   **jsonpath-plus** expands on the original **JSON Path** specification
+ *   to add some additional operators and makes explicit some behaviors
+ *   the original Goessner's work did not spell out.
+ * @external jsonpath-plus
+ * @see {@link https://www.npmjs.com/package/jsonpath-plus}
+ * @see {@link https://github.com/JSONPath-Plus/JSONPath}
+ * @see {@link https://goessner.net/articles/JsonPath/}
+**/
 
 /**
  * Crea el adaptador JSONPath. Carga 'jsonpath-plus' dinámicamente.

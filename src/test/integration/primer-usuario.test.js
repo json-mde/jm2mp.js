@@ -2,7 +2,6 @@
  * @author Luis Maria CAMARA ROSSI
  * @copyright Universidad Nacional de Educación a Distancia (U.N.E.D.) 2026
  * @license BSD-3-Clause
- * @module test/integration/primer_usuario
  * @file Test de integración: ejercicio 1 (extraer el primer usuario).
  *
  * Recreamos el ejercicio diseñado durante el modelado del lenguaje.
@@ -12,6 +11,12 @@
  * y su valor sobrescribe el acumulador en ese paso. Los demás pasos
  * preservan el acumulador (rama $else devuelve @.acc).
  */
+
+/**
+ * @module jm2mp/test/integration/primer_usuario
+ * @description
+ * Test de integración: ejercicio 1 (extraer el primer usuario).
+**/
 
 import { describe, it } from "node:test";
 import { strict as assert } from "node:assert";

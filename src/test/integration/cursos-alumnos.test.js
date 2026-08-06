@@ -2,7 +2,6 @@
  * @author Luis Maria CAMARA ROSSI
  * @copyright Universidad Nacional de Educación a Distancia (U.N.E.D.) 2026
  * @license BSD-3-Clause
- * @module test/integration/cursos_alumnos
  * @file Test de integración: ejercicio 3 (cursos × alumnos con $let).
  *
  * Reproduce el ejercicio donde la información dispersa en cursos × inscripciones
@@ -21,6 +20,12 @@
  *   - Marta:      15 cred, 18.0 notas, 3 cursos, media 6.0.
  *   - Pedro:      15 cred, 13.5 notas, 2 cursos, media 6.75.
  */
+
+/**
+ * @module jm2mp/test/integration/cursos_alumnos
+ * @description
+ * Test de integración: ejercicio 3 (cursos × alumnos con $let).
+**/
 
 import { describe, it } from "node:test";
 import { strict as assert } from "node:assert";

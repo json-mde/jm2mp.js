@@ -2,9 +2,7 @@
  * @author Luis Maria CAMARA ROSSI
  * @copyright Universidad Nacional de Educación a Distancia (U.N.E.D.) 2026
  * @license BSD-3-Clause
- * @module paths
  * @file Parser EBNF de rutas nativas y función de navegación.
- *
  * Este módulo encapsula la sintaxis nativa del lenguaje. Es usado exclusivamente
  * por el adaptador nativo (adapters/native.js); no se invoca desde el evaluador
  * principal ni desde el validador genérico.
@@ -19,7 +17,13 @@
  *
  * Adicionalmente, $path en sintaxis nativa puede ser un array literal de
  * accesores (strings y números), lo cual se navega directamente sin parsing.
- */
+**/
+
+/**
+ * @module jm2mp/paths
+ * @description
+ * Parser EBNF de rutas nativas y función de navegación.
+**/
 
 import { ParseError, EvaluationError } from "./errors.js";
 
