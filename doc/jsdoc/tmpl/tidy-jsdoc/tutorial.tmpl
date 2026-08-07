@@ -1,0 +1,15 @@
+<section>
+  <header>
+    <h1><?js= header ?></h1>
+  </header>
+  <?js if (children.length > 0) { ?><nav>
+    <ul><?js
+        var self = this;
+        children.forEach(function(t) { ?>
+        <li><?js= self.tutoriallink(t.name) ?></li>
+    <?js }); ?></ul>
+  </nav><?js } ?>
+  <article>
+    <?js= content ?>
+  </article>
+</section>

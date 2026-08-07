@@ -1,3 +1,0 @@
-# Second Tutorial.
-
-## EOF

@@ -1,8 +1,12 @@
 {
   "plugins": [
     "plugins/markdown",
-    "____plugins/summarize"
+    "plugins/summarize"
   ],
+  "markdown": {
+    "tags": [ "file" ],
+    "idInHeadings ": true
+  },
   "sourceType": "module",
   "opts": {
     "access": "all",

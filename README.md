@@ -6,7 +6,21 @@
 algebraically any input JSON document into another output JSON document, and a
 library to execute such transformations.
 
-## Authoring
+## Source code
+
+The source code for this **JM2MP.JS** library can be retrieved from:
+
+  - [https://GitHub.com/JSON-MDE/JM2MP.JS](https://GitHub.com/JSON-MDE/JM2MP.JS)
+
+## Documentation
+
+The documentation about this **JM2MP.JS** library and the **JM2MP** format can be found at:
+
+  - [https://json-mde.tech/jm2mp.js/](https://JSON-MDE.Tech/jm2mp.js/)
+
+Documentation has been generated using [JSDoc](https://jsdo.app/) and contains several tutorials to get started.
+
+## Authors
 
 ### Main author
 
@@ -30,10 +44,3 @@ The **JM2MP** format and this **JM2MP.JS** library are both licensed
 under the *BSD-3-Clause* license:
 
   - [BSD-3-Clause license](./LICENSE.txt)
-
-
-## Source code
-
-The source code for this **JM2MP.JS** library can be retrieved from:
-
-  - JavaScript (ES2024 & Node.JS v22+): [https://GitHub.com/JSON-MDE/JM2MP.JS](https://GitHub.com/JSON-MDE/JM2MP.JS)
