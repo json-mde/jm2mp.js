@@ -1,0 +1,69 @@
+<!--
+    @author       Luis Maria CAMARA ROSSI
+    @copyright    Universidad Nacional de Educación a Distancia (U.N.E.D.) 2026
+    @license      BSD-3-Clause
+    @description  Direct use of JM2MP via CDN.
+-->
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>Direct use of JM2MP via CDN.</title>
+    <script type="module">
+      import JM2MP from 'https://cdn.jsdelivr.net/npm/jsonpath-plus@10.4.0/+esm' ;
+    </script>
+    <style type="text/css">
+      body {
+        color: darkgreen;
+        background-color: lightgray;
+        font-family: "Verdana", "Arial", sans-serif;
+        font-size: medium;
+      }
+      pre {
+        font-family: "Consolas", "Courier New", monospace;
+        font-size: smaller;
+        color: lightgray;
+        background-color: navy;
+      }
+      hr {
+        display: none;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>JSON Model-to-Model Projections (JM2MP)</h1>
+    <h2>Direct use via CDN</h2>
+    <hr />
+    <h3>Source</h3>
+    <script type="module">
+      const source = { "Author": { "Name":"Luis", "Institution":"UNED" } };
+    </script>
+    <pre>
+      <script type="module">
+        document.write(source);
+      </script>
+    </pre>
+    <hr />
+    <h3>Projection</h3>
+    <script type="module">
+      const projection = { "@": null };
+    </script>
+    <pre>
+      <script type="module">
+        document.write(projection);
+      </script>
+    </pre>
+    <hr />
+    <h3>Resultant</h3>
+    <script type="module">
+      let resultant = undefined ;
+    </script>
+    <pre>
+      <script type="module">
+        resultant = JM2MP.project(source, projection);
+        document.write(resultant);
+      </script>
+    </pre>
+    <hr />
+  </body>
+</html>
