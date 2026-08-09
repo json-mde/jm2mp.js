@@ -221,7 +221,7 @@ const OPERATORS = {
       : await evalProjection(op.$else, deepen(env));
   },
 
-  async fold(op, env) {
+  async foldArr(op, env) {
     const xs = await evalProjection(op.$over, deepen(env));
     if (xs === null) {
       return await evalProjection(op.$init, deepen(env));

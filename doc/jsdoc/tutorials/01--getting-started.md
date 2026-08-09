@@ -2,6 +2,7 @@
 
 - [Introduction](#introduction)
 - [About](#about)
+- [Licensing](#licensing)
 - [Basic terminology](#basic-concepts)
 - [Usage](#usage)
   - [Direct web access](#direct-web-access)
@@ -37,12 +38,6 @@ transformations.
   [5](https://expressjs.com/en/5x/guide/using-middleware/) of this
   specific framework.
 
-Both `JM2MP` and `JM2MP.JS` are licensed under
-[BSD-3-Clause](https://spdx.org/licenses/BSD-3-Clause.html), so you can
-get the source code and derive it for your own specific needs. But,
-please, remember the conditions imposed by such license about redistribution,
-attribution and endorsement).
-
 ## About
 
 `JM2MP` and `JM2MP.JS` has been design and develop by [Luis Maria CAMARA ROSSI](mailto:lcamara8@alumno.uned.es) as part of his work toward a **Doctor in Philosophy (Ph.D.) degree** in
@@ -55,6 +50,14 @@ and my director
 for their contributions throughout my doctoral studies, as well as to all other members of the
 [ISSI](https://www.uned.es/universidad/facultades/en/departamentos/ingenieria-del-softw-y-sist-informaticos.html)
 and rest of Departments in the [School of Computer Science](https://www.uned.es/universidad/facultades/informatica.html).
+
+## Licensing
+
+Both `JM2MP` format and `JM2MP.JS` library are licensed under
+[BSD-3-Clause](https://spdx.org/licenses/BSD-3-Clause.html), so you can
+get the source code and all its products, and derive it for your own
+specific needs. But, please, remember the conditions under such
+license about redistribution, attribution and endorsement.
 
 ## Basic concepts
 
@@ -77,71 +80,74 @@ Complex _projections_ can be divided into separate files called
 and, at the same time, reduces the complexity that would be involved in
 working with a single, large projection.
 
-The tutorial [JM2MP's Syntax](./tutorial-02--jm2mp-syntax.html)
+The tutorial [JM2MP Syntax](./tutorial-02--jm2mp-syntax.html)
 discusses all of these topics in greater detail.
 
 ## Usage
 
-There are several ways to use `JM2MP.JS` directly from
-any modern web browser:
-
-- [Direct web access](#direct-web-access)
-- [GitHub Pages](#github-pages)
-- [Content Delivery Network (CDN)](#content-delivery-network-cdn)
+There are several ways to use `JM2MP.JS` directly from any modern web
+browser: direct web access (vía GitHub raw user content or CDN) or
+installation (manually downloading source code or installing it using
+NPM).
 
 ### Direct web access
 
 #### GitHub Pages
 
-![Hero image](https://raw.githubusercontent.com/lmcamara-aldeas/pixel-aid-connect/main/src/assets/hero-image.jpg)
+Everyone can access specific files from a GitHub repository using
+[https://raw.githubusercontent.com/lmcamara-aldeas/pixel-aid-connect/main/src/assets/hero-image.jpg](https://raw.githubusercontent.com/lmcamara-aldeas/pixel-aid-connect/main/src/assets/hero-image.jpg)
+instead of usual
+[https://github.com/lmcamara-aldeas/pixel-aid-connect/blob/main/src/assets/hero-image.jpg](https://github.com/lmcamara-aldeas/pixel-aid-connect/blob/main/src/assets/hero-image.jpg)
+URL.
+
+This way, you can link to specific files of `JM2MP.JS` library to use
+them from your own applications and services.
+
 
 ##### Content Delivery Network (CDN)
 
 Using [CDN](https://www.akamai.com/glossary/what-is-a-cdn) services like
 [jsDelivr](https://www.jsdelivr.com/) allows the `JM2MP.JS` library to
-be used in web applications without the need for prior installation,
+be used in web applications without the need for prior installation, <span style="background:yellow">
 thanks to the use of [WebPack](https://webpack.js.org/concepts/) as a
-code _bundler_.
+code _bundler_</span>.
 
-Next, you can see file `./web/jm2mp-cdn.html`. You can save it to your
-hard disk drive and open it with any modern browser to see it working:
+Next, you can see an extract from file `./web/jm2mp-cdn.html`. You can
+save it to your hard disk drive and open it with any modern browser to
+see it working:
 
 ```html
-<!DOCTYPE html>
-<html>
-  <head>
-    <meta charset="UTF-8">
-    <title>JM2MP used via CDN</title>
-  </head>
-  <body>
-    <h1>JM2MP used via CDN</h1>
-    <hr />
-    <script type="module">
-      const source = { "Author": { "Name":"Luis", "Institution":"UNED" } };
-    </script>
-    <h2>Source</h2>
-    <pre>
-      <script type="module">
-        document.write(source)
-      </script>
-    </pre>
-    <hr />
-  </body>
-</html>
+<script type="module">
+  import JM2MP from 'https://cdn.jsdelivr.net/npm/@json-mde/jm2mp@1.0.0/+esm' ;
+</script>
 ```
+
+As previuosly mentioned, you can access the full file from
+([https://raw.githubusercontent.com/lmcamara-aldeas/pixel-aid-connect/main/src/assets/hero-image.jpg](https://raw.githubusercontent.com/lmcamara-aldeas/pixel-aid-connect/main/src/assets/hero-image.jpg)) URL.
 
 ### Installation
 
 #### GitHub download
 
+Source code of the `JM2MP.JS` library is published in [GitHub](https://github.com/):
+
+- [https://github.com/json-mde/jm2mp.js/](https://github.com/json-mde/jm2mp.js/)
+
+You can directly download (only but all) source code as one single ZIP compressed file.
+
+An [inmutable](https://docs.github.com/en/code-security/concepts/supply-chain-security/immutable-releases)
+[release](https://docs.github.com/en/repositories/releasing-projects-on-github/managing-releases-in-a-repository)
+tagged as `1.0.0` has also been published; it consists of several files
+to make it easier to download the desired content: everything, only the
+source code, or only this documentation.
 
 #### Node.JS and Node Package Manager (NPM)
 
 You can install `JM2MP.JS` using [Node Package Manager (NPM)](https://npmjs.org/) for [Node.JS](https://nodejs.org/en/download) (version 22, at least) runtime.
 
-
 ```bash
 npm install --save @json-mde/jm2mp
 ```
 
-
+This is the way how to use `JM2MP.JS` library as part of a project that
+isn't just a simple web page, such as complex applications or services.

@@ -18,7 +18,7 @@ The documentation about this **JM2MP.JS** library and the **JM2MP** format can b
 
   - [https://json-mde.tech/jm2mp.js/](https://JSON-MDE.Tech/jm2mp.js/)
 
-Documentation has been generated using [JSDoc](https://jsdo.app/) and contains several tutorials to get started.
+Documentation has been generated using [JSDoc](https://jsdoc.app/) and contains several tutorials to get started.
 
 ## Authors
 

@@ -45,7 +45,7 @@ const OP_ARGS = {
   pipe:      { required: ["$stages"], optional: [] },
   get:       { required: ["$path"],   optional: ["$from", "$syntax"] },
   if:        { required: ["$cond", "$then", "$else"], optional: [] },
-  fold:      { required: ["$over", "$init", "$step"], optional: [] },
+  foldArr:   { required: ["$over", "$init", "$step"], optional: [] },
   foldObj:   { required: ["$over", "$init", "$step"], optional: [] },
   cons:      { required: ["$head", "$tail"],          optional: [] },
   insert:    { required: ["$key", "$value", "$into"], optional: [] },
@@ -113,18 +113,13 @@ export function isValidName(name)
 }
 
 /**
- * *typedef {import("./adapters/registry.js").AdapterRegistry} AdapterRegistry
- * @typedef {object} AdapterRegistry
- **/
-
-/**
  * Valida un módulo resuelto y todas sus plantillas.
  *
  * Esta función es ASÍNCRONA porque internamente puede invocar
  * adapter.validate() de adaptadores que son async.
  *
  * @param {object} module - Módulo resuelto.
- * @param {AdapterRegistry} registry
+ * @param {module:jm2mp/adapters/registry.AdapterRegistry} registry
  * @returns {Promise<void>}
  */
 export async function validateModule(module, registry)
