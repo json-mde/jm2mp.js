@@ -27,7 +27,7 @@
                 tutorial_headers.forEach( (current_header) => {
                 let header_text = current_header.innerText ;
                 header_text = header_text.replace(/\s/ig,"-")
-                                         .replace(/\W/g,"-")
+                                         .replace(/[^-A-Za-z0-9]/g,"")
                                          .toLowerCase();
                 console.log(tag,'header_text',header_text);
                 current_header.id = header_text ;

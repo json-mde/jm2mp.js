@@ -3,7 +3,9 @@
 - [Introduction](#introduction)
 - [Basic Terminology](#basic-terminology)
 - [Notation](#notation)
+- [Overview of JM2MP](#overview-of-jm2mp)
 - [Data Types](#data-types)
+- [Steps and Paths](#steps-and-paths)
 - [Template Commands](#template-commands)
   - [Execution Environment](#execution-environment)
     - [let](#let)
@@ -112,6 +114,16 @@ The following concepts are important terms defined as part of `JM2MP`:
   when you want to reuse the functionality provided by the composition
   of multiple instructions in JM2MP, you can declare _named templates_.
 
+- **Execution Environment**
+
+  The **execution environment** maintains information about the complete
+  _source document_, the value of the _source document_ currently being
+  processed, as well as any _aliases_ that may have been defined to
+  simplify the use of _template commands_ and _named templates_.
+
+  The section [execution environment](#execution-environment) below
+  offers more information about this concept.
+
 ## Notation
 
 We denote &#x1D541; as the complete set of all possible JSON values.
@@ -122,6 +134,161 @@ Due to the literality and homoiconicity of `JM2MP` with respect to JSON,
 this means that any `JM2MP` _projection_ is a valid JSON value, and since
 its _resultant_ value of such a _projection_ must also be a valid JSON
 value, we can therefore conclude that &#x2119;&sube;&#x1D541;.
+
+We will denote
+<span style="background-color:whitesmoke;">&#x27E6;Operator&#x27E7;</span>
+as the named operation to be formalized. When such operation acts over a
+list of arguments, we will represent the entire operation as
+<span style="background-color:whitesmoke;">&#x27E6;Operator&#x27E7;(arguments,&hellip;)</span>.
+When the operation is a composition of several operators, we will represent it as
+<span style="background-color:whitesmoke;">&#x27E6;MainOperator(Op<sub>1</sub>,&hellip;,Op<sub>n</sub>)&#x27E7;(arguments,&hellip;)</span>.
+
+## Overview of JM2MP
+
+The `JSON Model-to-Model Projection (JM2MP)` is designed in two parts:
+a _projection document_ and a _toolkit_.
+
+- The former is a specific document format based on JSON syntax called
+  the **projection document**, which defines different transformation
+  rules that we will call **template commands** that can be grouped into
+  **named templates**.
+
+- The latter is a set of tools (a _toolkit_) based on programming
+  modules, capable of both transforming any input JSON document (which
+  we will call the **source document**) into an arbitrary output JSON
+  document (called the **resultant document**) following the operations
+  that _named templates_ and _template commands_ describe in the
+  _projection document_ (also based on JSON).
+
+The `JM2MP` document or _projection document_ is a JSON document that
+must contain an object as its root value. This object must contain a
+property named `$`, called the **root template**, because as its name
+implies, it will be the first _named template_ to be invoked as part
+of the _projection process_.
+
+To preserve compatibility with the
+[JSON Schema standard](https://json-schema.org/), the declaration of a
+property called `$schema` is also supported.
+
+Optionally, it may contain another property called `$options` to allow
+certain parameters or conditions to be set when processing the _projection_,
+making it possible to configure the behavior of the programming module
+in some way, as we will see later.
+
+If there are other properties in this _root object_, they will be
+considered as additional **named templates**, invocable through their
+respective names, during the projection process.
+
+Both `$schema` and `$options` properties of the _root element_ will
+always be considered as _projection metadata_ and never _named
+templates_.
+
+The only mandatory property in the _root object_ is the _root template_,
+with the rest of the properties being entirely optional. So, the only
+mandatory _template_ for a _projection document_ is the _root template_.
+
+It will be the author of the projection who, depending on the complexity
+required and at their sole discretion, determines the appropriate number
+of templates in each case.
+
+Therefore, the simplest _projection_ that can be constructed is as
+following:
+
+```JSON
+{ "$" : NULL }
+```
+
+This _projection_ always generates a JSON document where the _output_
+value (the _resultant_ document) is the `null` literal, regardless of
+the _source document_. We will refer to this particular _projection_ as
+the **null projection**.
+
+Based in our experience using `JM2MP`, we recommend to construct
+_projections_ using a generative style of
+[successive refinement](https://dl.acm.org/doi/10.1145/362575.362577),
+starting with such _null projection_ and building the required
+_projection_ guided by the desired output, for instance, using classic
+Jackson's Structured Programming technics, like decomposition.
+
+Every template in a _projection_, whether it is the _root template_ or
+an additional _named template_, is intended to return a JSON value
+obtained from the resolution of that _template_. Therefore, _templates_
+can be seen as functions that operate on two set values: the JSON value
+(a fragment from the _projection document_) representing the operation
+itself (which can be arbitrarily complex), and the _execution environment_
+(which references the _source document_, from the root value and from
+the current value to process, plus additional _aliases_ that can be
+declared to ease the operations). The result of the _template_ will be a
+new JSON value that will form part of the _resultant document_.
+
+As previously stated, the `JM2MP.JS`library will start to project (to
+transform) the _source document_ into the _resultant document_ invoking
+the _root template_ (a kind of _applying_ or _executing_ its equivalent
+function) over the initial _executon environment_.
+
+This initial _execution environment_ will consider the root value of the
+_source document_ as an argument. Such root value will be, usually in
+any non-trivial JSON documents, a top-level object; but, let's not
+forget, could be an array or even a simple constant literal.
+
+`JM2MP` achieves dynamism when generating _projections_ through certain
+elements called **template commands**. These _commands_ are
+actually JSON objects that will be processed by the `JM2MP.JS` library
+to obtain their _resultant_ values, calculated according to the
+corresponding _command_. These _template commands_ emulate control
+statements in a programming language or lambda functions that are
+automatically invoked; in fact, in the JavaScript language from which
+JSON is derived, there is an idiom called
+[immediately invoked anonymous functions (IIFE)](https://developer.mozilla.org/en-US/docs/Glossary/IIFE).
+
+Note that the _projection document_ of `JM2MP` is always interpreted as
+literally as possible, except for _template commands_. So:
+
+- Any scalar literal value that appears as part of a _projection_ will
+  be part of the _resultant_ as is (except _strings_ considered as
+  **paths**, as it will be explained below in
+  [steps and paths](#steps-and-paths) section).
+
+- When an array is part of a _projection_, all its items will be
+  processed as potential _template commands_.
+
+- When an object is part of a _projection_, all its property values will
+  be processed as potential _template commands_.
+
+Furthermore, since the process is based on three documents (_source_,
+_projection_, and _resultant_), all of them in JSON format, both the
+knowledge and the operations required to construct such _projections_
+and _templates_ are greatly simplified.
+
+Is in the nature of `JM2MP` to treat both _source_ and _projection_ documents as immutable,
+[achieving referential transparency and avoiding side effects](https://wiki.haskell.org/index.php?title=Referential_transparency),
+and considering all _named templates_ and _template commands_ as
+[_pure functions_](https://wiki.haskell.org/index.php?title=Pure).
+So, to put it simply, mathematically speaking, we could say that:
+
+<math xmlns="http://www.w3.org/1998/Math/MathML" display="block">
+  <mrow>
+    <mrow>
+      <mo>&#x27E6;</mo>
+      <ms>projection</ms>
+      <mo>&#x27E7;</mo>
+    </mrow>
+    <mrow>
+      <mo>(</mo>
+      <mi>source</mi>
+      <mo>,</mo>
+      <mi>execution_environment</mi>
+      <mo>)</mo>
+    </mrow>
+  </mrow>
+  <mo>=</mo>
+  <ms>resultant</ms>
+</math>
+
+For all these reasons, we can conclude that the `JM2MP` syntax offers a
+combination of both declarative and functional paradigms for transforming
+JSON documents, while also achieving a level of interoperability that a
+simple script or application might not provide.
 
 ## Data types
 
@@ -139,8 +306,51 @@ following data types:
 
 Current versions of `JM2MP` and `JM2MP.JS` are strict handling data
 types, providing a function to identify the type of a value (see
-[typeof projection](#typeof)) but not providing functions to implictly
-cast neither explicitly convert values from one type to another.
+[typeof projection](#typeof) below) but not providing functions to
+implictly cast neither explicitly convert values from one type to
+another.
+
+## Steps and Paths
+
+To locate a specific value within a JSON document, we need to define a
+mechanism for accessing its structure.
+
+Due to the data types offered by JSON, its information set, we can
+consider its structure as recursive, because of complex types (arrays
+and objects). In fact, the information in JSON documents is typically
+structured as a tree, where the nodes are values and the edges represent
+membership relationships to arrays and objects. Therefore, all scalar
+values will be leaf nodes, as will arrays with no elements and objects
+with no properties. The root node of the tree will thus be the
+document's root JSON value.
+
+Consequently, to access a specific value in the document (a node within
+the tree), we need a mechanism to specify how to traverse that tree.
+
+Since the edges (membership relationships) are limited solely to arrays
+and objects, we can use only: integers to indicate the position of an
+element in the list (the item’s index in the array) and strings to
+indicate an object’s property (the name of the key for that property).
+
+With these considerations in mind, we can define a **step** as an
+integer or a text string and a **path** as the finite sequence of
+**steps** required to reach and access a specific value.
+
+Currently exist a multitude of mechanisms for locating, searching, and
+querying JSON documents. For this reason, the `JM2MP.JS` library
+facilitates the use of any of these mechanisms, defining an
+adapter-based interface to make them easy to use within the `JM2MP`
+format and incorporating newer ones in the future.
+
+In fact, it is possible to use several of them simultaneously within the
+same _projection_, so that you can always choose the most suitable
+option based on the features offered by that query mechanism.
+
+The _template command_ used for queries is [get](#get). By default,
+`JM2MP` incorporates a syntax known as `native`, which simplifies
+querying by simply using text string literals prefixed in a specific way.
+
+See [query languages](#query-languages) section for more information on this topic.
 
 ## Template Commands
 
@@ -154,21 +364,39 @@ of its intentions inside `JM2MP` syntax:
 
 ### Execution environment
 
-Every _projection_ in `JM2MP` is applied (executed) inside an **execution
-environment** &rho; which maintains:
+The **execution environment**, formally defined in `JM2MP` as an
+immutable tuple &rho;, maintains information about:
 
-- The **current context**... is represented by prefix `@`...
-- The **root context**... is represented by prefix `$`...
-- The **alias** bindings... is represented by prefix `%`...
+- The **root context**, represented by the _path_ prefix `$`, is always a
+  reference to the root value of the entire _source document_.
+
+- The **current context**, represented by the _path_ prefix `@`, is a
+  reference the value from the _source document_ currently being
+  processed by a _template command_ within a _named template_.
+
+  Note that two specific _template commands_ enrich their own
+  _current context_ to provide additional capabilities:
+  [foldArr](#foldarr) and [foldObj](#foldobj).
+
+- Named **aliases**, represented by the path prefix `%`, are expressions
+  bound to the current **scope** in which a _template command_ is being
+  applied (executed), with the intent of simplifying the use of such
+  _template command_.
+
+As part of any _named template_, you can use the _template commands_
+[let](#let) and [call](#call) to define new _scopes_, specifically to
+obtain a new _execution environment_ to work with (because, remember,
+they are immutable).
 
 #### let
 
 The `let` _template command_ is used to create new _alias bindings_.
 
-An _alias_ is an immutable expression that substitute such expression
-whenever is used.
+An _alias_ is an immutable expression that substitutes for that
+expression every time it is used, providing
+[referential transparency](https://wiki.haskell.org/index.php?title=Referential_transparency).
 
-Every `let` creates a new _scope_ where _bindings_ are defined.
+Every `let` creates a new **scope** where _bindings_ are defined.
 
 Its JSON form is:
 
@@ -184,15 +412,15 @@ Its JSON form is:
 }
 ```
 
-All _alias_ is computed in parallel, so two sibling aliases (defined in
-same scope) cannot depend on each another.
+All _aliases_ are computed in parallel, so two sibling aliases (defined in
+same _scope_) cannot depend on each another.
 
-When it is needed to create a second _alias_ that depends on a first
-_alias_, it is neccessary to define an inner scope (for the second
-alias) inside the outer scope (where the first alias is defined),
-because `bindings` clause is evaluated before than `in` clause.
+When you need to create a second _alias_ that depends on a first _alias_,
+you must define an inner scope (for the second _alias_) inside the outer
+_scope_ (where the first _alias_ is defined), since the `bindings` clause
+is evaluated before the `in` clause.
 
-For instance:
+For example:
 
 ```JSON
 { "$op" : "let",
@@ -704,9 +932,9 @@ to consider predicates, that is, functions or operations that obtains a
 logical value (a Boolean `true` or `false` value) in order to take some
 considerations.
 
-At the same time, it is neccessary to offer mechanisms to operate over
-scalar values to obtain resultant values derived from one or more source
-values.
+At the same time, it is neccessary to establish mechanisms that allow
+operations to be performed on scalar values in order to obtain
+_resultant_ values derived from one or more _source_ values.
 
 In general, their algebraic equivalence is as follows:
 
@@ -1121,7 +1349,10 @@ Its JSON form is:
 
 ##### substring
 
-...
+The `substring` _projection_ provides in `JM2MP` the ability to select
+inner characters from a _string_ value, specifying the position of
+initial character (zero-based) and, optionally, also the position of the
+final character (but not including it).
 
 Its JSON form is:
 
@@ -1136,7 +1367,9 @@ Its JSON form is:
 
 ##### upper
 
-...
+The `upper` _projection_ provides in `JM2MP` the ability to transform
+all characters from a _string_ value into their corresponding upper-case
+character.
 
 Its JSON form is:
 
@@ -1149,7 +1382,9 @@ Its JSON form is:
 
 ##### lower
 
-...
+Similarly, the `lower` _projection_ provides in `JM2MP` the ability to
+transform all characters from a _string_ value into their corresponding
+lower-case character.
 
 Its JSON form is:
 
@@ -1162,11 +1397,16 @@ Its JSON form is:
 
 #### Miscellaneous
 
-...
+Th miscellaneous category currently offers only one _template command_
+for type identification. In future lines of work this functionality
+could be expanded to allow, for instance, conversions between data
+types.
 
 ##### typeof
 
-...
+The `typeof` _template command_ provides in `JM2MP` the ability to
+detect the exact JSON data type of a value, that is: `null`, `boolean`,
+`number`, `string`, `array` or `object`.
 
 Its JSON form is:
 
@@ -1177,17 +1417,30 @@ Its JSON form is:
 }
 ```
 
+Note that JSON data types are a subset of JavaScript's data types. In
+the above section [data types](#data-types) you can examine them all.
+
 ## Named Templates
 
 ...
 
 ## Query Languages
 
-...
+A **query language** is a mechanism to locate a specific value within a
+JSON document, traversing its structure and maybe processing its
+information in specific ways (like sorting or filtering, just to name a
+few).
+
+The `JM2MP` syntax offers ...
+
+<span style="color:red;background:yellow;">FALTA</span>
+
 
 ### Native
 
-`JM2MP` offers a `native query language`...
+`JM2MP` offers a `native query language` ...
+
+<span style="color:red;background:yellow;">FALTA</span>
 
 ### External References
 
