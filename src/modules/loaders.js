@@ -2,7 +2,6 @@
  * @author Luis Maria CAMARA ROSSI
  * @copyright Universidad Nacional de Educación a Distancia (U.N.E.D.) 2026
  * @license BSD-3-Clause
- * @module jm2mp/modules/loaders
  * @file Implementaciones del loader de módulos.
  * @description
  * Tres loaders predefinidos que satisfacen la interfaz inyectable
@@ -12,7 +11,20 @@
  *  - createUrlLoader: carga vía fetch (navegador y Node 18+).
  *
  * Los loaders son agnósticos al sistema de adaptadores: simplemente cargan JSON.
- */
+**/
+
+/**
+ * @module jm2mp/modules/loaders
+ * @description
+ * Tres loaders predefinidos que satisfacen la interfaz inyectable:
+ * `(name: string) => Promise<object>`:
+ * 
+ * - **createStringLoader**: carga desde mapa en memoria; útil para tests.
+ * - **createFileLoader**: carga desde sistema de ficheros; Node.JS exclusivamente.
+ * - **createUrlLoader**: carga vía _fetch_ ; navegador y Node.JS v18+.
+ *
+ * Los loaders son agnósticos al sistema de adaptadores: simplemente cargan JSON.
+**/
 
 import { ResolutionError } from "../errors.js";
 
@@ -28,7 +40,7 @@ import { ResolutionError } from "../errors.js";
  *
  * @param {Object<string, string>} stringMap - Mapa nombre → JSON serializado.
  * @returns {StringLoaderResult}
- */
+**/
 export function createStringLoader(stringMap) {
   if (typeof stringMap !== "object" || stringMap === null) {
     throw new TypeError("createStringLoader: el argumento debe ser un objeto.");
@@ -124,6 +136,7 @@ export async function createFileLoader(options = {}) {
  * @param {string} [options.baseUrl] - URL base para resolver nombres relativos.
  * @param {RequestInit} [options.fetchOptions] - Opciones para fetch (headers, credentials, etc.).
  * @returns {UrlLoaderResult}
+ * @see [Mozilla Developer Network (MDN) > Web > APIs > Fetch API]{@link https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API}
  */
 export function createUrlLoader(options = {}) {
   if (typeof fetch !== "function") {

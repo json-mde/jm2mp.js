@@ -1,7 +1,7 @@
 {
   "plugins": [
     "plugins/markdown",
-    "plugins/summarize"
+    "____plugins/summarize"
   ],
   "markdown": {
     "tags": [ "file" ],
@@ -25,7 +25,7 @@
   "recurseDepth": 100,
   "source": {
     "include": [ "./" ],
-    "exclude": [ "./node_modules/", "./test/" ],
+    "exclude": [ "node_modules/", "test/" ],
     "includePattern": ".+\\.(c|m)?js(doc|x)?$",
     "excludePattern": "(node_modules/)|(test/)|((^|\\/|\\\\)_)"
   },

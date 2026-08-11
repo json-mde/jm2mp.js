@@ -1,4 +1,4 @@
-<section>
+<section class="tutorial">
   <header>
     <h1><?js= header ?></h1>
   </header>
@@ -12,4 +12,27 @@
   <article>
     <?js= content ?>
   </article>
+  <script type="module" id="LCamara8_CorrectMarkdownHeaderAnchors">
+    const all_tutorials = Array.from( document.getElementsByClassName("tutorial") ) ;
+    const all_tutorial_sections = all_tutorials.filter( (e) => ( e?.tagName?.toLowerCase() === "section" ) ) ;
+    console.log('all_tutorial_sections',all_tutorial_sections);
+    const this_tutorial_sections = all_tutorial_sections &&
+                                   all_tutorial_sections.length &&
+                                   all_tutorial_sections[0] ;
+    console.log('this_tutorial_sections',this_tutorial_sections);
+    if ( this_tutorial_sections ) {
+        ['h1','h2','h3','h4','h5','h6'].forEach( (tag) => {
+            const tutorial_headers = Array.from( this_tutorial_sections.getElementsByTagName(tag) ) ;
+            console.log('tutorial_headers',tutorial_headers);
+                tutorial_headers.forEach( (current_header) => {
+                let header_text = current_header.innerText ;
+                header_text = header_text.replace(/\s/ig,"-")
+                                         .replace(/\W/g,"-")
+                                         .toLowerCase();
+                console.log(tag,'header_text',header_text);
+                current_header.id = header_text ;
+            });
+        }) ;
+    }
+  </script>
 </section>

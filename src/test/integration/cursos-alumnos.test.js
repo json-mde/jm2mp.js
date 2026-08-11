@@ -98,7 +98,7 @@ describe("Integración: cursos × alumnos", () => {
               },
               "$in": {
                 // Recorremos las inscripciones del curso actual.
-                "$op": "fold",
+                "$op": "foldArr",
                 "$over": { "$op": "get", "$path": "@.value.inscripciones" },
                 "$init": { "$op": "get", "$path": "@.acc" },
                 "$step": {

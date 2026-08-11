@@ -42,12 +42,12 @@ import { isOperation } from "./validator.js";
  * Profundidad lógica máxima por defecto. No es del stack JS (que es
  * independiente por usar async/await), sino una protección contra
  * recursión sin terminación o expresiones lógicamente muy anidadas.
- */
+**/
 const DEFAULT_MAX_DEPTH = 1000;
 
 /**
+ * @description
  * Evalúa un módulo resuelto sobre un documento de origen.
- *
  * @param {object} module - Módulo resuelto y normalizado.
  * @param {*} document - Documento JSON de origen.
  * @param {object} options
@@ -55,7 +55,7 @@ const DEFAULT_MAX_DEPTH = 1000;
  * *param {import("./adapters/registry.js").AdapterRegistry} options.registry
  * @param {number} [options.maxDepth=1000]
  * @returns {Promise<*>} Resultado de aplicar la plantilla raíz.
- */
+**/
 export async function evaluate(module, document, options) {
   if (!options || !options.registry) {
     throw new EvaluationError("Se requiere options.registry para evaluar.");
@@ -90,8 +90,12 @@ export async function evaluate(module, document, options) {
 }
 
 /**
+ * @description
  * Evalúa recursivamente una proyección. Es async para soportar adaptadores async.
- */
+ * @param {*} proj proj
+ * @param {*} env env
+ * @returns {*} Returns
+**/
 async function evalProjection(proj, env) {
   if (env.depth >= env.maxDepth) {
     throw new EvaluationError(
@@ -124,15 +128,24 @@ async function evalProjection(proj, env) {
   throw new EvaluationError(`Tipo no soportado: ${typeof proj}.`);
 }
 
-/** Devuelve un entorno con depth incrementado en 1. */
+/**
+ * @description
+ * Devuelve un entorno con depth incrementado en 1.
+ * @param {*} env JM2MP's execution environment.
+ * @returns {object} Same 'env' but with 'env.depth' increased by 1.
+**/
 function deepen(env) {
   return { ...env, depth: env.depth + 1 };
 }
 
 /**
+ * @description
  * Evalúa un objeto literal: cada valor es proyección, cada clave puede
  * estar escapada con \$ para producir una clave que empiece literalmente por $.
- */
+ * @param {*} obj obj
+ * @param {*} env env
+ * @returns {*} Returns
+**/
 async function evalLiteralObject(obj, env) {
   const result = {};
   for (const key of Object.keys(obj)) {
@@ -147,16 +160,29 @@ async function evalLiteralObject(obj, env) {
   return result;
 }
 
-/** Despacha la operación al handler correspondiente. */
+/**
+ * @description
+ *  Despacha la operación al handler correspondiente.
+ * @param {*} op op
+ * @param {*} env env
+ * @returns {*} Returns
+**/
 async function evalOperation(op, env) {
-  const handler = OPERATORS[op.$op];
+  const handler = JM2MP_PROJECTIONS[op.$op];
   if (!handler) {
     throw new EvaluationError(`Operador desconocido '${op.$op}'.`);
   }
   return handler(op, env);
 }
 
-/** Asegura que `value` sea del tipo esperado o lanza EvaluationError. */
+/**
+ * @description
+ * Asegura que `value` sea del tipo esperado o lanza EvaluationError.
+ * @param {*} value Value to test.
+ * @param {*} expectedType Expected type's name.
+ * @param {*} opName Operation name.
+ * @param {*} argName Argument's name.
+**/
 function expectType(value, expectedType, opName, argName) {
   let actual;
   if (value === null) actual = "null";
@@ -170,13 +196,22 @@ function expectType(value, expectedType, opName, argName) {
 }
 
 /**
+ * @description
  * Tabla de operadores. Cada entrada es async para uniformidad con el
  * contrato de los adaptadores.
- */
-const OPERATORS = {
+ * @namespace
+**/
+const JM2MP_PROJECTIONS = {
 
   /* Núcleo categórico */
 
+  /**
+   * @description The PIPE template command.
+   * @param {object} op  Template command to execute.
+   * @param {object} env Runtime execution environment.
+   * @returns {*} Resultant JSON value from projection.
+   * @async
+  **/
   async pipe(op, env) {
     let currentCtx = env.ctx;
     for (const stage of op.$stages) {
@@ -188,6 +223,13 @@ const OPERATORS = {
 
   /* Acceso */
 
+  /**
+   * @description The GET template command.
+   * @param {object} op  Template command to execute.
+   * @param {object} env Runtime execution environment.
+   * @returns {*} Resultant JSON value from projection.
+   * @async
+  **/
   async get(op, env) {
     const syntax = op.$syntax;
     const adapter = env.registry.get(syntax);
@@ -209,6 +251,13 @@ const OPERATORS = {
 
   /* Eliminadores */
 
+  /**
+   * @description The IF template command.
+   * @param {object} op  Template command to execute.
+   * @param {object} env Runtime execution environment.
+   * @returns {*} Resultant JSON value from projection.
+   * @async
+  **/
   async if(op, env) {
     const cond = await evalProjection(op.$cond, deepen(env));
     if (typeof cond !== "boolean") {
@@ -221,6 +270,13 @@ const OPERATORS = {
       : await evalProjection(op.$else, deepen(env));
   },
 
+  /**
+   * @description The FOLDARR template command.
+   * @param {object} op  Template command to execute.
+   * @param {object} env Runtime execution environment.
+   * @returns {*} Resultant JSON value from projection.
+   * @async
+  **/
   async foldArr(op, env) {
     const xs = await evalProjection(op.$over, deepen(env));
     if (xs === null) {
@@ -239,6 +295,13 @@ const OPERATORS = {
     return acc;
   },
 
+  /**
+   * @description The FOLDOBJ template command.
+   * @param {object} op  Template command to execute.
+   * @param {object} env Runtime execution environment.
+   * @returns {*} Resultant JSON value from projection.
+   * @async
+  **/
   async foldObj(op, env) {
     const obj = await evalProjection(op.$over, deepen(env));
     if (obj === null) {
@@ -258,6 +321,13 @@ const OPERATORS = {
 
   /* Constructores dinámicos */
 
+  /**
+   * @description The CONS template command.
+   * @param {object} op  Template command to execute.
+   * @param {object} env Runtime execution environment.
+   * @returns {*} Resultant JSON value from projection.
+   * @async
+  **/
   async cons(op, env) {
     const head = await evalProjection(op.$head, deepen(env));
     const tail = await evalProjection(op.$tail, deepen(env));
@@ -267,6 +337,13 @@ const OPERATORS = {
     return [head, ...tail];
   },
 
+  /**
+   * @description The INSERT template command.
+   * @param {object} op  Template command to execute.
+   * @param {object} env Runtime execution environment.
+   * @returns {*} Resultant JSON value from projection.
+   * @async
+  **/
   async insert(op, env) {
     const key = await evalProjection(op.$key, deepen(env));
     if (typeof key !== "string") {
@@ -282,6 +359,13 @@ const OPERATORS = {
 
   /* Entorno */
 
+  /**
+   * @description The LET template command.
+   * @param {object} op  Template command to execute.
+   * @param {object} env Runtime execution environment.
+   * @returns {*} Resultant JSON value from projection.
+   * @async
+  **/
   async let(op, env) {
     // Bindings paralelos (no let*).
     const newAliases = { ...env.aliases };
@@ -294,6 +378,13 @@ const OPERATORS = {
 
   /* Invocación */
 
+  /**
+   * @description The CALL template command.
+   * @param {object} op  Template command to execute.
+   * @param {object} env Runtime execution environment.
+   * @returns {*} Resultant JSON value from projection.
+   * @async
+  **/
   async call(op, env) {
     const ref = op.$ref;
     if (!Object.hasOwn(env.module, ref)) {
@@ -321,31 +412,78 @@ const OPERATORS = {
 
   /* Predicados */
 
+  /**
+   * @description The EQ predicate.
+   * @param {object} op  Template command to execute.
+   * @param {object} env Runtime execution environment.
+   * @returns {*} Resultant JSON value from projection.
+   * @async
+  **/
   async eq(op, env) {
     const l = await evalProjection(op.$left, deepen(env));
     const r = await evalProjection(op.$right, deepen(env));
     return deepEqual(l, r);
   },
+
+  /**
+   * @description The LT predicate.
+   * @param {object} op  Template command to execute.
+   * @param {object} env Runtime execution environment.
+   * @returns {*} Resultant JSON value from projection.
+   * @async
+  **/
   async lt(op, env) {
     const l = await evalProjection(op.$left, deepen(env));
     const r = await evalProjection(op.$right, deepen(env));
     return compareOrdered(l, r, "lt") < 0;
   },
+
+  /**
+   * @description The GT predicate.
+   * @param {object} op  Template command to execute.
+   * @param {object} env Runtime execution environment.
+   * @returns {*} Resultant JSON value from projection.
+   * @async
+  **/
   async gt(op, env) {
     const l = await evalProjection(op.$left, deepen(env));
     const r = await evalProjection(op.$right, deepen(env));
     return compareOrdered(l, r, "gt") > 0;
   },
+
+  /**
+   * @description The LTE predicate.
+   * @param {object} op  Template command to execute.
+   * @param {object} env Runtime execution environment.
+   * @returns {*} Resultant JSON value from projection.
+   * @async
+  **/
   async lte(op, env) {
     const l = await evalProjection(op.$left, deepen(env));
     const r = await evalProjection(op.$right, deepen(env));
     return compareOrdered(l, r, "lte") <= 0;
   },
+
+  /**
+   * @description The GTE predicate.
+   * @param {object} op  Template command to execute.
+   * @param {object} env Runtime execution environment.
+   * @returns {*} Resultant JSON value from projection.
+   * @async
+  **/
   async gte(op, env) {
     const l = await evalProjection(op.$left, deepen(env));
     const r = await evalProjection(op.$right, deepen(env));
     return compareOrdered(l, r, "gte") >= 0;
   },
+
+  /**
+   * @description The NEQ predicate.
+   * @param {object} op  Template command to execute.
+   * @param {object} env Runtime execution environment.
+   * @returns {*} Resultant JSON value from projection.
+   * @async
+  **/
   async neq(op, env) {
     const l = await evalProjection(op.$left, deepen(env));
     const r = await evalProjection(op.$right, deepen(env));
@@ -354,11 +492,26 @@ const OPERATORS = {
 
   /* Booleanos */
 
+  /**
+   * @description The NOT logical operator.
+   * @param {object} op  Template command to execute.
+   * @param {object} env Runtime execution environment.
+   * @returns {*} Resultant JSON value from projection.
+   * @async
+  **/
   async not(op, env) {
     const v = await evalProjection(op.$value, deepen(env));
     expectType(v, "boolean", "not", "$value");
     return !v;
   },
+
+  /**
+   * @description The AND logical operator.
+   * @param {object} op  Template command to execute.
+   * @param {object} env Runtime execution environment.
+   * @returns {*} Resultant JSON value from projection.
+   * @async
+  **/
   async and(op, env) {
     // Cortocircuito: si $left es false, no evaluamos $right.
     const l = await evalProjection(op.$left, deepen(env));
@@ -368,6 +521,14 @@ const OPERATORS = {
     expectType(r, "boolean", "and", "$right");
     return r;
   },
+
+  /**
+   * @description The OR logical operator.
+   * @param {object} op  Template command to execute.
+   * @param {object} env Runtime execution environment.
+   * @returns {*} Resultant JSON value from projection.
+   * @async
+  **/
   async or(op, env) {
     // Cortocircuito: si $left es true, no evaluamos $right.
     const l = await evalProjection(op.$left, deepen(env));
@@ -380,6 +541,13 @@ const OPERATORS = {
 
   /* Aritmética */
 
+  /**
+   * @description The ADD arithmetic operator.
+   * @param {object} op  Template command to execute.
+   * @param {object} env Runtime execution environment.
+   * @returns {*} Resultant JSON value from projection.
+   * @async
+  **/
   async add(op, env) {
     const l = await evalProjection(op.$left, deepen(env));
     const r = await evalProjection(op.$right, deepen(env));
@@ -387,6 +555,14 @@ const OPERATORS = {
     expectType(r, "number", "add", "$right");
     return l + r;
   },
+
+  /**
+   * @description The SUB arithmetic operator.
+   * @param {object} op  Template command to execute.
+   * @param {object} env Runtime execution environment.
+   * @returns {*} Resultant JSON value from projection.
+   * @async
+  **/
   async sub(op, env) {
     const l = await evalProjection(op.$left, deepen(env));
     const r = await evalProjection(op.$right, deepen(env));
@@ -394,6 +570,14 @@ const OPERATORS = {
     expectType(r, "number", "sub", "$right");
     return l - r;
   },
+
+  /**
+   * @description The MUL arithmetic operator.
+   * @param {object} op  Template command to execute.
+   * @param {object} env Runtime execution environment.
+   * @returns {*} Resultant JSON value from projection.
+   * @async
+  **/
   async mul(op, env) {
     const l = await evalProjection(op.$left, deepen(env));
     const r = await evalProjection(op.$right, deepen(env));
@@ -401,6 +585,14 @@ const OPERATORS = {
     expectType(r, "number", "mul", "$right");
     return l * r;
   },
+
+  /**
+   * @description The DIV arithmetic operator.
+   * @param {object} op  Template command to execute.
+   * @param {object} env Runtime execution environment.
+   * @returns {*} Resultant JSON value from projection.
+   * @async
+  **/
   async div(op, env) {
     const l = await evalProjection(op.$left, deepen(env));
     const r = await evalProjection(op.$right, deepen(env));
@@ -411,6 +603,14 @@ const OPERATORS = {
     if ( ! Number.isFinite(result) ) throw EvaluationError("div: resultado no finito.");
     return result;
   },
+
+  /**
+   * @description The MOD arithmetic operator.
+   * @param {object} op  Template command to execute.
+   * @param {object} env Runtime execution environment.
+   * @returns {*} Resultant JSON value from projection.
+   * @async
+  **/
   async mod(op, env) {
     const l = await evalProjection(op.$left, deepen(env));
     const r = await evalProjection(op.$right, deepen(env));
@@ -421,11 +621,27 @@ const OPERATORS = {
     if ( ! Number.isFinite(result) ) throw EvaluationError("mod: resultado no finito.");
     return result;
   },
+
+  /**
+   * @description The NEG arithmetic operator.
+   * @param {object} op  Template command to execute.
+   * @param {object} env Runtime execution environment.
+   * @returns {*} Resultant JSON value from projection.
+   * @async
+  **/
   async neg(op, env) {
     const v = await evalProjection(op.$value, deepen(env));
     expectType(v, "number", "neg", "$value");
     return (-v);
   },
+
+  /**
+   * @description The ABS arithmetic operator.
+   * @param {object} op  Template command to execute.
+   * @param {object} env Runtime execution environment.
+   * @returns {*} Resultant JSON value from projection.
+   * @async
+  **/
   async abs(op, env) {
     const v = await evalProjection(op.$value, deepen(env));
     expectType(v, "number", "abs", "$value");
@@ -434,6 +650,13 @@ const OPERATORS = {
 
   /* Strings */
 
+  /**
+   * @description The CONCAT string operator.
+   * @param {object} op  Template command to execute.
+   * @param {object} env Runtime execution environment.
+   * @returns {*} Resultant JSON value from projection.
+   * @async
+  **/
   async concat(op, env) {
     if (!Array.isArray(op.$parts)) {
       throw new EvaluationError("concat: $parts debe ser array.");
@@ -451,13 +674,30 @@ const OPERATORS = {
     return result;
   },
 
+  /**
+   * @description The LENGTH operator.
+   * @param {object} op  Template command to execute.
+   * @param {object} env Runtime execution environment.
+   * @returns {*} Resultant JSON value from projection.
+   * @async
+  **/
   async length(op, env) {
     const v = await evalProjection(op.$value, deepen(env));
+    // It counts real characters, not code-points neither graphemes.
     if (typeof v === "string") return Array.from(v).length;
-    if (Array.isArray(v)) return v.length;
-    throw new EvaluationError("length: $value debe ser string o array.");
+    // It counts array's items.
+    else if (Array.isArray(v)) return v.length;
+    // Otherwise, an exception is raised.
+    else throw new EvaluationError("length: $value debe ser string o array.");
   },
 
+  /**
+   * @description The SUBSTRING string operator.
+   * @param {object} op  Template command to execute.
+   * @param {object} env Runtime execution environment.
+   * @returns {*} Resultant JSON value from projection.
+   * @async
+  **/
   async substring(op, env) {
     const v = await evalProjection(op.$value, deepen(env));
     expectType(v, "string", "substring", "$value");
@@ -480,12 +720,26 @@ const OPERATORS = {
     return codepoints.slice(realStart, realEnd).join("");
   },
 
+  /**
+   * @description The TO-UPPER-CASE string operator.
+   * @param {object} op  Template command to execute.
+   * @param {object} env Runtime execution environment.
+   * @returns {*} Resultant JSON value from projection.
+   * @async
+  **/
   async upper(op, env) {
     const v = await evalProjection(op.$value, deepen(env));
     expectType(v, "string", "upper", "$value");
     return v.toUpperCase();
   },
 
+  /**
+   * @description The TO-LOWER-CASE string operator.
+   * @param {object} op  Template command to execute.
+   * @param {object} env Runtime execution environment.
+   * @returns {*} Resultant JSON value from projection.
+   * @async
+  **/
   async lower(op, env) {
     const v = await evalProjection(op.$value, deepen(env));
     expectType(v, "string", "lower", "$value");
@@ -494,6 +748,13 @@ const OPERATORS = {
 
   /* Tipos y reflexión */
 
+  /**
+   * @description The TYPE-OF operator.
+   * @param {object} op  Template command to execute.
+   * @param {object} env Runtime execution environment.
+   * @returns {*} Resultant JSON value from projection.
+   * @async
+  **/
   async typeof(op, env) {
     const v = await evalProjection(op.$value, deepen(env));
     if (v === null) return "null";
@@ -501,6 +762,13 @@ const OPERATORS = {
     return typeof v;
   },
 
+  /**
+   * @description The COALESCE template command.
+   * @param {object} op  Template command to execute.
+   * @param {object} env Runtime execution environment.
+   * @returns {*} Resultant JSON value from projection.
+   * @async
+  **/
   async coalesce(op, env) {
     // Solo si $value es null, evaluamos $default (perezoso).
     const v = await evalProjection(op.$value, deepen(env));
@@ -510,6 +778,13 @@ const OPERATORS = {
     return v;
   },
 
+  /**
+   * @description The HAS predicate.
+   * @param {object} op  Template command to execute.
+   * @param {object} env Runtime execution environment.
+   * @returns {*} Resultant JSON value from projection.
+   * @async
+  **/
   async has(op, env) {
     const key = await evalProjection(op.$key, deepen(env));
     expectType(key, "string", "has", "$key");
@@ -522,6 +797,13 @@ const OPERATORS = {
 
   /* Listas (extensión) */
 
+  /**
+   * @description The SORT template command.
+   * @param {object} op  Template command to execute.
+   * @param {object} env Runtime execution environment.
+   * @returns {*} Resultant JSON value from projection.
+   * @async
+  **/
   async sort(op, env) {
     const xs = await evalProjection(op.$over, deepen(env));
     if (xs === null) return null;
@@ -552,6 +834,13 @@ const OPERATORS = {
 
   /* Acceso por clave (extensión, O(1)) */
 
+  /**
+   * @description The LOOKUP template command.
+   * @param {object} op  Template command to execute.
+   * @param {object} env Runtime execution environment.
+   * @returns {*} Resultant JSON value from projection.
+   * @async
+  **/
   async lookup(op, env) {
     const key = await evalProjection(op.$key, deepen(env));
     expectType(key, "string", "lookup", "$key");
@@ -566,6 +855,13 @@ const OPERATORS = {
 
   /* Fusión de objetos (extensión, O(m+n)) */
 
+  /**
+   * @description The MERGE template command.
+   * @param {object} op  Template command to execute.
+   * @param {object} env Runtime execution environment.
+   * @returns {*} Resultant JSON value from projection.
+   * @async
+  **/
   async merge(op, env) {
     const left = await evalProjection(op.$left, deepen(env));
     const right = await evalProjection(op.$right, deepen(env));
@@ -581,6 +877,7 @@ const OPERATORS = {
     // El spread es O(m+n); las claves de right ganan.
     return { ...leftObj, ...rightObj };
   },
+
 };
 
 /* =============================================================================
@@ -596,9 +893,9 @@ const OPERATORS = {
  *  - Objetos iguales si tienen mismo conjunto de claves y valores correspondientes iguales.
  *  - Tipos distintos: nunca iguales.
  *
- * @param {*} a
- * @param {*} b
- * @returns {boolean}
+ * @param {*} a a
+ * @param {*} b b
+ * @returns {boolean} (a==b)
  */
 function deepEqual(a, b) {
   if (a === b) return true;
@@ -628,24 +925,39 @@ function deepEqual(a, b) {
 }
 
 /**
+ * @description
  * Compara dos valores ordenables (number/number o string/string).
  * Lanza EvaluationError si los tipos son heterogéneos o no ordenables.
- */
+ * @param {*} a a
+ * @param {*} b b
+ * @param {*} opName Operation's name.
+ * @returns {integer} (-1)|(+1)|(0) when (a<b)|(a>b)|(a===b)
+**/
 function compareOrdered(a, b, opName) {
   if (typeof a === "number" && typeof b === "number") {
     return a < b ? -1 : (a > b ? 1 : 0);
   }
-  if (typeof a === "string" && typeof b === "string") {
+  else if (typeof a === "string" && typeof b === "string") {
     return a < b ? -1 : (a > b ? 1 : 0);
   }
-  throw new EvaluationError(
-    `${opName}: argumentos deben ser ambos number o ambos string ` +
-    `(recibido ${typeName(a)} y ${typeName(b)}).`
-  );
+  else {
+    throw new EvaluationError(
+      `${opName}: argumentos deben ser ambos number o ambos string ` +
+      `(recibido ${typeName(a)} y ${typeName(b)}).`
+    );
+  }
 }
 
+/**
+ * @description
+ * It returns the name of the JSON data type associated to 'v'.
+ * @param {*} v Value to be tested.
+ * @returns {string} String with corresponding JSON data type (not exactly like JavaScript).
+**/
 function typeName(v) {
-  if (v === null) return "null";
-  if (Array.isArray(v)) return "array";
-  return typeof v;
+  if (v === null) { return "null"; }
+  else if (Array.isArray(v)) { return "array"; }
+  else { return(typeof(v)); }
 }
+
+// End of file: $/jm2mp/src/evaluator.js //

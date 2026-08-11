@@ -2,8 +2,12 @@
  * @author Luis Maria CAMARA ROSSI
  * @copyright Universidad Nacional de Educación a Distancia (U.N.E.D.) 2026
  * @license BSD-3-Clause
- * @module jm2mp/modules/helpers
  * @file Funciones auxiliares relacionadas con los módulos.
+ * @description Funciones auxiliares relacionadas con los módulos.
+**/
+
+/**
+ * @module jm2mp/modules/helpers
  * @description Funciones auxiliares relacionadas con los módulos.
 **/
 

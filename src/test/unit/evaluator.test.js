@@ -142,7 +142,7 @@ describe("evaluator: if", () => {
 describe("evaluator: fold", () => {
   it("suma una lista por la derecha", async () => {
     const proj = {
-      "$op": "fold",
+      "$op": "foldArr",
       "$over": [1, 2, 3, 4],
       "$init": 0,
       "$step": {
@@ -156,7 +156,7 @@ describe("evaluator: fold", () => {
 
   it("expone @.index", async () => {
     const proj = {
-      "$op": "fold",
+      "$op": "foldArr",
       "$over": ["a", "b", "c"],
       "$init": [],
       "$step": {
@@ -171,7 +171,7 @@ describe("evaluator: fold", () => {
 
   it("$over null devuelve $init", async () => {
     const proj = {
-      "$op": "fold",
+      "$op": "foldArr",
       "$over": null,
       "$init": 42,
       "$step": null
@@ -181,7 +181,7 @@ describe("evaluator: fold", () => {
 
   it("rechaza $over no array/null", async () => {
     const proj = {
-      "$op": "fold", "$over": "string", "$init": 0, "$step": 0
+      "$op": "foldArr", "$over": "string", "$init": 0, "$step": 0
     };
     await assert.rejects(run(proj, null), EvaluationError);
   });

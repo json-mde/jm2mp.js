@@ -81,11 +81,11 @@ const OP_ARGS = {
 };
 
 /**
+ * @description
  * Determina si un objeto JSON es un objeto-operación.
  * Regla: contiene la clave "$op".
- *
  * @param {*} obj
- * @returns {boolean}
+ * @returns {boolean} True whenever 'obj' is a template command.
  */
 export function isOperation(obj)
 {

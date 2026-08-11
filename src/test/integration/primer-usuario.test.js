@@ -37,7 +37,7 @@ describe("Integración: extraer primer usuario", () => {
 
   it("extrae el primer usuario usando fold con @.index", async () => {
     const proj = {
-      "$op": "fold",
+      "$op": "foldArr",
       "$over": { "$op": "get", "$path": "$.Usuarios" },
       "$init": null,
       "$step": {
@@ -61,7 +61,7 @@ describe("Integración: extraer primer usuario", () => {
 
   it("array vacío devuelve null (el $init)", async () => {
     const proj = {
-      "$op": "fold",
+      "$op": "foldArr",
       "$over": [],
       "$init": null,
       "$step": {
@@ -82,7 +82,7 @@ describe("Integración: extraer primer usuario", () => {
 
   it("usuarios null absorbe la proyección", async () => {
     const proj = {
-      "$op": "fold",
+      "$op": "foldArr",
       "$over": { "$op": "get", "$path": "$.NoExisten" },
       "$init": null,
       "$step": { "$op": "get", "$path": "@.acc" }
@@ -94,7 +94,7 @@ describe("Integración: extraer primer usuario", () => {
 
   it("un solo usuario también es el primero", async () => {
     const proj = {
-      "$op": "fold",
+      "$op": "foldArr",
       "$over": { "$op": "get", "$path": "$.Usuarios" },
       "$init": null,
       "$step": {

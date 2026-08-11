@@ -71,7 +71,6 @@
     "@stylistic/eslint-plugin": "^5.10.0",
     "eslint": "^10.8.0",
     "globals": "^17.9.0",
-    "jsdoc": "4.0.x",
     "tidy-jsdoc": "^1.4.1"
   },
   "keywords": [
