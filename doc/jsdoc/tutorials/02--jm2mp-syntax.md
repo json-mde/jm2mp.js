@@ -246,7 +246,7 @@ literally as possible, except for _template commands_. So:
 
 - Any scalar literal value that appears as part of a _projection_ will
   be part of the _resultant_ as is (except _strings_ considered as
-  **paths**, as it will be explained below in
+  **paths**, as it will be explained below in the
   [steps and paths](#steps-and-paths) section).
 
 - When an array is part of a _projection_, all its items will be
@@ -350,7 +350,8 @@ The _template command_ used for queries is [get](#get). By default,
 `JM2MP` incorporates a syntax known as `native`, which simplifies
 querying by simply using text string literals prefixed in a specific way.
 
-See [query languages](#query-languages) section for more information on this topic.
+See below the [query languages](#query-languages) section for more
+information about this topic.
 
 ## Template Commands
 
@@ -462,8 +463,8 @@ clause:
 }
 ```
 
-In [Named Templates](#named-templates) section, you can learn more about
-this concept.
+In the [Named Templates](#named-templates) section, you can learn more
+about this concept.
 
 ### Projections
 
@@ -561,8 +562,8 @@ It is also possible to define which _query language_ is used (clause
 }
 ```
 
-Please, refer below to [Query Languages](#query-languages) section in
-this tutorial for more information.
+Please, refer below to the [Query Languages](#query-languages) section
+in this tutorial for more information.
 
 #### if
 
@@ -1418,7 +1419,7 @@ Its JSON form is:
 ```
 
 Note that JSON data types are a subset of JavaScript's data types. In
-the above section [data types](#data-types) you can examine them all.
+the above [data types](#data-types) section, you can examine them all.
 
 ## Named Templates
 

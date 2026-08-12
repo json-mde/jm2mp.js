@@ -23,6 +23,7 @@ doc/jsdoc-out/
 ### Operating systems.
 .DS_Store
 Thumbs.db
+.lnk
 
 ### Configuration of local environment variables.
 .env

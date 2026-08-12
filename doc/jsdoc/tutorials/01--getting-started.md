@@ -40,7 +40,9 @@ transformations.
 
 ## About
 
-`JM2MP` and `JM2MP.JS` has been design and develop by [Luis Maria CAMARA ROSSI](mailto:lcamara8@alumno.uned.es) as part of his work toward a **Doctor in Philosophy (Ph.D.) degree** in
+`JM2MP` and `JM2MP.JS` has been design and develop by
+[Luis Maria CAMARA ROSSI](mailto:lcamara8@alumno.uned.es) as part of his
+work toward a **Doctor in Philosophy (Ph.D.) degree** in
 **Doctoral Programme in Engineering of Systems and Control**<sup>[[1](https://www.uned.es/universidad/facultades/en/escueladoctorado/programas-de-doctorado/doctorado-en-ingenieria-de-sistemas-y-control.html)]</sup><sup>[[2](https://blogs.uned.es/doct-ing-sist-cont/)]</sup>.
 
 I would like to extend special thanks to my tutor
@@ -50,6 +52,10 @@ and my director
 for their contributions throughout my doctoral studies, as well as to all other members of the
 [ISSI](https://www.uned.es/universidad/facultades/en/departamentos/ingenieria-del-softw-y-sist-informaticos.html)
 and rest of Departments in the [School of Computer Science](https://www.uned.es/universidad/facultades/informatica.html).
+
+I would also like to thank _María Isabel Cámara_ and _Kulvir Sroy_ for
+their invaluable assistance during the translation of this article and
+other texts I wrote as part of my doctoral studies.
 
 ## Licensing
 

@@ -1,0 +1,17 @@
+@media screen {
+
+    ul.table-of-contents {
+        font-size : smaller ;
+    }
+
+    ul.table-of-contents,
+    ul.table-of-contents ul {
+        margin : 0px !important ;
+    }
+
+    span.external {
+        color : Silver !important ;
+    }
+
+}
+

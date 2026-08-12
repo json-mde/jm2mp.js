@@ -15,24 +15,53 @@
   <script type="module" id="LCamara8_CorrectMarkdownHeaderAnchors">
     const all_tutorials = Array.from( document.getElementsByClassName("tutorial") ) ;
     const all_tutorial_sections = all_tutorials.filter( (e) => ( e?.tagName?.toLowerCase() === "section" ) ) ;
-    console.log('all_tutorial_sections',all_tutorial_sections);
+    // console.log('all_tutorial_sections',all_tutorial_sections);
     const this_tutorial_sections = all_tutorial_sections &&
                                    all_tutorial_sections.length &&
                                    all_tutorial_sections[0] ;
-    console.log('this_tutorial_sections',this_tutorial_sections);
+    // console.log('this_tutorial_sections',this_tutorial_sections);
     if ( this_tutorial_sections ) {
         ['h1','h2','h3','h4','h5','h6'].forEach( (tag) => {
             const tutorial_headers = Array.from( this_tutorial_sections.getElementsByTagName(tag) ) ;
-            console.log('tutorial_headers',tutorial_headers);
-                tutorial_headers.forEach( (current_header) => {
+            // console.log('tutorial_headers',tutorial_headers);
+            tutorial_headers.forEach( (current_header) => {
                 let header_text = current_header.innerText ;
                 header_text = header_text.replace(/\s/ig,"-")
                                          .replace(/[^-A-Za-z0-9]/g,"")
-                                         .toLowerCase();
-                console.log(tag,'header_text',header_text);
+                                         .toLowerCase() ;
+                // console.log(tag,'header_text',header_text);
                 current_header.id = header_text ;
             });
         }) ;
     }
+  </script>
+  <script type="module" id="LCamara8_TableOfCOntents">
+    const toc_header = document.getElementById( "table-of-contents" ) ;
+    console.log('toc_header',toc_header) ;
+    if ( toc_header ) {
+        let toc_ul = toc_header.nextElementSibling ;
+        console.log('toc_ul',toc_ul) ;
+        if ( toc_ul.tagName.toLowerCase() === "ul" ) {
+            toc_ul.className = ( ((toc_ul.className)?(toc_ul.className+" "):("")) + "table-of-contents" ) ;
+        }
+    }
+  </script>
+  <script type="module" id="LCamara8_TargetExternalUrls">
+    const this_tutorial_origin = document.location.origin ;
+    // console.log('this_tutorial_origin',this_tutorial_origin);
+    const all_anchors = Array.from( document.getElementsByTagName("a") ) ;
+    // console.log('all_anchors',all_anchors);
+    const all_external_anchors = all_anchors.filter(
+      (a) => ( !!(a.href) && !(a.target) && URL.canParse(a.href) &&
+               URL.canParse(this_tutorial_origin) &&
+               ["http:","https:"].includes( URL.parse(a.href,this_tutorial_origin).protocol ) &&
+               ( URL.parse(a.href,this_tutorial_origin).origin !== URL.parse(this_tutorial_origin).origin ) )
+    ) ;
+    // console.log('all_external_anchors',all_external_anchors);
+    all_external_anchors.forEach( (a) => {
+        a.target = "_blank" ;
+        a.className = ( ((a.className)?(a.className+" "):("")) + "external" ) ;
+        a.insertAdjacentHTML( "afterend", "&nbsp;<span class=\"external\">&#x1F875</span>" ) ;
+    });
   </script>
 </section>

@@ -18,5 +18,14 @@
                 "title":"Inventory"
             }
         }
+    },
+    "04--how-to-project-other-formats" : {
+        "title" : "How to Project Other Usual Document Formats"
+    },
+    "05--use-cases" : {
+        "title" : "Use Cases"
+    },
+    "06--jsdoc" : {
+        "title" : "Documentation Generation Using Tidy-JSDoc"
     }
 }
