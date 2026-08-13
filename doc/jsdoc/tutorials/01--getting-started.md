@@ -24,7 +24,7 @@ transformations.
 - A JavaScript [EM2024](https://tc39.es/ecma262/2024/) library to execute
   `JM2MP` transformations as part of your applications and services.
 
-- An script `./cli.js` to execute transformations (using, for instance,
+- An script `./cli/main.js` to execute transformations (using, for instance,
   [Node.JS](https://NodeJS.ORG/en)) as part of an on-line and interactive
   _command-line interface_ (CLI), or as part of a batch processing in a
   _shell script_.

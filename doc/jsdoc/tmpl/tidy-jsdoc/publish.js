@@ -347,9 +347,10 @@ function buildMemberNav(items, itemHeading, itemsSeen, linktoFn) {
                 displayName = displayName.replace(/^module:/g, "")
 
                 if (itemHeading === 'Tutorials') {
-                    nav.push(buildNavItem(linktoFn(item.longname, displayName)))
+                //  nav.push(buildNavItem(                            linktoFn(item.longname, displayName)))
+                    nav.push(buildNavHeading(buildNavType('tutorial', linktoFn(item.longname, displayName)), true));
                 } else {
-                    nav.push(buildNavHeading(buildNavType(item.kind, linktoFn(item.longname, displayName))))
+                    nav.push(buildNavHeading(buildNavType(item.kind, linktoFn(item.longname, displayName))));
                 }
 
                 if (members.length) {
@@ -696,17 +697,8 @@ exports.publish = function (taffyData, opts, tutorials) {
 
     // TODO: move the tutorial functions to templateHelper.js
     function generateTutorial(title, tutorial, filename) {
-        /*
         var tutorialData = {
-            title: title,
-            kind: null,
-            header: tutorial.title,
-            content: tutorial.parse(),
-            children: tutorial.children
-        };
-        */
-        var tutorialData = {
-            title: '',
+            title: '', // title
             kind: null,
             header: tutorial.title,
             content: tutorial.parse(),
@@ -750,10 +742,11 @@ function buildNavLink(linkClass, linkContent) {
 
 function buildNavType(type, typeLink) {
     return [
+        // Letter as type icon.
         '<span class="nav-item-type type-' + type + '" title="' + type + '">',
         type[0].toUpperCase(),
         '</span>',
-
+        // Name as actual text nav-item.
         `<span class="nav-item-name is-${type}">`,
         typeLink,
         '</span>'
@@ -767,9 +760,9 @@ function buildNavType(type, typeLink) {
  * @param {String} content navigation header content
  * @return {String}
  */
-function buildNavHeading(content) {
+function buildNavHeading(content, isTutorial=false) {
     return [
-        '<li class="nav-heading">',
+        `<li class="nav-heading${(isTutorial?'-tutorial':'')}">`,
         content,
         '</li>'
     ].join('')

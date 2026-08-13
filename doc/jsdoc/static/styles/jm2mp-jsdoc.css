@@ -1,3 +1,35 @@
+/**
+ * @author Luis Maria CAMARA ROSSI
+ * @copyright Universidad Nacional de Educación a Distancia (U.N.E.D.) 2026
+ * @license BSD-3-Clause
+ * @file JM2MP JSDoc CSS
+**/
+
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
+
+@media all {
+
+    .tutorial {
+
+        h1, h2, h3, h4, h4, h5, h6 {
+            color: Green ;
+        }
+
+        h2, h3, h4, h4, h5, h6 {
+            border-bottom: 1px solid rgb(192,222,192) ;
+        }
+
+        #table-of-contents {
+            border: 0px;
+        }
+
+    }
+
+}
+
+
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
+
 @media screen {
 
     ul.table-of-contents {
@@ -15,3 +47,6 @@
 
 }
 
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
+/* End of file. */

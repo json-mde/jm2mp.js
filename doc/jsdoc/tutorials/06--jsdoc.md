@@ -89,8 +89,8 @@ applied to both
 [JSDoc (document generation)](https://jsdoc.app/about-commandline) and
 [AJV-CLI (CLI for JSON-Schema validator)](https://ajv.js.org/packages/ajv-cli.html).
 
-Executing `npm run jsdoc` in your _shell_ will create a new directory
-`./doc/jsdoc-out/` containing the final documentation, which can be
+Executing `npm run jsdoc` from `${JM2MP.JS_ROOT}/src/` in your _shell_ will create a new directory
+`${JM2MP.JS_ROOT}/doc/jsdoc-out/` containing the final documentation, which can be
 archived using any utility (like
 [TAR](https://manpages.debian.org/trixie/tar/tar.1.en.html) or
 [GZIP](https://manpages.debian.org/trixie/gzip/gzip.1.en.html), to name
