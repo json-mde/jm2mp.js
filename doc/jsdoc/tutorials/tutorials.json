@@ -5,27 +5,30 @@
     "02--jm2mp-syntax" : {
         "title" : "JM2MP Syntax"
     },
-    "03--examples" : {
+    "03--nql-syntax" : {
+        "title" : "Native Query Language"
+    },
+    "04--examples" : {
         "title" : "Examples",
         "children": {
-            "03.01--examples--first-user": {
+            "04.01--examples--first-user": {
                 "title":"First User Example"
             },
-            "03.02--examples--alumni": {
+            "04.02--examples--alumni": {
                 "title":"Alumni"
             },
-            "03.03--examples--inventory": {
+            "04.03--examples--inventory": {
                 "title":"Inventory"
             }
         }
     },
-    "04--how-to-project-other-formats" : {
+    "05--how-to-project-other-formats" : {
         "title" : "How to Project Other Usual Document Formats"
     },
-    "05--use-cases" : {
+    "06--use-cases" : {
         "title" : "Use Cases"
     },
-    "06--jsdoc" : {
+    "07--jsdoc" : {
         "title" : "Documentation Generation Using Tidy-JSDoc"
     }
 }
