@@ -37,10 +37,10 @@
   </script>
   <script type="module" id="LCamara8_TableOfCOntents">
     const toc_header = document.getElementById( "table-of-contents" ) ;
-    console.log('toc_header',toc_header) ;
+    // console.log('toc_header',toc_header) ;
     if ( toc_header ) {
         let toc_ul = toc_header.nextElementSibling ;
-        console.log('toc_ul',toc_ul) ;
+        // console.log('toc_ul',toc_ul) ;
         if ( toc_ul.tagName.toLowerCase() === "ul" ) {
             toc_ul.className = ( ((toc_ul.className)?(toc_ul.className+" "):("")) + "table-of-contents" ) ;
         }

@@ -10,17 +10,80 @@
 @media all {
 
     .tutorial {
+        /* section.tutorial */
+        text-align: justify ;
+
+        #table-of-contents, ul.table-of-contents {
+            /* h2 & ul (top level) */
+            border: 0px;
+            text-align: left ;
+            counter-reset: counter-toc 1;
+            counter-set: counter-toc 1;
+
+            ul {
+                counter-reset: counter-toc;
+            }
+            li {
+                counter-increment: counter-toc;
+            }
+            li::marker {
+                content: counters(counter-toc, ".") ") ";
+            }
+        }
 
         h1, h2, h3, h4, h4, h5, h6 {
             color: Green ;
+            text-align: left ;
         }
 
         h2, h3, h4, h4, h5, h6 {
+            margin-top: 2em;
             border-bottom: 1px solid rgb(192,222,192) ;
         }
 
-        #table-of-contents {
-            border: 0px;
+        h1 {
+            counter-reset: counter-h2 -1;
+            counter-set: counter-h2 -1;
+        }
+
+        h2 {
+            counter-increment: counter-h2;
+            counter-reset: counter-h3;
+        }
+        h2::before {
+            content: counter(counter-h2,decimal) ".- ";
+        }
+
+        h3 {
+            counter-increment: counter-h3;
+            counter-reset: counter-h4;
+        }
+        h3::before {
+            content: counter(counter-h2,decimal) "." counter(counter-h3,decimal) ".- ";
+        }
+
+        h4 {
+            counter-increment: counter-h4;
+            counter-reset: counter-h5;
+        }
+        h4::before {
+            content: counter(counter-h2,decimal) "." counter(counter-h3,decimal)  "." counter(counter-h4,decimal) ".- ";
+        }
+
+        h5 {
+            counter-increment: counter-h5;
+            counter-reset: counter-h6;
+        }
+        h5::before {
+            content: counter(counter-h2,decimal) "." counter(counter-h3,decimal) "." counter(counter-h4,decimal) "." counter(counter-h5,decimal) ".- ";
+        }
+
+        h6 {
+            counter-increment: counter-h6;
+            counter-reset: counter-h7;
+        }
+        h6::before {
+            content: counter(counter-h2,decimal) "." counter(counter-h3,decimal) "." counter(counter-h4,decimal) "." counter(counter-h5,decimal) "." counter(counter-h6,decimal) ".- ";
         }
 
     }
