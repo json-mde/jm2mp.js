@@ -58,7 +58,8 @@ import { AdapterError, ValidationError, EvaluationError } from "../errors.js";
  *   which is a query language for JSON. It will take a JSON document
  *   and transform it into another JSON document through a JMESPath
  *   expression.
- * @external jmespath
+ * @external JMESpath
+ * @see {@link https://jmespath.org/}
  * @see {@link https://www.npmjs.com/package/jmespath}
  * @see {@link https://github.com/jmespath/jmespath.js}
 **/

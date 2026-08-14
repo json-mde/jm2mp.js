@@ -40,7 +40,7 @@ The general idea is to convert such formats to JSON, transform it using
 <br />
 <math xmlns="http://www.w3.org/1998/Math/MathML" display="block">
   <mrow>
-    <mi>t</mi>
+    <mi>p</mi>
     <mo>=</mo>
     <mrow>
       <msub><mi>Project</mi><ms>JM2MP</ms></msub>
@@ -63,16 +63,29 @@ The general idea is to convert such formats to JSON, transform it using
   <mrow>
     <msub><mi>Convert-From-JSON</mi><ms>Other-Format</ms></msub>
     <mo>(</mo>
-    <mi>t</mi>
+    <mi>p</mi>
     <mo>)</mo>
   </mrow>
 </math>
 
 ### JSONC and JSON5
 
-...
+Both [JSONC](#) and [JSON5](https://json5.org/) ...
 
 ```javascript
+```
+
+```javascript
+// How to install JSON5 using NPM.
+npm install json5
+
+// How to use JSON5 in Node.JS.
+import JSON5 from 'json5'
+// Import JSON5 file.
+const json5_register = require('json5/lib/register') ;
+const json5_content_one = require('${FILE_PATH}/file.json5') ;
+const json5_content_two = JSON5.parse() ;
+const json5_string = JSON5.stringify() ;
 ```
 
 ### JSON Lines
@@ -112,7 +125,7 @@ help you loading and saving XML data. See
 for more information.
 
 However, the data structures of XML and JSON are not exactly the same,
-so it is necessary to make certain design decisions first. There are
+so first it is necessary to make certain design decisions. There are
 many online tools that can help you make these decisions; for
 instance: [https://jsonlint.com/xml-to-json](https://jsonlint.com/xml-to-json).
 

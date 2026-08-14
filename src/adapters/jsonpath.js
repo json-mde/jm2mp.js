@@ -33,10 +33,10 @@ import { AdapterError, ValidationError, EvaluationError } from "../errors.js";
  *   **jsonpath-plus** expands on the original **JSON Path** specification
  *   to add some additional operators and makes explicit some behaviors
  *   the original Goessner's work did not spell out.
- * @external jsonpath-plus
+ * @external JSONPath
+ * @see {@link https://goessner.net/articles/JsonPath/}
  * @see {@link https://www.npmjs.com/package/jsonpath-plus}
  * @see {@link https://github.com/JSONPath-Plus/JSONPath}
- * @see {@link https://goessner.net/articles/JsonPath/}
 **/
 
 /**

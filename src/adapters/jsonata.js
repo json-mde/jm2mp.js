@@ -40,8 +40,8 @@ import { AdapterError, ParseError, ValidationError, EvaluationError } from "../e
  * which is a JSON query and transformation language.
  * This packages is the reference implementation of the JSONata query and transformation language.
  * @external JSONata
- * @see {@link https://www.npmjs.com/package/jsonata}
  * @see {@link http://jsonata.org/}
+ * @see {@link https://www.npmjs.com/package/jsonata}
  * @see {@link https://github.com/jsonata-js/jsonata}
 **/
 

@@ -1423,69 +1423,77 @@ the above [data types](#data-types) section, you can examine them all.
 
 ## Named Templates
 
-...
+<span style="color:yellow; background:red;">... FALTA ...</span>
 
 ## Query Languages
 
-A **query language** is a mechanism to locate a specific value within a
-JSON document, traversing its structure and maybe processing its
-information in specific ways (like sorting or filtering, just to name a
-few).
+A _query language_ is the mechanism used to locate (search for and
+select) JSON values within a JSON document.
 
-The `JM2MP` syntax offers ...
-
-<span style="color:red;background:yellow;">FALTA</span>
-
+There are several languages designed for this purpose, ranging from the
+simplest (which simply allow you to locate any element in the document)
+to the most sophisticated (which offer pattern-based searches, as well
+as additional filtering and sorting operations, among others).
 
 ### Native
 
-`JM2MP` offers a `native query language` ...
+The `JM2MP` format offers its own _query language_, just named `native`.
+Both formats, `JM2MP` and `native`, have been designed to be
+algebraically complete, in the sense that they provide, with mathematical
+rigor, at least the minimal set of operations necessary to achieve
+complete transformations between JSON documents.
 
-<span style="color:red;background:yellow;">FALTA</span>
+The `native query language` features two syntactically different but
+semantically equivalent notations: one based on text strings and another
+based on JSON syntax.
+
+Please refer to the [Native Query Language](./tutorial--03--nql-syntax.html)
+tutorial for full details about this _query language_ and how to use it.
 
 ### External References
 
-The `JM2MP.JS` library references itself several external libraries in
-order to allow usage of different _query languages_ as part of `JM2MP`
-projections.
+The `JM2MP.JS` library also references several external libraries to
+enable the use of different _query languages_ as part of `JM2MP`
+_projections_.
 
 At the same time, it is possible to use additional _query languages_
 if proper _adapter class_ is developed. Please, refer to any _external
 reference_ to see how to do so.
 
-#### JSONquery
+#### JMESpath
 
-See [@jsonquerylang/jsonquery](./external-@jsonquerylang_jsonquery.html) _external reference_ for more information.
+See [JMESpath](./external-JMESpath.html) _external reference_ for more information.
 
 #### JSONata
 
 See [JSONata](./external-JSONata.html) _external reference_ for more information.
 
-#### JMESpath
+#### JSON Path
 
-See [@jsonquerylang/jsonquery](./external-jmespath.html) _external reference_ for more information.
+See [JSONPath](./external-JSONPath.html) _external reference_ for more information.
 
 #### JSON Pointer
 
-See [@jsonquerylang/jsonquery](./external-json-pointer.html) _external reference_ for more information.
+See [JSON Pointer](./external-JSONPointer.html) _external reference_ for more information.
 
-#### JSON Path Plus
+#### JSON Query
 
-See [@jsonquerylang/jsonquery](./external-jsonpath-plus.html) _external reference_ for more information.
+See [JSON Query](./external-JSONQuery.html) _external reference_ for more information.
 
 ### Other Query Languages
 
 It is possible to use other query languages not initially referenced by
 `JM2MP.JS`. In order to do that, it is required to develop an _adapter
-class_, sames as any other external reference previosly mentioned.
+class_, same as any other external reference previosly mentioned.
 
-Remember that any _JM2MP module_ that will use such query language,
-needs to declare its usage as part of [$options](#options) _root
-property_ or as part of any [$get](#get) projection.
+Remember that any _JM2MP module_ that will use any _query language_
+different than `native`, needs to declare its usage as part of
+[$options](#options) _root property_ or as part of any [$get](#get)
+_template command_.
 
 ## Modularization
 
-...
+<span style="color:yellow; background:red;">... FALTA ...</span>
 
 - Root template
 - `$options`
@@ -1493,7 +1501,7 @@ property_ or as part of any [$get](#get) projection.
 - _Projection document_ vs _projection module_
 - _Right prevalence_
 
-...
+<span style="color:yellow; background:red;">... FALTA ...</span>
 
 ## Examples
 

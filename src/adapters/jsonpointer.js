@@ -51,10 +51,10 @@ import { AdapterError, ValidationError, EvaluationError } from "../errors.js";
  * **json-pointer** offers some utilities for JSON pointers described by RFC 6901.
  * It provides some additional stuff needed but is not included in
  * [node-jsonpointer](https://github.com/janl/node-jsonpointer).
- * @external json-pointer
+ * @external JSONPointer
+ * @see {@link https://www.rfc-editor.org/info/rfc6901/}
  * @see {@link https://www.npmjs.com/package/json-pointer}
  * @see {@link https://github.com/manuelstofer/json-pointer}
- * @see {@link https://www.rfc-editor.org/info/rfc6901/}
 **/
 
 /**

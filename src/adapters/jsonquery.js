@@ -28,10 +28,10 @@ import { AdapterError, ValidationError, EvaluationError } from "../errors.js";
 /**
  * @description
  * **JSON Query**: a small, flexible, and expandable JSON query language.
- * @external @jsonquerylang/jsonquery
+ * @external JSONQuery
+ * @see {@link https://jsonquerylang.org/}
  * @see {@link https://www.npmjs.com/package/@jsonquerylang/jsonquery}
  * @see {@link https://github.com/jsonquerylang/jsonquery}
- * @see {@link https://jsonquerylang.org/}
 **/
 
 /**
