@@ -25,14 +25,14 @@ semantically equivalent notations: one based on text strings and another
 based on JSON syntax.
 
 In addition, the `JM2MP.JS` library allows you to use several _external
-query languages_ by default (see section
-[query languages](./tutorial-02--jm2mp-syntax.html#query-languages) of
-[JM2MP Syntax](./tutorial-02--jm2mp-syntax.html)
-tutorial for more details):
+query languages_ by default (see
+[external references](./tutorial-02--jm2mp-syntax.html#external-references)
+section from
+[JM2MP Syntax](./tutorial-02--jm2mp-syntax.html) tutorial for more details):
 
 - [JMESpath](./tutorial-02--jm2mp-syntax.html#jmespath)
 - [JSONata](./tutorial-02--jm2mp-syntax.html#jsonata)
-- [JSONPath](./tutorial-02--jm2mp-syntax.html#json-path)
+- [JSONPath](./tutorial-02--jm2mp-syntax.html#jsonpath)
 - [JSON Pointer](./tutorial-02--jm2mp-syntax.html#json-pointer)
 - [JSON Query](./tutorial-02--jm2mp-syntax.html#json-query)
 

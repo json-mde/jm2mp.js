@@ -19,7 +19,6 @@ import { describe, it } from "node:test";
 import { strict as assert } from "node:assert";
 import { createStringLoader, createFileLoader, createUrlLoader } from "../../modules/loaders.js";
 import { ResolutionError } from "../../errors.js";
-import { ROOT_TEMPLATE_NAME } from '../../modules/helpers.js' ;
 
 // ============================================================================
 // createStringLoader
@@ -34,10 +33,10 @@ describe("createStringLoader", () => {
 
   it("carga un módulo válido", async () => {
     const loader = createStringLoader({
-      "main": JSON.stringify({ ROOT_TEMPLATE: "valor" })
+      "main": JSON.stringify({ '$': "valor" })
     });
     const result = await loader("main");
-    assert.deepEqual(result, { ROOT_TEMPLATE: "valor" });
+    assert.deepEqual(result, { '$': "valor" });
   });
 
   it("rechaza módulo no encontrado", async () => {
@@ -57,11 +56,11 @@ describe("createStringLoader", () => {
 
   it("carga múltiples módulos del mismo mapa", async () => {
     const loader = createStringLoader({
-      "a": JSON.stringify({ ROOT_TEMPLATE: 1 }),
-      "b": JSON.stringify({ ROOT_TEMPLATE: 2 })
+      "a": JSON.stringify({ '$': 1 }),
+      "b": JSON.stringify({ '$': 2 })
     });
-    assert.deepEqual(await loader("a"), { ROOT_TEMPLATE: 1 });
-    assert.deepEqual(await loader("b"), { ROOT_TEMPLATE: 2 });
+    assert.deepEqual(await loader("a"), { '$': 1 });
+    assert.deepEqual(await loader("b"), { '$': 2 });
   });
 });
 
@@ -98,12 +97,12 @@ describe("createFileLoader", () => {
     // Creamos un directorio temporal y un fichero JSON dentro.
     const tmpDir = await fs.mkdtemp(path.join(os.tmpdir(), "proj-test-"));
     const filePath = path.join(tmpDir, "modulo.json");
-    await fs.writeFile(filePath, JSON.stringify({ ROOT_TEMPLATE: "ok" }), "utf8");
+    await fs.writeFile(filePath, JSON.stringify({ '$': "ok" }), "utf8");
 
     try {
       const loader = await createFileLoader({ baseDir: tmpDir });
       const result = await loader("modulo.json");
-      assert.deepEqual(result, { ROOT_TEMPLATE: "ok" });
+      assert.deepEqual(result, { '$': "ok" });
     } finally {
       await fs.rm(tmpDir, { recursive: true, force: true });
     }
@@ -134,12 +133,12 @@ describe("createFileLoader", () => {
     const tmpDir = await fs.mkdtemp(path.join(os.tmpdir(), "proj-test-"));
     const sub = path.join(tmpDir, "sub");
     await fs.mkdir(sub);
-    await fs.writeFile(path.join(sub, "x.json"), JSON.stringify({ ROOT_TEMPLATE: 1 }), "utf8");
+    await fs.writeFile(path.join(sub, "x.json"), JSON.stringify({ '$': 1 }), "utf8");
 
     try {
       const loader = await createFileLoader({ baseDir: sub });
       const result = await loader("x.json");
-      assert.deepEqual(result, { ROOT_TEMPLATE: 1 });
+      assert.deepEqual(result, { '$': 1 });
     } finally {
       await fs.rm(tmpDir, { recursive: true, force: true });
     }

@@ -21,7 +21,7 @@ import { EvaluationError } from "../../errors.js";
 import { evaluate } from "../../evaluator.js";
 import { createNativeRegistry } from "../../adapters/helpers.js";
 import { normalizeModule } from "../../modules/normalizer.js";
-import { moduleWith, ROOT_TEMPLATE_NAME } from "../../modules/helpers.js";
+import { moduleWith } from "../../modules/helpers.js";
 
 const registry = createNativeRegistry();
 

@@ -20,7 +20,6 @@ import { ValidationError } from "../../errors.js";
 import { validateModule } from "../../validator.js";
 import { createNativeRegistry } from "../../adapters/helpers.js";
 import { normalizeModule } from "../../modules/normalizer.js";
-import { ROOT_TEMPLATE_NAME } from "../../modules/helpers.js";
 
 const registry = createNativeRegistry();
 

@@ -19,7 +19,7 @@ import { describe, it } from "node:test";
 import { strict as assert } from "node:assert";
 import { resolve } from "../../modules/resolver.js";
 import { ResolutionError } from "../../errors.js";
-import { ROOT_TEMPLATE_NAME, moduleOf, moduleWith } from "../../modules/helpers.js";
+import { ROOT_TEMPLATE_NAME, moduleOf } from "../../modules/helpers.js";
 
 /** Crea un loader a partir de un mapa de objetos JSON ya parseados. */
 function objectLoader(mapping) {

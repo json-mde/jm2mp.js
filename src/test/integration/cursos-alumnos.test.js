@@ -32,7 +32,7 @@ import { strict as assert } from "node:assert";
 import { evaluate } from "../../evaluator.js";
 import { normalizeModule } from "../../modules/normalizer.js";
 import { createNativeRegistry } from "../../adapters/helpers.js";
-import { moduleOf, ROOT_TEMPLATE_NAME } from "../../modules/helpers.js";
+import { moduleOf } from "../../modules/helpers.js";
 
 const registry = createNativeRegistry();
 
