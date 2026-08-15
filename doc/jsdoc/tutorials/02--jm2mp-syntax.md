@@ -1646,8 +1646,9 @@ _template command_.
 
 ## Modularization
 
-In order to simplify large or complex projection documents,
-modularization can be achieved using an optional `$depends-on` property;
+In order to simplify large or complex _projection documents_,
+**modularization** can be achieved using an optional `$depends-on`
+property inside the [$options](#options) inner object of the _root object_;
 the value of this property must be an array of string items, where each
 string will be interpreted by `JM2MP.JS` in different manners (as
 filenames, as URLs or as literal JSON content) whose content will be
@@ -1661,15 +1662,54 @@ performing the import will take precedence, overriding (substituting)
 any _named templates_ with the same name that may exist in the imported
 _document_.
 
+- _Projection document_ and _projections modules_
 
+  There is no real difference between a _projection document_ and a
+  _projection module_. It is customary to name _document_ to whatever
+  file (URL or content) that will be used as a starting point to run a
+  _projection_, considered then as the _root projection document_.
 
-- Root template
-- `$options`
-- `$schema`
-- _Projection document_ vs _projection module_
-- _Right prevalence_
+- _Root and named templates_
 
-<span style="color:yellow; background:red;">... FALTA ...</span>
+  Any _projection document or module_ can contain any _named template_,
+  including the _root template_. Or any at all, just dependencies.
+
+- _Overriding templates_
+
+  Any _root or named template_ can be _overriden_ by any _module_ with
+  higher precedence.
+
+  If a _projection module_ `Higher` depends on a _projection module_
+  `Lower` then both will have a form similar to:
+
+```JSON
+// Higher
+{
+  "$options": {
+    "$depend-on" : [ "Lower", ... ],
+    // If no default query language is declared, then NATIVE is considered.
+  },
+  "$" : "The root template.",
+  "CommonNamedTemplate" : "Higher precedence, it will remain."
+}
+
+// Lower
+{
+  "$option" : {
+    "$default-query-language": "Language only considered to be default in this LOWER module."
+   },
+  "CommonNamedTemplate" : "Lower precedence, it will be overriden."
+}
+```
+
+- _Meta data_
+
+  Both `$options` and `$schema` properties of can appear on any
+  _projection document or module_ affecting only to that _module_
+  and not propagating its respectives values outside that _module_.
+
+  Please, refear to [$options](#options) and [$schema](#json-schema)
+  sections for more information.
 
 ## Options
 
