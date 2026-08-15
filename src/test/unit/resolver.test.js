@@ -19,6 +19,7 @@ import { describe, it } from "node:test";
 import { strict as assert } from "node:assert";
 import { resolve } from "../../modules/resolver.js";
 import { ResolutionError } from "../../errors.js";
+import { ROOT_TEMPLATE_NAME, moduleOf, moduleWith } from "../../modules/helpers.js";
 
 /** Crea un loader a partir de un mapa de objetos JSON ya parseados. */
 function objectLoader(mapping) {
@@ -33,9 +34,9 @@ function objectLoader(mapping) {
 
 describe("resolve: caso simple sin dependencias", () => {
   it("resuelve un módulo sin importaciones", async () => {
-    const loader = objectLoader({ "main": { "@": null } });
+    const loader = objectLoader({ "main": moduleOf(null) });
     const result = await resolve("main", loader);
-    assert.deepEqual(result, { "@": null });
+    assert.deepEqual(result, { '$': null });
   });
 
   it("falla si no se encuentra la plantilla raíz tras resolver", async () => {
@@ -44,14 +45,14 @@ describe("resolve: caso simple sin dependencias", () => {
     });
     await assert.rejects(
       resolve("main", loader),
-      (err) => err instanceof ResolutionError && /raíz "@"/.test(err.message)
+      (err) => err instanceof ResolutionError && /raíz "\$"/.test(err.message)
     );
   });
 
   it("módulo sin $options no tiene dependencias", async () => {
-    const loader = objectLoader({ "main": { "@": "valor" } });
+    const loader = objectLoader({ "main": moduleOf("valor") });
     const result = await resolve("main", loader);
-    assert.equal(result["@"], "valor");
+    assert.equal(result[ROOT_TEMPLATE_NAME], "valor");
   });
 
   it("propaga error del loader como ResolutionError", async () => {
@@ -74,39 +75,46 @@ describe("resolve: caso simple sin dependencias", () => {
 });
 
 describe("resolve: dependencias en cadena", () => {
-  it("resuelve A→B→C y aplica plantillas en orden topológico", async () => {
+  it("resuelve A-->B-->C y aplica plantillas en orden topológico", async () => {
     const loader = objectLoader({
       "A": {
+        '$': { "$op": "call", "$ref": "fromB" },
         "$options": { "$depends-on": ["B"] },
-        "@": { "$op": "call", "$ref": "fromB" }
       },
       "B": {
         "$options": { "$depends-on": ["C"] },
+        "$schema": "https://json-mde.tech/schemas/",
         "fromB": { "$op": "call", "$ref": "fromC" }
       },
       "C": { "fromC": "valor de C" }
     });
     const result = await resolve("A", loader);
-    assert.ok(Object.hasOwn(result, "@"));
+    // Asserts...
+    assert.ok(Object.hasOwn(result, ROOT_TEMPLATE_NAME));
     assert.ok(Object.hasOwn(result, "fromB"));
     assert.ok(Object.hasOwn(result, "fromC"));
     assert.equal(result.fromC, "valor de C");
-    // $options no debe aparecer en el módulo final.
+    // ...neither $options nor $schem must appear in final projection document.
     assert.equal(result.$options, undefined);
+    assert.equal(result.$schema, undefined);
   });
 
   it("rechaza $depends-on con entrada no string", async () => {
     const loader = objectLoader({
-      "A": { "$options": { "$depends-on": [42] }, "@": null }
+      "A": {
+        '$': null,
+        "$options": { "$depends-on": [42] },
+      }
     });
     await assert.rejects(resolve("A", loader), ResolutionError);
   });
 });
 
 describe("resolve: detección de ciclos", () => {
-  it("detecta ciclo directo A→B→A", async () => {
+  it("detecta ciclo directo A-->B-->A", async () => {
     const loader = objectLoader({
-      "A": { "$options": { "$depends-on": ["B"] }, "@": null },
+      "A": { "$options": { "$depends-on": ["B"] },
+             '$': null },
       "B": { "$options": { "$depends-on": ["A"] } }
     });
     await assert.rejects(
@@ -115,9 +123,10 @@ describe("resolve: detección de ciclos", () => {
     );
   });
 
-  it("detecta autoreferencia A→A", async () => {
+  it("detecta autoreferencia A-->A", async () => {
     const loader = objectLoader({
-      "A": { "$options": { "$depends-on": ["A"] }, "@": null }
+      "A": { "$options": { "$depends-on": ["A"] },
+             '$': null }
     });
     await assert.rejects(
       resolve("A", loader),
@@ -127,7 +136,8 @@ describe("resolve: detección de ciclos", () => {
 
   it("detecta ciclo de tres elementos", async () => {
     const loader = objectLoader({
-      "A": { "$options": { "$depends-on": ["B"] }, "@": null },
+      "A": { "$options": { "$depends-on": ["B"] },
+             '$': null },
       "B": { "$options": { "$depends-on": ["C"] } },
       "C": { "$options": { "$depends-on": ["A"] } }
     });
@@ -143,7 +153,7 @@ describe("resolve: estructura de diamante", () => {
     const loader = objectLoader({
       "A": {
         "$options": { "$depends-on": ["B", "C"] },
-        "@": { "$op": "call", "$ref": "comun" }
+        '$': { "$op": "call", "$ref": "comun" }
       },
       "B": { "comun": "desde B" },
       "C": { "comun": "desde C" }
@@ -156,7 +166,7 @@ describe("resolve: estructura de diamante", () => {
     const loader = objectLoader({
       "A": {
         "$options": { "$depends-on": ["C", "B"] },
-        "@": { "$op": "call", "$ref": "comun" }
+        '$': { "$op": "call", "$ref": "comun" }
       },
       "B": { "comun": "desde B" },
       "C": { "comun": "desde C" }
@@ -168,30 +178,30 @@ describe("resolve: estructura de diamante", () => {
   it("el módulo raíz tiene máxima prioridad", async () => {
     const loader = objectLoader({
       "A": {
+        '$': "root",
         "$options": { "$depends-on": ["B"] },
-        "@": "raíz",
-        "comun": "desde A"
+        "common": "Template from A.",
       },
-      "B": { "comun": "desde B" }
+      "B": { "common": "Template from B." }
     });
     const result = await resolve("A", loader);
-    assert.equal(result.comun, "desde A");
+    assert.equal(result['common'], "Template from A.");
   });
 
   it("módulo ya visitado en otra rama del DAG no se reprocesa", async () => {
     let dCount = 0;
     const loader = async (name) => {
       if (name === "A") return {
+        '$': null,
         "$options": { "$depends-on": ["B", "C"] },
-        "@": null
       };
       if (name === "B") return { "$options": { "$depends-on": ["D"] } };
       if (name === "C") return { "$options": { "$depends-on": ["D"] } };
       if (name === "D") {
         dCount++;
-        return { "valor": "D" };
+        return { "value": "D" };
       }
-      throw new Error("desconocido");
+      throw new Error("Already visited!");
     };
     await resolve("A", loader);
     assert.equal(dCount, 1);
@@ -204,7 +214,8 @@ describe("resolve: cache normalizada a minúsculas", () => {
     const loader = async (name) => {
       calls++;
       if (name === "main") {
-        return { "$options": { "$depends-on": ["Foo", "foo"] }, "@": null };
+        return { '$': null,
+                 "$options": { "$depends-on": ["Foo", "foo"] }, };
       }
       return { "valor": name.toLowerCase() };
     };
@@ -222,8 +233,8 @@ describe("resolve: maxModules", () => {
     const loader = async (_name) => {
       count++;
       return {
+        '$': null,
         "$options": { "$depends-on": [`m${count}`] },
-        "@": null
       };
     };
     await assert.rejects(
@@ -234,13 +245,13 @@ describe("resolve: maxModules", () => {
 
   it("módulos dentro del límite se resuelven correctamente", async () => {
     const loader = async (name) => {
-      if (name === "A") return { "$options": { "$depends-on": ["B"] }, "@": null };
+      if (name === "A") return { '$': null, "$options": { "$depends-on": ["B"] }, };
       if (name === "B") return { "$options": { "$depends-on": ["C"] } };
-      if (name === "C") return { "valor": "C" };
-      throw new Error("?");
+      if (name === "C") return { "value": "C" };
+      throw new Error("Dependency error!");
     };
     const result = await resolve("A", loader, { maxModules: 5 });
-    assert.equal(result.valor, "C");
+    assert.equal(result.value, "C");
   });
 });
 
@@ -248,8 +259,8 @@ describe("resolve: descarte de metadata", () => {
   it("descarta $options aunque venga de varios módulos", async () => {
     const loader = objectLoader({
       "A": {
+        '$': null,
         "$options": { "$depends-on": ["B"], "$default-query-language": "jsonata" },
-        "@": null
       },
       "B": {
         "$options": { "$default-query-language": "jsonpath" },
@@ -263,8 +274,8 @@ describe("resolve: descarte de metadata", () => {
   it("descarta $schema del módulo final", async () => {
     const loader = objectLoader({
       "A": {
-        "$schema": "https://example.com/s.json",
-        "@": null
+        '$': null,
+        "$schema": "https://json-mde.tech/schemas/",
       }
     });
     const result = await resolve("A", loader);

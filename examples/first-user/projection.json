@@ -1,5 +1,5 @@
 {
-  "@" : {
+  "$" : {
       "$op": "fold",
       "$over": { "$op": "get", "$path": "$.Usuarios" },
       "$init": null,

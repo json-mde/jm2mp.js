@@ -1,5 +1,5 @@
 {
-    "@": {
+    "$": {
         "almacen": { "$op": "get", "$path": "$.almacen" },
         "valor_total_inventario": {
             "$op": "foldObj",

@@ -53,15 +53,25 @@
       - [typeof](#typeof)
 - [Named Templates](#named-templates)
 - [Query Languages](#query-languages)
-  - [Native](#native)
-  - [External References](#external-references)
-    - [JSONquery](#jsonquery)
-    - [JSONata](#jsonata)
-    - [JMESpath](#jmespath)
-    - [JSON Pointer](#json-pointer)
-    - [JSON Path Plus](#json-path-plus)
-  - [Other Query Languages](#other-query-languages)
+  - [Query Language Syntaxes](#query-language-syntaxes)
+    - [Text Literal Query Language Expressions](#text-literal-query-language-expressions)
+    - [JSON Query Language Expressions](#json-query-language-expressions)
+  - [Available Query Languages](#available-query-languages)
+    - [Native](#native)
+    - [External References](#external-references)
+      - [JMESpath](#jmespath)
+      - [JSONata](#jsonata)
+      - [JSONPath](#jsonpath)
+      - [JSON Pointer](#json-pointer)
+      - [JSON Query](#json-query)
+    - [Other Query Languages](#other-query-languages)
 - [Modularization](#modularization)
+- [Options](#options)
+  - [Version](#version)
+  - [Annotations](#annotations)
+  - [Default Query Language](#default-query-language)
+  - [Depends On](#depends-on)
+- [JSON Schema](#json-schema)
 - [Examples](#examples)
 
 ## Introduction
@@ -195,7 +205,7 @@ Therefore, the simplest _projection_ that can be constructed is as
 following:
 
 ```JSON
-{ "$" : NULL }
+{ "$" : null }
 ```
 
 This _projection_ always generates a JSON document where the _output_
@@ -440,8 +450,8 @@ For example:
 
 #### call
 
-The `call` _template command_ is used to invoke an existing _named
-template_, just as if it were a function.
+The `call` _template command_ is used to invoke an existing
+[named template](#named-templates), just as if it were a function.
 
 Its basic JSON form is:
 
@@ -452,8 +462,8 @@ Its basic JSON form is:
 }
 ```
 
-Optionally, it allows to change the _current context_ using its `at`
-clause:
+Optionally, it allows to change the [current context](#execution-environment)
+using its `at` clause:
 
 ```JSON
 {
@@ -462,9 +472,6 @@ clause:
   "$at"  :  &#x2119;
 }
 ```
-
-In the [Named Templates](#named-templates) section, you can learn more
-about this concept.
 
 ### Projections
 
@@ -1423,7 +1430,139 @@ the above [data types](#data-types) section, you can examine them all.
 
 ## Named Templates
 
-<span style="color:yellow; background:red;">... FALTA ...</span>
+**Named templates** are all properties of the _root object_ from the
+_projection document_ or _projection module_ whose identifier is neither
+the _root template_ (`$`) nor _metadata_ (`$options` and `$schema`).
+
+Just as in any programming languages, where a sequence of instructions
+is given a name and encapsulated in a function or procedure so that it
+can be called multiple times from different points in the program,
+_named templates_ are used to group a set of _template commands_ and
+JSON values to obtain a _resultant value_ each time they are invoked
+(using [call](#call) _template command_), thereby avoiding the
+repetition of the same structure at different points in the _projection_.
+
+Since `JM2MP` treats object properties as commutative sets, the order in
+which _named templates_ appear in the _projection document_ is
+irrelevant. However, you must take into account the [import rules for
+projection modules](#modularization), because when the same _named
+template_ identifier is used in several different _modules_, the last
+ones to be imported might _override_ previously imported _named
+templates_.
+
+Also important to note is that `call` resets _aliases_ to &empty; (the
+empty set) deliberately: no previously _aliases_ can be used by a invoked
+_named template_). _Named templates_ are autonomous functions of their
+_context_, so their behaviour is predictable regardless of who invoked
+them (and when).
+
+Considering the next example, where the _source document_ contains
+only an integer (`number`) value:
+
+```JSON
+5
+```
+
+the _projection document_ contains the
+[Gregory-Liebniz (or Madhava-Leibniz) Series](https://www.kirupa.chat/p/life-of-pi-calculating-its-value)
+formula to calculate an approximation of number
+[Pi (&pi;)](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math/PI)
+in a recursive manner:
+
+<math xmlns="http://www.w3.org/1998/Math/MathML" display="block">
+  <mrow>
+    <mi>&pi;</mi>
+    <mo>=</mo>
+    <mrow>
+      <mn>4</mn>
+      <mo>&middot;</mo>
+      <mrow>
+        <munderover>
+          <mo>&sum;</mo>
+          <mrow>
+            <mi>n</mi>
+            <mo>=</mo>
+            <mn>0</mn>
+          </mrow>
+          <mrow>
+            <mn>&infin;</mn>
+          </mrow>
+        </munderover>
+        <mo>(</mo>
+        <mfrac>
+          <mrow>
+            <msup>
+              <mrow>
+                <mo>(</mo>
+                <mn>-1</mn>
+                <mo>)</mo>
+              </mrow>
+              <mi>n</mi>
+            </msup>
+          </mrow>
+          <mrow>
+            <mo>(</mo>
+            <mo>(</mo>
+            <mn>2</mn>
+            <mo>&middot;</mo>
+            <mi>n</mi>
+            <mo>)</mo>
+            <mo>+</mo>
+            <mn>1</mn>
+            <mo>)</mo>
+          </mrow>
+        </mfrac>
+        <mo>)</mo>
+      </mrow>
+    </mrow>
+  </mrow>
+</math>
+
+```JSON
+{
+  "$": {
+    "$op": "mul",
+    "$left": 4,
+    "$right": { "$op": "call",
+                "$ref": "Pi",
+                "$at": 0 }
+  },
+
+  "Pi": {
+    "$op": "if",
+    "$cond": {
+      "$op": "lt",
+      "$left":  { "$op": "get", "$path": "@" },
+      "$right": { "$op": "get", "$path": "$" }
+    },
+    "$then": {
+      "$op": "sub",
+      "$left": { "$op": "div",
+                 "$left": 1,
+                 "$right": { "$op": "add",
+                             "$left": { "$op": "mul",
+                                        "$left": 2,
+                                        "$right": { "$op": "get", "$path": "@" } },
+                             "$right": 1 }
+      },
+      "$right": { "$op": "call",
+                  "$ref": "Pi",
+                  "$at": { "$op": "add",
+                           "$left": { "$op": "get", "$path": "@" },
+                           "$right": 1 }
+      }
+    },
+    "$else": 0
+  }
+}
+```
+
+and the _resultant document_ of such projection will be the &pi;
+approximation for such number of iterations:
+
+```JSON
+3.33968253968254
+```
 
 ## Query Languages
 
@@ -1435,7 +1574,21 @@ simplest (which simply allow you to locate any element in the document)
 to the most sophisticated (which offer pattern-based searches, as well
 as additional filtering and sorting operations, among others).
 
-### Native
+### Query Language Syntaxes
+
+#### Text Literal Query Language Expressions
+
+... FALTA ...
+
+#### JSON Query Language Expressions
+
+... FALTA ...
+
+### Available Query Languages
+
+... FALTA ...
+
+#### Native
 
 The `JM2MP` format offers its own _query language_, just named `native`.
 Both formats, `JM2MP` and `native`, have been designed to be
@@ -1450,7 +1603,7 @@ based on JSON syntax.
 Please refer to the [Native Query Language](./tutorial--03--nql-syntax.html)
 tutorial for full details about this _query language_ and how to use it.
 
-### External References
+#### External References
 
 The `JM2MP.JS` library also references several external libraries to
 enable the use of different _query languages_ as part of `JM2MP`
@@ -1460,27 +1613,27 @@ At the same time, it is possible to use additional _query languages_
 if proper _adapter class_ is developed. Please, refer to any _external
 reference_ to see how to do so.
 
-#### JMESpath
+##### JMESpath
 
 See [JMESpath](./external-JMESpath.html) _external reference_ for more information.
 
-#### JSONata
+##### JSONata
 
 See [JSONata](./external-JSONata.html) _external reference_ for more information.
 
-#### JSON Path
+##### JSONPath
 
 See [JSONPath](./external-JSONPath.html) _external reference_ for more information.
 
-#### JSON Pointer
+##### JSON Pointer
 
 See [JSON Pointer](./external-JSONPointer.html) _external reference_ for more information.
 
-#### JSON Query
+##### JSON Query
 
 See [JSON Query](./external-JSONQuery.html) _external reference_ for more information.
 
-### Other Query Languages
+#### Other Query Languages
 
 It is possible to use other query languages not initially referenced by
 `JM2MP.JS`. In order to do that, it is required to develop an _adapter
@@ -1493,7 +1646,22 @@ _template command_.
 
 ## Modularization
 
-<span style="color:yellow; background:red;">... FALTA ...</span>
+In order to simplify large or complex projection documents,
+modularization can be achieved using an optional `$depends-on` property;
+the value of this property must be an array of string items, where each
+string will be interpreted by `JM2MP.JS` in different manners (as
+filenames, as URLs or as literal JSON content) whose content will be
+imported into current projection document following the exact order of
+this list.
+
+Each new projection content, in turn, could have its own (ordered) list
+of_dependencies. It is worth mentioning that, in case of conflict,
+_named templates_ that already exist in the _projection document_
+performing the import will take precedence, overriding (substituting)
+any _named templates_ with the same name that may exist in the imported
+_document_.
+
+
 
 - Root template
 - `$options`
@@ -1502,6 +1670,91 @@ _template command_.
 - _Right prevalence_
 
 <span style="color:yellow; background:red;">... FALTA ...</span>
+
+## Options
+
+The `$options` property of the _root object_ of any _projection_ is always
+considered as _metadata_ (not a _named template_) and is always optional.
+
+It is possible to define certain values at this special object `$options`
+as property of the _projection_'s _root element_, which will be
+interpreted by `JM2MP.JS` processors to get:
+[version assurance](#version),
+[simple user's documentation](#annotations),
+to set the [default query language](#default-query-language) to be considered,
+and to declare the [dependencies](#depends-on) for modularization purposes.
+
+So, `$options` object for a _projection document or module_ should
+comply with the following form:
+
+```JSON
+{
+  "$options": {
+    "$version": "1.0",
+    "$annotations": &#x1D541;,
+    "$default-query-language": STRING,
+    "$depends-on": [ STRING_1, ..., STRING_n ]
+  }
+}
+```
+
+### Version
+
+An optional `$version` property can be declared to specify which version
+of `JM2MP` may be interpreted; currently only a value of `"1.0"` is
+accepted, which is the format described in this documentation.
+
+### Annotations
+
+An optional `$annotations` property can be declared to specify
+user's documentation; any JSON value can be used, as simple or complex
+as authors of the _projection document or module_ consider; its value
+will be fully ignored.
+
+### Default Query Language
+
+An optional `$default-query-language` property can be declared to
+specify which [available query language](#available-query-languages)
+will be used by default by the `JM2MP.JS` processor (that is,
+`JM2MP.JS`) whenever a
+[text literal query language expression](#text-literal-query-language-syntax)
+was used instead of a
+[JSON query language expression](#json-query-language-syntax),
+as part of any [query language syntax](#query-language-syntaxes) used in
+the _projection document or module_. If it is not declared, its value will be
+considered as `"native"` (see [native query language](#native)).
+
+### Depends On
+
+In order to simplify large or complex projection documents,
+modularization can be achieved using an optional `$depends-on` property;
+the value of this property must be an array of string items, where each
+string will be interpreted by `JM2MP.JS` in different manners (as
+filenames, as URLs or as literal JSON content) whose content will be
+imported into current projection document following the exact order of
+this list.
+
+Each new projection content, in turn, could have its own (ordered) list
+of_dependencies. It is worth mentioning that, in case of conflict,
+_named templates_ that already exist in the _projection document_
+performing the import will take precedence, overriding (substituting)
+any _named templates_ with the same name that may exist in the imported
+_document_.
+
+## JSON Schema
+
+The `$schema` property of the _root object_ of any _projection_ is always
+considered as _metadata_ (not a _named template_) and is always optional.
+
+For compatibility reasons, `JM2MP` supports the declaration of such
+property in any _projection document_, in order to comply with the
+[JSON Schema](https://json-schema.org/) standard. Although currently the
+`JM2MP.JS` library neither uses nor validates against this schema, it
+was considered useful to reserve such possibility from the outset.
+
+The URL `https://json-mde.tech/schemas/json-schema/draft--2020-12/jm2mp--1-0-0.json`
+can be used to specifify the current version of `JM2MP` using
+[JSON Schema (Draft 2020-12)](https://json-schema.org/draft/2020-12).
 
 ## Examples
 

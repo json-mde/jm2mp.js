@@ -1,5 +1,5 @@
 {
-    "@": {
+    "$": {
         "centro":  { "$op": "get", "$path": "$.centro"  },
         "periodo": { "$op": "get", "$path": "$.periodo" },
         "alumnos": {

@@ -4,7 +4,7 @@
  * @license BSD-3-Clause
  * @file Evaluador del lenguaje de proyecciones.
  *
- * Dado un módulo resuelto y normalizado, evalúa la plantilla raíz "@" sobre
+ * Dado un módulo resuelto y normalizado, evalúa la plantilla raíz sobre
  * un documento de origen. El evaluador es ASÍNCRONO porque el contrato de
  * los adaptadores es async.
  *
@@ -36,6 +36,7 @@
 **/
 
 import { ProjectionError, EvaluationError } from "./errors.js";
+import { ROOT_TEMPLATE_NAME } from "./modules/helpers.js";
 import { isOperation } from "./validator.js";
 
 /**
@@ -86,7 +87,7 @@ export async function evaluate(module, document, options) {
     maxDepth,
   };
 
-  return evalProjection(module["@"], env);
+  return evalProjection(module[ROOT_TEMPLATE_NAME], env);
 }
 
 /**

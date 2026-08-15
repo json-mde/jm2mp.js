@@ -21,7 +21,7 @@ import { EvaluationError } from "../../errors.js";
 import { evaluate } from "../../evaluator.js";
 import { createNativeRegistry } from "../../adapters/helpers.js";
 import { normalizeModule } from "../../modules/normalizer.js";
-import { moduleWith } from "../../modules/helpers.js";
+import { moduleWith, ROOT_TEMPLATE_NAME } from "../../modules/helpers.js";
 
 const registry = createNativeRegistry();
 
@@ -657,7 +657,7 @@ describe("evaluator: merge", () => {
 
 describe("evaluator: ramas adicionales", () => {
   it("requiere options.registry", async () => {
-    const mod = normalizeModule({ "@": null });
+    const mod = normalizeModule({ ROOT_TEMPLATE: null });
     await assert.rejects(evaluate(mod, null, {}), EvaluationError);
   });
 

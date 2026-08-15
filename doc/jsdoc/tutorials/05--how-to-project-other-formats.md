@@ -2,7 +2,9 @@
 
 - [Introduction](#introduction)
 - [Other usual document formats](#other-usual-document-formats)
-  - [JSONC and JSON5](#jsonc-and-json5)
+  - [Variants of JSON](#variants-of-json)
+    - [JSONC](#jsonc)
+    - [JSON5](#json5)
   - [JSON Lines](#json-lines)
   - [YAML](#yaml)
   - [TOML](#toml)
@@ -27,12 +29,12 @@ The general idea is to convert such formats to JSON, transform it using
 
 <math xmlns="http://www.w3.org/1998/Math/MathML" display="block">
   <mrow>
-    <mi>s</mi>
+    <msub><mi>source</mi><ms>JM2MP</ms></msub>
     <mo>=</mo>
     <mrow>
-      <msub><mi>Convert-To-JSON</mi><ms>Other-Format</ms></msub>
+      <msub><mi>Load-To-JavaScript</mi><ms>Other-Format</ms></msub>
       <mo>(</mo>
-      <msub><mi>source</mi><ms>Other-Format</ms></msub>
+      <msub><mi>input</mi><ms>Other-Format</ms></msub>
       <mo>)</mo>
     </mrow>
   </mrow>
@@ -40,12 +42,12 @@ The general idea is to convert such formats to JSON, transform it using
 <br />
 <math xmlns="http://www.w3.org/1998/Math/MathML" display="block">
   <mrow>
-    <mi>p</mi>
+    <msub><mi>resultant</mi><ms>JM2MP</ms></msub>
     <mo>=</mo>
     <mrow>
       <msub><mi>Project</mi><ms>JM2MP</ms></msub>
       <mo>(</mo>
-      <mi>s</mi>>
+      <msub><mi>source</mi><ms>JM2MP</ms></msub>
       <mo>,</mo>
       <msub><mi>projection</mi><ms>JM2MP</ms></msub>
       <mo>)</mo>
@@ -56,29 +58,78 @@ The general idea is to convert such formats to JSON, transform it using
 <math xmlns="http://www.w3.org/1998/Math/MathML" display="block">
   <mrow>
     <mrow>
-      <msub><mi>resultant</mi><ms>Other-Format</ms></msub>
+      <msub><mi>output</mi><ms>Other-Format</ms></msub>
     </mrow>
   </mrow>
   <mo>=</mo>
   <mrow>
-    <msub><mi>Convert-From-JSON</mi><ms>Other-Format</ms></msub>
+    <msub><mi>Save-From-JavaScript</mi><ms>Other-Format</ms></msub>
     <mo>(</mo>
-    <mi>p</mi>
+    <msub><mi>resultant</mi><ms>JM2MP</ms></msub>
     <mo>)</mo>
   </mrow>
 </math>
 
-### JSONC and JSON5
+### Variants of JSON
 
-Both [JSONC](#) and [JSON5](https://json5.org/) ...
+Debido a que el formato JSON se consideró como un subconjunto de JavaScript
+pero dejó fuera del mismo determinadas cuestiones que facilitan bastante
+la labor de los usuarios, como son, por un lado, el uso de comentarios y, por otro,
+el uso de comas como terminadores en lugar de como separadores (lo que permite escribir una coma al final de un elemento de un array, o al final de la última propiedad de un objeto)
+se han creado pequeñas variaciones de JSON para dar cabida a estas cuestiones.
 
-```javascript
+Dos de las más conocidas y extendidas son [JSONC](#jsonc) y [JSON5](#json5), las cuales presentamos a continuación.
+
+#### JSONC
+
+El formato [JSONC](https://jsonc.org/) fue creado por [Microsoft](https://www.microsoft.com/) como parte de su entorno de desarrollo [Visual Studio Code](https://code.visualstudio.com/) con el objetivo inicial de admitir comentarios y hoy en día admite también el uso de la coma como terminador además de como separador.
+
+Because comments and trailing commas are lost, saving _resultan document_
+as JSON or as JSONC is irrelevant.
+
+
+```bash
+# How to install JSONC using NPM.
+npm install --save jsonc-parser
 ```
 
 ```javascript
-// How to install JSON5 using NPM.
-npm install json5
+import jsonc from 'jsonc-parser' ;
+// It reads the JSONC file using Node.JS.
+const jsonc_content = fs.readFileSync('./sample-source.jsonc', 'utf8');
+// It parses its JSONC content as a real JSON object.
+const parse_errors = [] ;
+const jsonc_parse_options = {
+  disallowComments : false,
+  allowTrailingComma: true,
+  allowEmptyContent : true,
+};
+const actual_json = jsonc.parse(jsonc_content, parse_errors, jsonc_parse_options );
+if (parse_errors.length === 0)
+{
+  // You can use actual JSON as source document for JM2MP.JS library.
+  //// ...
+}
+```
 
+
+Véanse:
+
+- [The JSON5 Data Interchange Format (1.0.0, March 2018)](https://spec.json5.org/)
+- [https://github.com/JSONC-org/JSONC](https://github.com/JSONC-org/JSONC)
+- [https://www.npmjs.com/package/jsonc-parser](https://www.npmjs.com/package/jsonc-parser)
+- [https://github.com/microsoft/node-jsonc-parser](https://github.com/microsoft/node-jsonc-parser)
+
+#### JSON5
+
+and [JSON5](https://json5.org/) ...
+
+```bash
+# How to install JSON5 using NPM.
+npm install --save json5
+```
+
+```javascript
 // How to use JSON5 in Node.JS.
 import JSON5 from 'json5'
 // Import JSON5 file.
@@ -90,7 +141,7 @@ const json5_string = JSON5.stringify() ;
 
 ### JSON Lines
 
-...
+The [JSON Lines](https://jsonlines.org/) ...
 
 ```javascript
 ```

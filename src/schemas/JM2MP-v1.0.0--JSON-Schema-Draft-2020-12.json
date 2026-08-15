@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://json-mde.tech/schemas/jm2mp.json",
+  "$id": "https://json-mde.tech/schemas/json-schema/draft--2020-12/jm2mp--1-0-0.json",
   "title": "JSON Model-to-Model Projection (JM2MP) v1.0.0 JSON Schema (Draft 2020-12).",
   "description": "JSON Schema for JM2MP projection modules. A module is an object with named templates (like callable functions), a root template (named '@' as entry point for transformations), and optional properties '$options' and '$schema' for metadata.",
 
@@ -13,7 +13,7 @@
       "properties": {
         "$options": { "$ref": "#/$defs/Options" },
         "$schema":  { "type": "string" },
-        "@":        { "$ref": "#/$defs/Projection" }
+        "$":        { "$ref": "#/$defs/Projection" }
       },
       "patternProperties": {
         "^(?![\\$@%])(?!$).*$": { "$ref": "#/$defs/Projection" }

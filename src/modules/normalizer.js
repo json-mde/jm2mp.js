@@ -62,7 +62,8 @@ export function normalizeModule(module)
       result[key] = module[key];
       continue;
     }
-    // Las demás claves son plantillas (incluyendo "@"). Las normalizamos recursivamente.
+    // Las demás claves son plantillas (incluyendo la plantilla raiz)...
+    // ...las normalizamos recursivamente.
     result[key] = normalizeNode(module[key], defaultSyntax);
   }
 

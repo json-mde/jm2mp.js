@@ -37,6 +37,7 @@
 **/
 
 import { ResolutionError } from "../errors.js";
+import { ROOT_TEMPLATE_NAME } from "./helpers.js";
 import { normalizeModule } from "./normalizer.js";
 
 /**
@@ -208,10 +209,10 @@ export async function resolve(rootName, loader, options = {}) {
   // Iniciamos la resolución desde la raíz.
   await visit(rootName);
 
-  // Validamos que el módulo final tenga la plantilla raíz "@".
-  if (!Object.hasOwn(result, "@")) {
+  // Validamos que el módulo final tenga la plantilla raíz.
+  if (!Object.hasOwn(result, ROOT_TEMPLATE_NAME)) {
     throw new ResolutionError(
-      'El módulo final tras la resolución no contiene la plantilla raíz "@".'
+      `El módulo final tras la resolución no contiene la plantilla raíz "${ROOT_TEMPLATE_NAME}".`
     );
   }
 

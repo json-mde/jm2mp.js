@@ -32,6 +32,7 @@ import { strict as assert } from "node:assert";
 import { evaluate } from "../../evaluator.js";
 import { normalizeModule } from "../../modules/normalizer.js";
 import { createNativeRegistry } from "../../adapters/helpers.js";
+import { moduleOf, ROOT_TEMPLATE_NAME } from "../../modules/helpers.js";
 
 const registry = createNativeRegistry();
 
@@ -77,12 +78,10 @@ describe("Integración: cursos × alumnos", () => {
     // dentro fold sobre inscripciones que actualiza el acumulador por alumno.
     // Tras todos los cursos, segundo foldObj para añadir nota_media a cada alumno.
 
-    const mod = normalizeModule({
-      "@": {
-        "centro":  { "$op": "get", "$path": "$.centro" },
-        "periodo": { "$op": "get", "$path": "$.periodo" },
-
-        "alumnos": {
+    const mod = normalizeModule(moduleOf({
+      "centro":  { "$op": "get", "$path": "$.centro" },
+      "periodo": { "$op": "get", "$path": "$.periodo" },
+      "alumnos": {
           // Pasada 2: añadir nota_media a cada alumno del resultado de pasada 1.
           "$op": "foldObj",
           "$over": {
@@ -207,8 +206,7 @@ describe("Integración: cursos × alumnos", () => {
             "$into": { "$op": "get", "$path": "@.acc" }
           }
         }
-      }
-    });
+      }));
 
     const result = await evaluate(mod, documento, { registry });
 

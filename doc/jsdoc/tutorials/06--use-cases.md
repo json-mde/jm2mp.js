@@ -81,7 +81,7 @@ needed to create a module that performs projections using
 [Express.JS](https://Express.JS/) _middleware_ (written with slight
 variations for versions [4](https://expressjs.com/en/4x/guide/using-middleware/)
 and [5](https://expressjs.com/en/5x/guide/using-middleware/) of this
-specific _framework_), available in the `${JM2MPJS}/src/api/`
+specific _framework_), available in the `${JM2MP.JS}/src/api/`
 subdirectory.
 
 ## Infrastructure as Code

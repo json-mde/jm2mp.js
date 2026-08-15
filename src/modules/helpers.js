@@ -14,6 +14,13 @@
 import { ValidationError } from "../errors.js";
 
 /**
+ * @constant {string} "$"
+ * @description
+ * The name of the **root template** of any **JM2MP projection**.
+ */
+export const ROOT_TEMPLATE_NAME = '$' ;
+
+/**
  * Construye un módulo simple a partir de una proyección raíz, sin opciones
  * ni plantillas auxiliares. Útil para tests rápidos.
  *
@@ -50,7 +57,9 @@ export function ThrowsValidationErrorWhenIsNotAModule(module) {
  * @returns {object} Módulo válido.
  */
 export function moduleOf(rootProjection) {
-  return { "@": rootProjection };
+  const result = new Object();
+  result[ROOT_TEMPLATE_NAME] = rootProjection ;
+  return result ;
 }
 
 /**
@@ -61,7 +70,7 @@ export function moduleOf(rootProjection) {
  * @returns {object}
  */
 export function moduleWith(rootProjection, namedTemplates = {}) {
-  return { "@": rootProjection, ...namedTemplates };
+  return { ...moduleOf(rootProjection), ...namedTemplates };
 }
 
 /**

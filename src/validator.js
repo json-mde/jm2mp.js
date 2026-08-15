@@ -20,7 +20,7 @@
  */
 
 import { ValidationError } from "./errors.js";
-import { ThrowsValidationErrorWhenIsNotAModule } from "./modules/helpers.js";
+import { ROOT_TEMPLATE_NAME, ThrowsValidationErrorWhenIsNotAModule } from "./modules/helpers.js";
 import { parsePath } from "./paths.js";
 
 /**
@@ -129,12 +129,12 @@ export async function validateModule(module, registry)
 
   const templateNames = Object.keys(module);
 
-  if (!templateNames.includes("@")) {
-    throw new ValidationError('El módulo final no contiene la plantilla raíz "@".');
+  if (!templateNames.includes(ROOT_TEMPLATE_NAME)) {
+    throw new ValidationError(`El módulo final no contiene la plantilla raíz "${ROOT_TEMPLATE_NAME}".`);
   }
 
   for (const name of templateNames) {
-    if (name === "@") continue;
+    if (name === ROOT_TEMPLATE_NAME) continue;
     if (!isValidName(name)) {
       throw new ValidationError(
         `Nombre de plantilla inválido: "${name}". Los nombres no pueden ` +

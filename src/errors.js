@@ -48,7 +48,7 @@ export class ParseError extends ProjectionError {}
 
 /**
  * Error durante la resolución de módulos: ciclos, módulo no encontrado,
- * o ausencia de plantilla raíz "@" en el módulo final.
+ * o ausencia de plantilla raíz 'ROOT_TEMPLATE' en el módulo final.
  */
 export class ResolutionError extends ProjectionError {}
 
