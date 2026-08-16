@@ -15,10 +15,10 @@
  *   - Doble pasada: acumulación + cálculo derivado (nota_media).
  *
  * Resultado esperado:
- *   - Luis María: 15 cred, 16.5 notas, 2 cursos, media 8.25.
- *   - Inés:        6 cred, 11.0 notas, 2 cursos, media 5.5.
- *   - Marta:      15 cred, 18.0 notas, 3 cursos, media 6.0.
- *   - Pedro:      15 cred, 13.5 notas, 2 cursos, media 6.75.
+ *   - Luis María:    15 cred, 16.5 notas, 2 cursos, media 8.25.
+ *   - Inés:           6 cred, 11.0 notas, 2 cursos, media 5.50.
+ *   - Elena:         15 cred, 18.0 notas, 3 cursos, media 6.00.
+ *   - José Antonio:  15 cred, 13.5 notas, 2 cursos, media 6.75.
  */
 
 /**
@@ -36,38 +36,38 @@ import { moduleOf } from "../../modules/helpers.js";
 
 const registry = createNativeRegistry();
 
-describe("Integración: cursos × alumnos", () => {
+describe("Integration test: courses per student", () => {
   const documento = {
-    "centro": "Academia Madrid",
-    "periodo": "2026-Q1",
-    "nota_aprobado": 5.0,
-    "cursos": {
+    "university": "Universidad Nacional de Educación a Distancia (U.N.E.D.)",
+    "period": "2026-Q1",
+    "passing_grade": 5.0,
+    "courses": {
       "ALG-101": {
-        "titulo": "Álgebra lineal",
-        "creditos": 6,
-        "inscripciones": [
-          { "alumno": "Luis María", "nota": 7.5 },
-          { "alumno": "Inés",       "nota": 4.0 },
-          { "alumno": "Marta",      "nota": 8.5 },
-          { "alumno": "Pedro",      "nota": null }
+        "title": "Linear Algebra",
+        "credits": 4,
+        "enrollments": [
+          { "student": "Luis María",   "grade": 7.5 },
+          { "student": "Inés",         "grade": 4.0 },
+          { "student": "Elena",        "grade": 8.5 },
+          { "student": "José Antonio", "grade": null }
         ]
       },
       "PROG-201": {
-        "titulo": "Programación funcional",
-        "creditos": 9,
-        "inscripciones": [
-          { "alumno": "Luis María", "nota": 9.0 },
-          { "alumno": "Marta",      "nota": 6.5 },
-          { "alumno": "Pedro",      "nota": 5.5 }
+        "title": "Functional Programming",
+        "credits": 6,
+        "enrollments": [
+          { "student": "Luis María",   "grade": 9.0 },
+          { "student": "Elena",        "grade": 6.5 },
+          { "student": "José Antonio", "grade": 5.5 }
         ]
       },
       "BD-301": {
-        "titulo": "Bases de datos",
-        "creditos": 6,
-        "inscripciones": [
-          { "alumno": "Inés",  "nota": 7.0 },
-          { "alumno": "Marta", "nota": 3.0 },
-          { "alumno": "Pedro", "nota": 8.0 }
+        "title": "Databases",
+        "credits": 9,
+        "enrollments": [
+          { "student": "Inés",         "grade": 7.0 },
+          { "student": "Elena",        "grade": 3.0 },
+          { "student": "José Antonio", "grade": 8.0 }
         ]
       }
     }
@@ -79,33 +79,33 @@ describe("Integración: cursos × alumnos", () => {
     // Tras todos los cursos, segundo foldObj para añadir nota_media a cada alumno.
 
     const mod = normalizeModule(moduleOf({
-      "centro":  { "$op": "get", "$path": "$.centro" },
-      "periodo": { "$op": "get", "$path": "$.periodo" },
-      "alumnos": {
+      "university":  { "$op": "get", "$path": "$.university" },
+      "period": { "$op": "get", "$path": "$.period" },
+      "students": {
           // Pasada 2: añadir nota_media a cada alumno del resultado de pasada 1.
           "$op": "foldObj",
           "$over": {
             // Pasada 1: agrega cursos × inscripciones por alumno.
             "$op": "foldObj",
-            "$over": { "$op": "get", "$path": "$.cursos" },
+            "$over": { "$op": "get", "$path": "$.courses" },
             "$init": {},
             "$step": {
               // Capturamos los créditos del curso actual.
               "$op": "let",
               "$bindings": {
-                "creditos": { "$op": "get", "$path": "@.value.creditos" }
+                "credits": { "$op": "get", "$path": "@.value.credits" }
               },
               "$in": {
                 // Recorremos las inscripciones del curso actual.
                 "$op": "foldArr",
-                "$over": { "$op": "get", "$path": "@.value.inscripciones" },
+                "$over": { "$op": "get", "$path": "@.value.enrollments" },
                 "$init": { "$op": "get", "$path": "@.acc" },
                 "$step": {
                   // Si la nota es null, esta inscripción no cuenta.
                   "$op": "if",
                   "$cond": {
                     "$op": "eq",
-                    "$left":  { "$op": "get", "$path": "@.item.nota" },
+                    "$left":  { "$op": "get", "$path": "@.item.grade" },
                     "$right": null
                   },
                   "$then": { "$op": "get", "$path": "@.acc" },
@@ -113,32 +113,32 @@ describe("Integración: cursos × alumnos", () => {
                     // Capturamos el alumno, la nota y el acc.
                     "$op": "let",
                     "$bindings": {
-                      "alumno": { "$op": "get", "$path": "@.item.alumno" },
-                      "nota":   { "$op": "get", "$path": "@.item.nota" },
+                      "student": { "$op": "get", "$path": "@.item.student" },
+                      "grade":   { "$op": "get", "$path": "@.item.grade" },
                       "accI":   { "$op": "get", "$path": "@.acc" }
                     },
                     "$in": {
                       // Lookup O(1) sobre el acumulador por nombre de alumno.
                       "$op": "let",
                       "$bindings": {
-                        "previo": {
+                        "previous_step": {
                           "$op": "lookup",
-                          "$key": { "$op": "get", "$path": "%alumno" },
+                          "$key": { "$op": "get", "$path": "%student" },
                           "$in":  { "$op": "get", "$path": "%accI" }
                         }
                       },
                       "$in": {
                         "$op": "insert",
-                        "$key": { "$op": "get", "$path": "%alumno" },
+                        "$key": { "$op": "get", "$path": "%student" },
                         "$value": {
-                          "creditos_aprobados": {
+                          "passing_credits": {
                             "$op": "add",
                             "$left": {
                               "$op": "coalesce",
                               "$value": {
                                 "$op": "lookup",
-                                "$key": "creditos_aprobados",
-                                "$in":  { "$op": "get", "$path": "%previo" }
+                                "$key": "passing_credits",
+                                "$in":  { "$op": "get", "$path": "%previous_step" }
                               },
                               "$default": 0
                             },
@@ -146,34 +146,34 @@ describe("Integración: cursos × alumnos", () => {
                               "$op": "if",
                               "$cond": {
                                 "$op": "gte",
-                                "$left":  { "$op": "get", "$path": "%nota" },
-                                "$right": { "$op": "get", "$path": "$.nota_aprobado" }
+                                "$left":  { "$op": "get", "$path": "%grade" },
+                                "$right": { "$op": "get", "$path": "$.passing_grade" }
                               },
-                              "$then": { "$op": "get", "$path": "%creditos" },
+                              "$then": { "$op": "get", "$path": "%credits" },
                               "$else": 0
                             }
                           },
-                          "suma_notas": {
+                          "sum_of_grades": {
                             "$op": "add",
                             "$left": {
                               "$op": "coalesce",
                               "$value": {
                                 "$op": "lookup",
-                                "$key": "suma_notas",
-                                "$in":  { "$op": "get", "$path": "%previo" }
+                                "$key": "sum_of_grades",
+                                "$in":  { "$op": "get", "$path": "%previous_step" }
                               },
                               "$default": 0
                             },
-                            "$right": { "$op": "get", "$path": "%nota" }
+                            "$right": { "$op": "get", "$path": "%grade" }
                           },
-                          "cursos_terminados": {
+                          "enrolled_courses": {
                             "$op": "add",
                             "$left": {
                               "$op": "coalesce",
                               "$value": {
                                 "$op": "lookup",
-                                "$key": "cursos_terminados",
-                                "$in":  { "$op": "get", "$path": "%previo" }
+                                "$key": "enrolled_courses",
+                                "$in":  { "$op": "get", "$path": "%previous_step" }
                               },
                               "$default": 0
                             },
@@ -194,13 +194,13 @@ describe("Integración: cursos × alumnos", () => {
             "$op": "insert",
             "$key": { "$op": "get", "$path": "@.key" },
             "$value": {
-              "creditos_aprobados": { "$op": "get", "$path": "@.value.creditos_aprobados" },
-              "suma_notas":         { "$op": "get", "$path": "@.value.suma_notas" },
-              "cursos_terminados":  { "$op": "get", "$path": "@.value.cursos_terminados" },
-              "nota_media": {
+              "passing_credits": { "$op": "get", "$path": "@.value.passing_credits" },
+              "sum_of_grades": { "$op": "get", "$path": "@.value.sum_of_grades" },
+              "enrolled_courses": { "$op": "get", "$path": "@.value.enrolled_courses" },
+              "average_grade": {
                 "$op": "div",
-                "$left":  { "$op": "get", "$path": "@.value.suma_notas" },
-                "$right": { "$op": "get", "$path": "@.value.cursos_terminados" }
+                "$left":  { "$op": "get", "$path": "@.value.sum_of_grades" },
+                "$right": { "$op": "get", "$path": "@.value.enrolled_courses" }
               }
             },
             "$into": { "$op": "get", "$path": "@.acc" }
@@ -210,35 +210,35 @@ describe("Integración: cursos × alumnos", () => {
 
     const result = await evaluate(mod, documento, { registry });
 
-    assert.equal(result.centro, "Academia Madrid");
-    assert.equal(result.periodo, "2026-Q1");
+    assert.equal(result.university, "Universidad Nacional de Educación a Distancia (U.N.E.D.)");
+    assert.equal(result.period, "2026-Q1");
 
-    assert.deepEqual(Object.keys(result.alumnos).sort(), [
-      "Inés", "Luis María", "Marta", "Pedro"
+    assert.deepEqual(Object.keys(result.students).sort(), [
+      "Elena", "Inés", "José Antonio", "Luis María"
     ]);
 
     // Luis María.
-    assert.equal(result.alumnos["Luis María"].creditos_aprobados, 15);
-    assert.equal(result.alumnos["Luis María"].suma_notas, 16.5);
-    assert.equal(result.alumnos["Luis María"].cursos_terminados, 2);
-    assert.equal(result.alumnos["Luis María"].nota_media, 8.25);
+    assert.equal(result.students["Luis María"].passing_credits, 10);
+    assert.equal(result.students["Luis María"].sum_of_grades, 16.5);
+    assert.equal(result.students["Luis María"].enrolled_courses, 2);
+    assert.equal(result.students["Luis María"].average_grade, 8.25);
 
     // Inés.
-    assert.equal(result.alumnos["Inés"].creditos_aprobados, 6);
-    assert.equal(result.alumnos["Inés"].suma_notas, 11.0);
-    assert.equal(result.alumnos["Inés"].cursos_terminados, 2);
-    assert.equal(result.alumnos["Inés"].nota_media, 5.5);
+    assert.equal(result.students["Inés"].passing_credits, 9);
+    assert.equal(result.students["Inés"].sum_of_grades, 11.0);
+    assert.equal(result.students["Inés"].enrolled_courses, 2);
+    assert.equal(result.students["Inés"].average_grade, 5.5);
 
-    // Marta (BD-301 no aprobado, no suma créditos pero sí cuenta como terminado).
-    assert.equal(result.alumnos["Marta"].creditos_aprobados, 15);
-    assert.equal(result.alumnos["Marta"].suma_notas, 18.0);
-    assert.equal(result.alumnos["Marta"].cursos_terminados, 3);
-    assert.equal(result.alumnos["Marta"].nota_media, 6.0);
+    // Elena (BD-301 no aprobado, no suma créditos pero sí cuenta como terminado).
+    assert.equal(result.students["Elena"].passing_credits, 10);
+    assert.equal(result.students["Elena"].sum_of_grades, 18.0);
+    assert.equal(result.students["Elena"].enrolled_courses, 3);
+    assert.equal(result.students["Elena"].average_grade, 6.0);
 
-    // Pedro (ALG-101 sin nota, excluido).
-    assert.equal(result.alumnos["Pedro"].creditos_aprobados, 15);
-    assert.equal(result.alumnos["Pedro"].suma_notas, 13.5);
-    assert.equal(result.alumnos["Pedro"].cursos_terminados, 2);
-    assert.equal(result.alumnos["Pedro"].nota_media, 6.75);
+    // José Antonio (ALG-101 sin nota, excluido).
+    assert.equal(result.students["José Antonio"].passing_credits, 15);
+    assert.equal(result.students["José Antonio"].sum_of_grades, 13.5);
+    assert.equal(result.students["José Antonio"].enrolled_courses, 2);
+    assert.equal(result.students["José Antonio"].average_grade, 6.75);
   });
 });

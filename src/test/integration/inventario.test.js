@@ -31,23 +31,23 @@ import { moduleWith } from "../../modules/helpers.js";
 const registry = createNativeRegistry();
 
 const documento = {
-  "almacen": "Madrid-01",
-  "umbral_critico": 10,
-  "productos": {
-    "SKU-A100": { "nombre": "Teclado mecánico",      "categoria": "perifericos", "stock": 45, "precio":  89.90 },
-    "SKU-A101": { "nombre": "Ratón inalámbrico",     "categoria": "perifericos", "stock":  8, "precio":  35.00 },
-    "SKU-B200": { "nombre": "Monitor 27 pulgadas",   "categoria": "pantallas",   "stock": 12, "precio": 320.00 },
-    "SKU-B201": { "nombre": "Monitor 32 pulgadas",   "categoria": "pantallas",   "stock":  3, "precio": 480.00 },
-    "SKU-C300": { "nombre": "Webcam HD",             "categoria": "perifericos", "stock":  0, "precio":  65.00 },
-    "SKU-D400": { "nombre": "Auriculares Bluetooth", "categoria": "audio",       "stock": 25, "precio": 120.00 }
+  "store": "Madrid-01",
+  "threshold": 10,
+  "products": {
+    "SKU-A100": { "name": "Mechanical Keyboard", "category": "peripheral", "stock": 45, "price":  89.90 },
+    "SKU-A101": { "name": "Wireless Mouse",      "category": "peripheral", "stock":  8, "price":  35.00 },
+    "SKU-B200": { "name": "Monitor 27 inches",   "category": "screen",     "stock": 12, "price": 320.00 },
+    "SKU-B201": { "name": "Monitor 32 inches",   "category": "screen",     "stock":  3, "price": 480.00 },
+    "SKU-C300": { "name": "Webcam HD",           "category": "peripheral", "stock":  0, "price":  65.00 },
+    "SKU-D400": { "name": "Bluetooth earphones", "category": "audio",      "stock": 25, "price": 120.00 }
   }
 };
 
-describe("Integración: inventario — valor total", () => {
-  it("calcula la suma de stock × precio", async () => {
+describe("Integration test: inventory - total value as sum·product", () => {
+  it("SUM( stock * price )", async () => {
     const proj = {
       "$op": "foldObj",
-      "$over": { "$op": "get", "$path": "$.productos" },
+      "$over": { "$op": "get", "$path": "$.products" },
       "$init": 0,
       "$step": {
         "$op": "add",
@@ -55,35 +55,37 @@ describe("Integración: inventario — valor total", () => {
         "$right": {
           "$op": "mul",
           "$left":  { "$op": "get", "$path": "@.value.stock" },
-          "$right": { "$op": "get", "$path": "@.value.precio" }
+          "$right": { "$op": "get", "$path": "@.value.price" }
         }
       }
     };
     const mod = normalizeModule(moduleWith(proj));
     const result = await evaluate(mod, documento, { registry });
-    // 45×89.90 + 8×35 + 12×320 + 3×480 + 0×65 + 25×120 = 4045.50+280+3840+1440+0+3000 = 12605.50
-    assert.ok(Math.abs(result - 12605.50) < 0.01, `esperado 12605.50, recibido ${result}`);
+    // 45*89.90 + 8*35 + 12*320 + 3*480 + 0*65 + 25*120 =
+    // = 4045.50 + 280.00 + 3840.00 + 1440.00 + 0.00 + 3000.00 =
+    // = 12605.50
+    assert.ok(Math.abs(result - 12605.50) < 0.01, `Expected='12605.50', Actual='${result}'`);
   });
 });
 
-describe("Integración: inventario — productos críticos", () => {
-  it("filtra productos con stock ≤ umbral_critico", async () => {
+describe("Integration test: inventory - products below critical threshold", () => {
+  it("FILTER( products[*].stock <= threshold )", async () => {
     const proj = {
       "$op": "foldObj",
-      "$over": { "$op": "get", "$path": "$.productos" },
+      "$over": { "$op": "get", "$path": "$.products" },
       "$init": {},
       "$step": {
         "$op": "if",
         "$cond": {
           "$op": "lte",
           "$left":  { "$op": "get", "$path": "@.value.stock" },
-          "$right": { "$op": "get", "$path": "$.umbral_critico" }
+          "$right": { "$op": "get", "$path": "$.threshold" }
         },
         "$then": {
           "$op": "insert",
           "$key": { "$op": "get", "$path": "@.key" },
           "$value": {
-            "nombre": { "$op": "get", "$path": "@.value.nombre" },
+            "nombre": { "$op": "get", "$path": "@.value.name" },
             "stock":  { "$op": "get", "$path": "@.value.stock" }
           },
           "$into": { "$op": "get", "$path": "@.acc" }
@@ -96,28 +98,28 @@ describe("Integración: inventario — productos críticos", () => {
     assert.deepEqual(Object.keys(result).sort(), [
       "SKU-A101", "SKU-B201", "SKU-C300"
     ]);
-    assert.deepEqual(result["SKU-A101"], { nombre: "Ratón inalámbrico", stock: 8 });
-    assert.deepEqual(result["SKU-B201"], { nombre: "Monitor 32 pulgadas", stock: 3 });
+    assert.deepEqual(result["SKU-A101"], { nombre: "Wireless Mouse", stock: 8 });
+    assert.deepEqual(result["SKU-B201"], { nombre: "Monitor 32 inches", stock: 3 });
     assert.deepEqual(result["SKU-C300"], { nombre: "Webcam HD", stock: 0 });
   });
 });
 
-describe("Integración: inventario — stock por categoría", () => {
-  it("agrupa stocks por categoría usando lookup en el acumulador", async () => {
+describe("Integration test: inventory - stock per category", () => {
+  it("SELECT SUM( stock ) FROM lookup( products ) GROUP-BY( category )", async () => {
     const proj = {
       "$op": "foldObj",
-      "$over": { "$op": "get", "$path": "$.productos" },
+      "$over": { "$op": "get", "$path": "$.products" },
       "$init": {},
       "$step": {
         "$op": "insert",
-        "$key": { "$op": "get", "$path": "@.value.categoria" },
+        "$key": { "$op": "get", "$path": "@.value.category" },
         "$value": {
           "$op": "add",
           "$left": {
             "$op": "coalesce",
             "$value": {
               "$op": "lookup",
-              "$key": { "$op": "get", "$path": "@.value.categoria" },
+              "$key": { "$op": "get", "$path": "@.value.category" },
               "$in":  { "$op": "get", "$path": "@.acc" }
             },
             "$default": 0
@@ -129,23 +131,24 @@ describe("Integración: inventario — stock por categoría", () => {
     };
     const mod = normalizeModule(moduleWith(proj));
     const result = await evaluate(mod, documento, { registry });
-    // perifericos: 45 + 8 + 0 = 53; pantallas: 12 + 3 = 15; audio: 25.
+    // peripheral: 45 + 8 + 0 = 53; screen: 12 + 3 = 15; audio: 25.
     assert.deepEqual(result, {
-      "perifericos": 53,
-      "pantallas":   15,
-      "audio":       25
+      "peripheral": 53,
+      "screen":     15,
+      "audio":      25
     });
   });
 });
 
-describe("Integración: inventario — proyección completa", () => {
-  it("produce el documento esperado en una sola pasada", async () => {
+describe("Integration test: inventory - full projection", () => {
+  it("Full projection in a single pass", async () => {
     const proj = {
-      "almacen": { "$op": "get", "$path": "$.almacen" },
-
-      "valor_total_inventario": {
+      // Store.
+      "store": { "$op": "get", "$path": "$.store" },
+      // Total inventory value.
+      "total_inventory_value": {
         "$op": "foldObj",
-        "$over": { "$op": "get", "$path": "$.productos" },
+        "$over": { "$op": "get", "$path": "$.products" },
         "$init": 0,
         "$step": {
           "$op": "add",
@@ -153,49 +156,49 @@ describe("Integración: inventario — proyección completa", () => {
           "$right": {
             "$op": "mul",
             "$left":  { "$op": "get", "$path": "@.value.stock" },
-            "$right": { "$op": "get", "$path": "@.value.precio" }
+            "$right": { "$op": "get", "$path": "@.value.price" }
           }
         }
       },
-
-      "productos_criticos": {
+      // Products below the critical threshold.
+      "products_below_critical_threshold": {
         "$op": "foldObj",
-        "$over": { "$op": "get", "$path": "$.productos" },
+        "$over": { "$op": "get", "$path": "$.products" },
         "$init": {},
         "$step": {
           "$op": "if",
           "$cond": {
             "$op": "lte",
             "$left":  { "$op": "get", "$path": "@.value.stock" },
-            "$right": { "$op": "get", "$path": "$.umbral_critico" }
+            "$right": { "$op": "get", "$path": "$.threshold" }
           },
           "$then": {
             "$op": "insert",
             "$key": { "$op": "get", "$path": "@.key" },
             "$value": {
-              "nombre": { "$op": "get", "$path": "@.value.nombre" },
-              "stock":  { "$op": "get", "$path": "@.value.stock" }
+              "name":  { "$op": "get", "$path": "@.value.name"  },
+              "stock": { "$op": "get", "$path": "@.value.stock" }
             },
             "$into": { "$op": "get", "$path": "@.acc" }
           },
           "$else": { "$op": "get", "$path": "@.acc" }
         }
       },
-
-      "stock_por_categoria": {
+      // Aggregated stock per category.
+      "stock_per_category": {
         "$op": "foldObj",
-        "$over": { "$op": "get", "$path": "$.productos" },
+        "$over": { "$op": "get", "$path": "$.products" },
         "$init": {},
         "$step": {
           "$op": "insert",
-          "$key": { "$op": "get", "$path": "@.value.categoria" },
+          "$key": { "$op": "get", "$path": "@.value.category" },
           "$value": {
             "$op": "add",
             "$left": {
               "$op": "coalesce",
               "$value": {
                 "$op": "lookup",
-                "$key": { "$op": "get", "$path": "@.value.categoria" },
+                "$key": { "$op": "get", "$path": "@.value.category" },
                 "$in":  { "$op": "get", "$path": "@.acc" }
               },
               "$default": 0
@@ -208,16 +211,17 @@ describe("Integración: inventario — proyección completa", () => {
     };
     const mod = normalizeModule(moduleWith(proj));
     const result = await evaluate(mod, documento, { registry });
+    //// console.log('result', JSON.stringify(result,undefined,'  '));
 
-    assert.equal(result.almacen, "Madrid-01");
-    assert.ok(Math.abs(result.valor_total_inventario - 12605.50) < 0.01);
-    assert.deepEqual(Object.keys(result.productos_criticos).sort(), [
+    assert.equal(result.store, "Madrid-01");
+    assert.ok(Math.abs(result.total_inventory_value - 12605.50) < 0.01);
+    assert.deepEqual(Object.keys(result.products_below_critical_threshold).sort(), [
       "SKU-A101", "SKU-B201", "SKU-C300"
     ]);
-    assert.deepEqual(result.stock_por_categoria, {
-      "perifericos": 53,
-      "pantallas":   15,
-      "audio":       25
+    assert.deepEqual(result.stock_per_category, {
+      "peripheral": 53,
+      "screen":     15,
+      "audio":      25
     });
   });
 });

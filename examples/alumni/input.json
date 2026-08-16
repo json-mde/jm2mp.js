@@ -1,34 +1,34 @@
 {
-    "centro": "Academia Madrid",
-    "periodo": "2026-Q1",
-    "nota_aprobado": 5.0,
-    "cursos": {
+    "university": "Universidad Nacional de Educación a Distancia (U.N.E.D.)",
+    "period": "2026-Q1",
+    "passing_grade": 5.0,
+    "courses": {
       "ALG-101": {
-        "titulo": "Álgebra lineal",
-        "creditos": 6,
-        "inscripciones": [
-          { "alumno": "Luis María",   "nota": 7.5 },
-          { "alumno": "Inés",         "nota": 4.0 },
-          { "alumno": "Elena",        "nota": 8.5 },
-          { "alumno": "José Antonio", "nota": null }
+        "title": "Linear Algebra",
+        "credits": 4,
+        "enrollments": [
+          { "student": "Luis María",   "grade": 7.5 },
+          { "student": "Inés",         "grade": 4.0 },
+          { "student": "Elena",        "grade": 8.5 },
+          { "student": "José Antonio", "grade": null }
         ]
       },
       "PROG-201": {
-        "titulo": "Programación funcional",
-        "creditos": 9,
-        "inscripciones": [
-          { "alumno": "Luis María",   "nota": 9.0 },
-          { "alumno": "Elena",        "nota": 6.5 },
-          { "alumno": "José Antonio", "nota": 5.5 }
+        "title": "Functional Programming",
+        "credits": 6,
+        "enrollments": [
+          { "student": "Luis María",   "grade": 9.0 },
+          { "student": "Elena",        "grade": 6.5 },
+          { "student": "José Antonio", "grade": 5.5 }
         ]
       },
       "BD-301": {
-        "titulo": "Bases de datos",
-        "creditos": 6,
-        "inscripciones": [
-          { "alumno": "Inés",         "nota": 7.0 },
-          { "alumno": "Elena",        "nota": 3.0 },
-          { "alumno": "José Antonio", "nota": 8.0 }
+        "title": "Databases",
+        "credits": 9,
+        "enrollments": [
+          { "student": "Inés",         "grade": 7.0 },
+          { "student": "Elena",        "grade": 3.0 },
+          { "student": "José Antonio", "grade": 8.0 }
         ]
       }
     }

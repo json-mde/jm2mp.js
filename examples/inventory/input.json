@@ -1,12 +1,12 @@
 {
-  "almacen": "Madrid-01",
-  "umbral_critico": 10,
-  "productos": {
-    "SKU-A100": { "nombre": "Teclado mecánico",      "categoria": "perifericos", "stock": 45, "precio":  89.90 },
-    "SKU-A101": { "nombre": "Ratón inalámbrico",     "categoria": "perifericos", "stock":  8, "precio":  35.00 },
-    "SKU-B200": { "nombre": "Monitor 27 pulgadas",   "categoria": "pantallas",   "stock": 12, "precio": 320.00 },
-    "SKU-B201": { "nombre": "Monitor 32 pulgadas",   "categoria": "pantallas",   "stock":  3, "precio": 480.00 },
-    "SKU-C300": { "nombre": "Webcam HD",             "categoria": "perifericos", "stock":  0, "precio":  65.00 },
-    "SKU-D400": { "nombre": "Auriculares Bluetooth", "categoria": "audio",       "stock": 25, "precio": 120.00 }
+  "store": "Madrid-01",
+  "threshold": 10,
+  "products": {
+    "SKU-A100": { "name": "Mechanical Keyboard", "category": "peripheral", "stock": 45, "price":  89.90 },
+    "SKU-A101": { "name": "Wireless Mouse",      "category": "peripheral", "stock":  8, "price":  35.00 },
+    "SKU-B200": { "name": "Monitor 27 inches",   "category": "screen",     "stock": 12, "price": 320.00 },
+    "SKU-B201": { "name": "Monitor 32 inches",   "category": "screen",     "stock":  3, "price": 480.00 },
+    "SKU-C300": { "name": "Webcam HD",           "category": "peripheral", "stock":  0, "price":  65.00 },
+    "SKU-D400": { "name": "Bluetooth earphones", "category": "audio",      "stock": 25, "price": 120.00 }
   }
 }

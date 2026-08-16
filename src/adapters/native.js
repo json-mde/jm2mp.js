@@ -22,7 +22,7 @@
  */
 
 import { EvaluationError, ValidationError } from "../errors.js";
-import { parsePath, navigate } from "../paths.js";
+import { parsePath, navigate } from "./native-paths.js";
 
 /**
  * Crea el adaptador para la sintaxis nativa.

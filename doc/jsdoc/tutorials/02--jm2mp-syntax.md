@@ -53,9 +53,6 @@
       - [typeof](#typeof)
 - [Named Templates](#named-templates)
 - [Query Languages](#query-languages)
-  - [Query Language Syntaxes](#query-language-syntaxes)
-    - [Text Literal Query Language Expressions](#text-literal-query-language-expressions)
-    - [JSON Query Language Expressions](#json-query-language-expressions)
   - [Available Query Languages](#available-query-languages)
     - [Native](#native)
     - [External References](#external-references)
@@ -557,8 +554,9 @@ Its basic JSON form is:
 }
 ```
 
-It is also possible to define which _query language_ is used (clause
-`syntax`), and also change its _current context_ (clause `from`):
+It is also possible to define which [query language](#query-languages)
+is used (clause `syntax`), and also change its _current context_ (clause
+`from`):
 
 ```JSON
 {
@@ -569,14 +567,15 @@ It is also possible to define which _query language_ is used (clause
 }
 ```
 
-Please, refer below to the [Query Languages](#query-languages) section
-in this tutorial for more information.
-
 #### if
 
 The `if` _template command_ is the _projection_ that projects its `then`
 clause when the `cond` clause is evaluated as `true`; otherwise, it
 projects its `else` clause.
+
+The `if` _template command_ uses short-circuit evaluation, meaning that
+the `else` clause is only projected if and only if the _resultant value_
+from `cond` _projection_ is `false`.
 
 Its JSON form is:
 
@@ -1571,37 +1570,49 @@ select) JSON values within a JSON document.
 
 There are several languages designed for this purpose, ranging from the
 simplest (which simply allow you to locate any element in the document)
-to the most sophisticated (which offer pattern-based searches, as well
-as additional filtering and sorting operations, among others).
+to the most sophisticated (which offer pattern-matching searches, as
+well as additional filtering and sorting operations, among others).
 
-### Query Language Syntaxes
+The `JM2MP` syntax provides a mechanism for using any (hypothetical)
+_query language_ that can be embedded in JSON, either as a string
+literal or as any other JSON value (tipically arrays or objects). To do
+this, there are two options:
 
-#### Text Literal Query Language Expressions
+1. Any _document or projection module_ can tell the `JM2MP.JS` library
+   which _query language_ to use by default in that _document_ by
+   declaring its name in the [$default-query-language](#default-query-language)
+   property of the [$options](#options) object.
 
-... FALTA ...
-
-#### JSON Query Language Expressions
-
-... FALTA ...
+1. The _template command_ [get](#get) supports the `syntax` clause to
+   indicate that the query written in the `path` clause uses such language.
 
 ### Available Query Languages
 
-... FALTA ...
+The `JM2MP.JS` library provides built-in support for several _query
+languages_ widely used in the industry: [JMESpath](#jmespath),
+[JSONata](#jsonata), [JSONPath](#jsonpath),
+[JSON Pointer](#json-pointer), and [JSON Query](#json-query). You can
+find information about each one of them in the
+[external references](#external-references) section, below.
+
+In addition, the `JM2MP` format offers its own _query language_ syntax,
+simply called [native](#native), which we will briefly describe next.
 
 #### Native
 
-The `JM2MP` format offers its own _query language_, just named `native`.
-Both formats, `JM2MP` and `native`, have been designed to be
+The `JM2MP` format offers its own _query language_ syntax, simply named
+`native`. Both formats, `JM2MP` and `native`, have been designed to be
 algebraically complete, in the sense that they provide, with mathematical
 rigor, at least the minimal set of operations necessary to achieve
-complete transformations between JSON documents.
+complete location and transformations between JSON documents.
 
 The `native query language` features two syntactically different but
 semantically equivalent notations: one based on text strings and another
 based on JSON syntax.
 
 Please refer to the [Native Query Language](./tutorial--03--nql-syntax.html)
-tutorial for full details about this _query language_ and how to use it.
+tutorial for complete details about this _query language syntax_ and how
+to use it.
 
 #### External References
 
@@ -1638,6 +1649,11 @@ See [JSON Query](./external-JSONQuery.html) _external reference_ for more inform
 It is possible to use other query languages not initially referenced by
 `JM2MP.JS`. In order to do that, it is required to develop an _adapter
 class_, same as any other external reference previosly mentioned.
+
+<span style="color:yellow; background:red;"> ... FALTA ... </span>
+Please, refer to the [QueryAdapter](./module-jm2mp_adapters_helpers.html#QueryAdapter)
+interface for more information.
+
 
 Remember that any _JM2MP module_ that will use any _query language_
 different than `native`, needs to declare its usage as part of
@@ -1702,11 +1718,15 @@ _document_.
 }
 ```
 
-- _Meta data_
+- _Metadata_
 
   Both `$options` and `$schema` properties of can appear on any
   _projection document or module_ affecting only to that _module_
   and not propagating its respectives values outside that _module_.
+
+  That means that if some _projection module_ configure its
+  `$default-query-language`, such configuration only affects to that
+  _module_ and no other one (neither dependant nor imported).
 
   Please, refear to [$options](#options) and [$schema](#json-schema)
   sections for more information.
@@ -1767,19 +1787,19 @@ considered as `"native"` (see [native query language](#native)).
 ### Depends On
 
 In order to simplify large or complex projection documents,
-modularization can be achieved using an optional `$depends-on` property;
-the value of this property must be an array of string items, where each
-string will be interpreted by `JM2MP.JS` in different manners (as
-filenames, as URLs or as literal JSON content) whose content will be
-imported into current projection document following the exact order of
-this list.
+[modularization](#modularization) can be achieved using an optional
+`$depends-on` property; the value of this property must be an array of
+strings, where each string would be interpreted by `JM2MP.JS` in
+different manners (as filenames, as URLs or as literal JSON content)
+whose content will be imported into current _projection document_
+following the exact order of this list.
 
-Each new projection content, in turn, could have its own (ordered) list
-of_dependencies. It is worth mentioning that, in case of conflict,
-_named templates_ that already exist in the _projection document_
-performing the import will take precedence, overriding (substituting)
-any _named templates_ with the same name that may exist in the imported
-_document_.
+Each new _projection_ content, in turn, could have its own (ordered)
+list of _dependencies_. It is worth mentioning that, in case of
+conflict, _named templates_ that already exist in the _projection
+document_ performing the import will take precedence, overriding
+(substituting) any _named templates_ with the same name that may exist
+in the imported _documents_.
 
 ## JSON Schema
 

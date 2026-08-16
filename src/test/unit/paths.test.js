@@ -13,7 +13,7 @@
 
 import { describe, it } from "node:test";
 import { strict as assert } from "node:assert";
-import { parsePath, navigate } from "../../paths.js";
+import { parsePath, navigate } from "../../adapters/native-paths.js";
 import { ParseError } from "../../errors.js";
 
 describe("parsePath: raíces", () => {

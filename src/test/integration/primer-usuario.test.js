@@ -29,16 +29,16 @@ const registry = createNativeRegistry();
 
 describe("Integración: extraer primer usuario", () => {
   const documento = {
-    "Usuarios": [
-      { "nombre": "Luis Maria", "correos": ["Uno", "Dos"] },
-      { "nombre": "Inés",       "correos": ["Tres", "Cuatro"] }
+    "Users": [
+      { "name": "Luis Maria", "emails": ["Alpha.One", "Alpha.Two"] },
+      { "name": "Inés",       "emails": ["Bravo.One", "Bravo.Two"] }
     ]
   };
 
   it("extrae el primer usuario usando fold con @.index", async () => {
     const proj = {
       "$op": "foldArr",
-      "$over": { "$op": "get", "$path": "$.Usuarios" },
+      "$over": { "$op": "get", "$path": "$.Users" },
       "$init": null,
       "$step": {
         "$op": "if",
@@ -54,8 +54,8 @@ describe("Integración: extraer primer usuario", () => {
     const mod = normalizeModule(moduleWith(proj));
     const result = await evaluate(mod, documento, { registry });
     assert.deepEqual(result, {
-      "nombre": "Luis Maria",
-      "correos": ["Uno", "Dos"]
+      "name": "Luis Maria",
+      "emails": ["Alpha.One", "Alpha.Two"]
     });
   });
 
@@ -95,7 +95,7 @@ describe("Integración: extraer primer usuario", () => {
   it("un solo usuario también es el primero", async () => {
     const proj = {
       "$op": "foldArr",
-      "$over": { "$op": "get", "$path": "$.Usuarios" },
+      "$over": { "$op": "get", "$path": "$.Users" },
       "$init": null,
       "$step": {
         "$op": "if",
@@ -108,9 +108,9 @@ describe("Integración: extraer primer usuario", () => {
         "$else": { "$op": "get", "$path": "@.acc" }
       }
     };
-    const docMini = { Usuarios: [{ nombre: "Único" }] };
+    const docMini = { Users: [{ name: "Single" }] };
     const mod = normalizeModule(moduleWith(proj));
     const result = await evaluate(mod, docMini, { registry });
-    assert.deepEqual(result, { nombre: "Único" });
+    assert.deepEqual(result, { name: "Single" });
   });
 });

@@ -21,7 +21,7 @@
 
 import { ValidationError } from "./errors.js";
 import { ROOT_TEMPLATE_NAME, ThrowsValidationErrorWhenIsNotAModule } from "./modules/helpers.js";
-import { parsePath } from "./paths.js";
+import { parsePath } from "./adapters/native-paths.js";
 
 /**
  * Operadores reconocidos. Mantener sincronizado con el evaluador.

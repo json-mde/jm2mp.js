@@ -20,12 +20,12 @@
 **/
 
 /**
- * @module jm2mp/paths
+ * @module jm2mp/adapters/native_paths
  * @description
  * Parser EBNF de rutas nativas y función de navegación.
 **/
 
-import { ParseError, EvaluationError } from "./errors.js";
+import { ParseError, EvaluationError } from "../errors.js";
 
 /**
  * Tipo lógico de una ruta parseada (de un string).

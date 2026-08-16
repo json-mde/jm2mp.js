@@ -1,0 +1,10 @@
+{
+  "store": "Madrid-01",
+  "total_inventory_value": 12605.5,
+  "products_below_critical_threshold": {
+    "SKU-A101": { "name": "Wireless Mouse", "stock": 8 },
+    "SKU-B201": { "name": "Monitor 32 inches", "stock": 3 },
+    "SKU-C300": { "name": "Webcam HD", "stock": 0 }
+  },
+  "stock_per_category": { "peripheral": 53, "screen": 15, "audio": 25 }
+}

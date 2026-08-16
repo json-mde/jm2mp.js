@@ -1,6 +1,6 @@
 {
-    "Users": [
-        { "name": "Luis Maria", "emails": ["Uno", "Dos"] },
-        { "name": "Inés",       "emails": ["Tres", "Cuatro"] }
-    ]
+  "Users": [
+    { "name": "Luis Maria", "emails": ["Alpha.One", "Alpha.Two"] },
+    { "name": "Inés",       "emails": ["Bravo.One", "Bravo.Two"] }
+  ]
 }
