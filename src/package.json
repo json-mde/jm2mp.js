@@ -46,7 +46,7 @@
     "test:coverage-lcov": "node --test --experimental-test-coverage --test-reporter=lcov --test-reporter-destination=coverage.lcov",
     "eslint": "npx -- eslint",
     "jsdoc": "npm run jsdoc@windows",
-    "jsdoc@windows": "DEL /Q /F /S ..\\doc\\jsdoc-out\\ && .\\node_modules\\.bin\\jsdoc.cmd --configure .\\JSDoc.config.json",
+    "jsdoc@windows": "( DEL /Q /F /S ..\\doc\\jsdoc-out\\ ) && ( COPY /B ..\\README.md + ..\\CHANGELOG.md ..\\README_CHANGELOG.md ) && ( .\\node_modules\\.bin\\jsdoc.cmd --configure .\\JSDoc.config.json ) & ( DEL ..\\README_CHANGELOG.md )",
     "jsdoc@linux": "./node_modules/.bin/jsdoc --configure ./JSDoc.config.json",
     "ajv": "npm run ajv@windows",
     "ajv@windows": "npx -- ajv-cli --spec=draft2020 -s .\\schemas\\JM2MP-v1.0.0--JSON-Schema-Draft-2020-12.json -d ..\\examples\\alumni\\projection.json",

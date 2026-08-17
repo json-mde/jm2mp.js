@@ -18,7 +18,7 @@
     "destination": "../doc/jsdoc-out/",
     "recurse": true,
     "tutorials": "../doc/jsdoc/tutorials/",
-    "readme": "../README.md",
+    "readme": "../README_CHANGELOG.md",
     "package": "./package.json",
     "verbose": true
   },

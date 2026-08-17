@@ -2,7 +2,6 @@
  * @author Luis Maria CAMARA ROSSI
  * @copyright Universidad Nacional de Educación a Distancia (U.N.E.D.) 2026
  * @license BSD-3-Clause
- * @module jm2mp/adapters/native
  * @file Adaptador para la sintaxis nativa del lenguaje.
  *
  * Es el adaptador de REFERENCIA: define el contrato de comportamiento
@@ -19,15 +18,22 @@
  * para cumplir el contrato uniforme del registro. El overhead de envolver
  * en Promise.resolve() es despreciable y se compensa con la coherencia
  * arquitectónica.
- */
+**/
+
+/**
+ * @module jm2mp/adapters/native
+ * @description
+ * Adaptador para la sintaxis nativa del lenguaje.
+**/
 
 import { EvaluationError, ValidationError } from "../errors.js";
 import { parsePath, navigate } from "./native-paths.js";
 
 /**
+ * @description
  * Crea el adaptador para la sintaxis nativa.
- *
- * @returns {module:registry.QueryAdapter}
+ * @returns {module:jm2mp/adapters/registry.QueryAdapter}
+ * The `QueryAdapter` for the [native query language]{@tutorial 03--nql-syntax}.
  */
 export function createNativeAdapter() {
   return {
@@ -144,4 +150,5 @@ export function createNativeAdapter() {
       nullInput: "null (sin invocar lógica adicional)",
     },
   };
-}
+
+}  // export function createNativeAdapter //
