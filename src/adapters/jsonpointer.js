@@ -2,82 +2,115 @@
  * @author Luis Maria CAMARA ROSSI
  * @copyright Universidad Nacional de Educación a Distancia (U.N.E.D.) 2026
  * @license BSD-3-Clause
- * @file Adaptador para sintaxis JSON Pointer (RFC 6901).
- *
- * JSON Pointer es una sintaxis de direccionamiento estandarizada que
- * identifica UN ÚNICO valor dentro de un documento JSON mediante una cadena
- * de tokens separados por '/'. No es un lenguaje de consulta general (no
- * tiene wildcards, filtros, ni descenso recursivo), pero está cubierto por
- * una RFC y su gramática cabe en treinta líneas.
- *
- * Sintaxis (RFC 6901):
- *   ""           → el documento raíz completo
- *   "/foo"       → propiedad "foo" del raíz
- *   "/foo/0"     → primer elemento del array en "foo"
- *   "/a~1b"      → propiedad literal "a/b"   (~1 escapa '/')
- *   "/a~0b"      → propiedad literal "a~b"   (~0 escapa '~')
- *   "/-"         → en array, posición "siguiente" inexistente (RFC 6901 §4)
- *
- * COMPORTAMIENTO UNIFORMIZADO (replica el contrato del adaptador nativo):
- *   - Input null → null sin invocar la librería.
- *   - Cadena vacía como puntero → el input completo (raíz).
- *   - Ruta inexistente → null (chequeo previo con .has antes de .get para
- *     evitar la excepción que lanzaría .get).
- *   - Punteros SIEMPRE referencian 0 o 1 valor: no hay desempaquetado de
- *     array a hacer. El valor devuelto pasa tal cual (incluido null literal).
- *   - Ruta sintácticamente inválida → ValidationError en validate(),
- *     EvaluationError en evaluate() (paralelo al patrón jsonpath/jsonata).
- *
- * Versión soportada: json-pointer 0.6.x EXCLUSIVAMENTE. Cualquier otra
- * versión puede funcionar pero no está oficialmente soportada. La librería
- * se carga con import dinámico al construir el adaptador; si no está
- * instalada, la factoría falla con AdapterError claro.
- *
- * Nota de diseño: JSON Pointer es tan compacto que una implementación
- * propia cabría aquí mismo. Se ha optado, sin embargo, por delegar en la
- * librería externa para mantener uniformidad con los demás adaptadores
- * (todos delegan en su librería de referencia) y para que la conformidad
- * con la RFC quede en manos del paquete dedicado y su suite de tests.
- */
+ * @file
+ * The module [JSON Pointer]{@link module:jm2mp/adapters/jsonpointer} implements
+ * the [QueryAdapter]{@link module:jm2mp/adapters/registry.QueryAdapter}
+ * interface to use **JSON Pointer** _query language_ as part of `JM2MP`
+ * _projection documents_.
+**/
 
 /**
  * @module jm2mp/adapters/jsonpointer
+ * @description
+ * This module implements the
+ * [QueryAdapter]{@link module:jm2mp/adapters/registry.QueryAdapter}
+ * interface to use the
+ * [JSON Pointer (RFC 6901)](https://www.rfc-editor.org/info/rfc6901/)
+ *  _query language_ as part of `JM2MP` _projection documents_.
+ *
+ * This module _only_ supports **json-pointer 0.6.x** _versions_.
+ * Other versions must be tested previously to be considered as well.
+ *
+ * **JSON Pointer** is a standardized addressing syntax that identifies
+ * only single values within a JSON document using a string of tokens
+ * separated by the "/" (slash) character. It is not a general-purpose
+ * _query language_ (it has no wildcards, filters, nor recursive
+ * descent), but it is covered by an RFC, and its grammar fits into
+ * thirty lines of notation.
+ *
+ * Syntax based on RFC 6901:
+ * - `""`       --> the root value (the full document)
+ * - `"/foo"`   --> "foo" property from the root object
+ * - `"/foo/0"` --> first item in "foo" array
+ * - `"/a~1b"`  --> literal property "a/b"   (~1 escapes '/')
+ * - `"/a~0b"`  --> literal property "a~b"   (~0 escapes '~')
+ * - `"/-"`     --> the (nonexistent) member after the last array element (RFC 6901 §4)
+ *
+ * By compliance with `JM2MP`, the
+ * [QueryAdapter]{@link module:jm2mp/adapters/registry.QueryAdapter}
+ * created by
+ * [createJsonPointerAdapter]{@link module:jm2mp/adapters/jsonpointer.createJsonPointerAdapter}
+ * maintains the expected behavior:
+ * - `null` input --> `null` output without calling [JSONPath+{@link external:JSONPath} external library,
+ * - empty string as path --> root context (the full document),
+ * - nonexistent path --> `null` (avoiding any exception using `has` before `get`),
+ * - a path always points to single scalar value --> returns such scalar value,
+ * - syntax error --> raises an exception
+ *   ([ValidationError]{@link module:jm2mp/errors.ValidationError} on
+ *   [validate]{@link module:jm2mp/adapters/registry.QueryAdapter.validate} and
+ *   [EvaluationError]{@link module:jm2mp/errors.EvaluationError} on
+ *   [evaluate]{@link module:jm2mp/adapters/registry.QueryAdapter.evaluate}).
+ *
+ * The [json-pointer](https://www.npmjs.com/package/json-pointer)
+ * library is dynamically loaded when constructing its corresponding
+ * [QueryAdapter]{@link module:jm2mp/adapters/registry.QueryAdapter}.
+ * If not previously installed, an
+ * [AdapterError]{@link module:jm2mp/errors.AdapterError} exception will
+ * be raised from
+ * [createJsonPointerAdapter]{@link module:jm2mp/adapters/jsonpointer.createJsonPointerAdapter}
+ * with a clear message about it.
+ *
+ * @see [JSONPointer (external)]{@link external:JSONPointer}
 **/
 
-import { AdapterError, ValidationError, EvaluationError } from "../errors.js";
-
 /**
- * @description
- * **json-pointer** offers some utilities for JSON pointers described by RFC 6901.
- * It provides some additional stuff needed but is not included in
- * [node-jsonpointer](https://github.com/janl/node-jsonpointer).
  * @external JSONPointer
+ * @description
+ * **json-pointer** offers some utilities for JSON pointers described by
+ * RFC 6901. It provides some additional stuff needed but is not
+ * included in other libraries like
+ * [node-jsonpointer](https://github.com/janl/node-jsonpointer).
+ *
+ * The module {@link module:jm2mp/adapters/jsonpointer} implements the
+ * [QueryAdapter]{@link module:jm2mp/adapters/registry.QueryAdapter}
+ * interface to use [JSON Pointer](https://www.rfc-editor.org/info/rfc6901/)
+ * as part of `JM2MP` _projection documents_.
+ *
  * @see {@link https://www.rfc-editor.org/info/rfc6901/}
  * @see {@link https://www.npmjs.com/package/json-pointer}
  * @see {@link https://github.com/manuelstofer/json-pointer}
 **/
 
+/* ------------------------------------------------------------------ */
+/* ------------------------------------------------------------------ */
+
+import { AdapterError, ValidationError, EvaluationError } from "../errors.js";
+
+/* ------------------------------------------------------------------ */
+/* ------------------------------------------------------------------ */
+
 /**
- * Crea el adaptador JSON Pointer. Carga 'json-pointer' dinámicamente.
+ * @description
+ * It creates a new
+ * [QueryAdapter]{@link module:jm2mp/adapters/registry.QueryAdapter}
+ * dynamically loading
+ * [JSON Pointer](https://www.npmjs.com/package/json-pointer) version **0.6.x**.
  *
- * Versión soportada: json-pointer 0.6.x.
- *
- * @returns {Promise<module:registry.QueryAdapter>}
+ * @returns {Promise<module:jm2mp/adapters/registry.QueryAdapter>}
  */
 export async function createJsonPointerAdapter() {
+  // Trying to load JSONPath external library.
   let jsonPointer;
   try {
     const mod = await import("json-pointer");
-    // 'json-pointer' exporta sus funciones tanto como named exports como
-    // bajo un único default export, según el bundler / sistema de módulos.
     jsonPointer = mod.default ?? mod;
     if (typeof jsonPointer.get !== "function" || typeof jsonPointer.has !== "function") {
-      throw new Error("Las funciones 'get' y 'has' no están disponibles en la librería.");
+      throw new Error("Functions 'get' and 'has' (from default or named export) not found!");
     }
   } catch (cause) {
     throw new AdapterError(
-      "No se pudo cargar la librería 'json-pointer' v0.6.x. " +
-      "Asegúrese de instalarla: npm install json-pointer@0.6.",
+      "Unable to load 'json-pointer 0.6.x' external library. " +
+      "To install it, please use: `npm install json-pointer@0.6` .",
       { cause }
     );
   }
@@ -99,56 +132,58 @@ export async function createJsonPointerAdapter() {
   function validateSyntax(path) {
     if (typeof path !== "string") {
       throw new ValidationError(
-        `JSON Pointer: $path debe ser un string, recibido ${typeof path}.`
+        `JSON Pointer: $path must be a string, instead of '${typeof path}'.`
       );
     }
-    // Cadena vacía → raíz, válido.
+    // An empty string returns the root value, so it is a valid
+    // expression.
     if (path.length === 0) return;
-    // Debe empezar por '/'.
+    // A pointer must always start by slash.
     if (path.charCodeAt(0) !== 0x2F /* '/' */) {
       throw new ValidationError(
-        `JSON Pointer inválido: debe empezar por '/' o ser cadena vacía. Recibido: "${path}".`
+        `Invalid JSON Pointer expression (must be an empty string or start by '/'): "${path}".`,
       );
     }
-    // Validación de escapes: '~' solo puede ir seguido de '0' o '1'.
+    // It validates escaping characters:
+    // '~' must only be followed by '0' or '1'.
     for (let i = 0; i < path.length; i++) {
       if (path.charCodeAt(i) === 0x7E /* '~' */) {
         const next = i + 1 < path.length ? path.charCodeAt(i + 1) : -1;
         if (next !== 0x30 /* '0' */ && next !== 0x31 /* '1' */) {
           throw new ValidationError(
-            `JSON Pointer inválido: el escape '~' en posición ${i} de "${path}" ` +
-            `debe ir seguido de '0' o '1'.`
+            `Invalid JSON Pointer expression (escape '~' in position ${i} must be followed by '0' or '1') in "${path}".`
           );
         }
-        i++; // saltamos el carácter de escape ya validado.
+        i++; // It jumps (also) the escaped character.
       }
     }
   }
 
+  /** @type {@link module:jm2mp/adapters/registry.QueryAdapter} */
   return {
     name: "jsonpointer",
-    description:
-      "Sintaxis JSON Pointer (RFC 6901). Identifica un único valor mediante " +
-      "tokens separados por '/'. Soportada: json-pointer 0.6.x.",
+    description: "JSON Pointer (RFC 6901) 0.60.x query adapter.",
 
     /**
-     * Valida estáticamente una expresión JSON Pointer.
+     * @description
+     * It validates a JSON Pointer expression.
      */
     async validate(path) {
       validateSyntax(path);
     },
 
     /**
-     * Evalúa una expresión JSON Pointer y uniformiza el resultado al contrato.
+     * @description
+     * It evaluates a JSON Pointer expression and normalize its result.
      *
-     * El parámetro `cache` se usa para marcar que el path ya fue validado
-     * sintácticamente al menos una vez, evitando re-validar en bucle. El
-     * coste de la validación es despreciable; cachear es por simetría con
-     * los demás adaptadores.
+     * The `cache` parameter is used to mark a previously evaluated path
+     * avoiding loops.
      *
-     * El parámetro `env` se ignora: JSON Pointer no tiene concepto de
-     * alias léxicos ni de raíz/contexto distintos del input.
-     */
+     * The `env` parameter is ignored: `JSON Pointer` does not support
+     * lexical _aliases_ and does not distinguish between roots and
+     * contexts, other than just the input; so the expression is always
+     * evaluated against `input`.
+    **/
     /* eslint-disable-next-line no-unused-vars -- _env */
     async evaluate(path, input, cache, _env) {
       // Validación perezosa con cache de "ya validado".
@@ -164,7 +199,7 @@ export async function createJsonPointerAdapter() {
         }
       }
 
-      // Propagación absorbente: input null → null sin invocar.
+      // Propagación absorbente: input null --> null sin invocar.
       if (input === null || input === undefined) return null;
 
       // Cadena vacía: referencia el documento entero. La librería también
@@ -198,21 +233,38 @@ export async function createJsonPointerAdapter() {
           { cause }
         );
       }
-      // undefined → null (uniformización defensiva).
+      // undefined --> null (uniformización defensiva).
       return value === undefined ? null : value;
     },
 
     /**
-     * Política de comportamiento del adaptador frente a casos límite.
-     * Documentada explícitamente como parte de la API pública del adaptador.
+     * @type {@link module:jm2mp/adapters/registry.FallbackPolicyObject}
+     * @description
+     * [QueryAdapter]{@link module:jm2mp/adapters/registry.QueryAdapter}
+     * behavior policy for edge cases in `JSON Pointer`.
      */
     fallbackPolicy: {
-      missing: "null (chequeo previo con .has antes de .get; nunca propaga la excepción de .get)",
-      multipleMatches: "no aplica (JSON Pointer identifica siempre 0 o 1 valor por la RFC 6901)",
-      singleMatch: "el valor encontrado tal cual: escalar, objeto, array o null literal",
-      typeError: "null (acceso a clave inexistente, índice fuera de rango o tipo incompatible)",
-      nullInput: "null (sin invocar la librería)",
-      emptyPointer: "el input completo (la cadena vacía referencia el raíz por RFC 6901 §5)",
+      missing:
+        "null (using HAS before GET never raises any exception)",
+      multipleMatches:
+        "never (JSON Pointer only returns scalar values)",
+      singleMatch:
+        "scalar (JSON Pointer only returns scalara values)",
+      typeError:
+        "null (nonexistent key, out of range index, type mismatch)",
+      nullInput:
+        "null (without invoking external library)",
+      timeout:
+        "0 (not async)",
+      emptyPointer:
+        "full root document (empty string is root, RFC 6901 §5)",
     },
   };
-}
+
+/* ------------------------------------------------------------------ */
+
+}  // export async function createJsonPointerAdapter
+
+/* ------------------------------------------------------------------ */
+/* ------------------------------------------------------------------ */
+/* End of file: ${JM2MP.JS}/src/adapters/jsonpointer.js               */

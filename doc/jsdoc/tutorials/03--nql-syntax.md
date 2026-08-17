@@ -30,7 +30,7 @@ query languages_ by default (see
 section from
 [JM2MP Syntax](./tutorial-02--jm2mp-syntax.html) tutorial for more details):
 
-- [JMESpath](./tutorial-02--jm2mp-syntax.html#jmespath)
+- [JMESPath](./tutorial-02--jm2mp-syntax.html#jmespath)
 - [JSONata](./tutorial-02--jm2mp-syntax.html#jsonata)
 - [JSONPath](./tutorial-02--jm2mp-syntax.html#jsonpath)
 - [JSON Pointer](./tutorial-02--jm2mp-syntax.html#json-pointer)

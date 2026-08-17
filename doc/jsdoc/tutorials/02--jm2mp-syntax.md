@@ -56,7 +56,7 @@
   - [Available Query Languages](#available-query-languages)
     - [Native](#native)
     - [External References](#external-references)
-      - [JMESpath](#jmespath)
+      - [JMESPath](#jmespath)
       - [JSONata](#jsonata)
       - [JSONPath](#jsonpath)
       - [JSON Pointer](#json-pointer)
@@ -1589,7 +1589,7 @@ this, there are two options:
 ### Available Query Languages
 
 The `JM2MP.JS` library provides built-in support for several _query
-languages_ widely used in the industry: [JMESpath](#jmespath),
+languages_ widely used in the industry: [JMESPath](#jmespath),
 [JSONata](#jsonata), [JSONPath](#jsonpath),
 [JSON Pointer](#json-pointer), and [JSON Query](#json-query). You can
 find information about each one of them in the
@@ -1624,9 +1624,9 @@ At the same time, it is possible to use additional _query languages_
 if proper _adapter class_ is developed. Please, refer to any _external
 reference_ to see how to do so.
 
-##### JMESpath
+##### JMESPath
 
-See [JMESpath](./external-JMESpath.html) _external reference_ for more information.
+See [JMESPath](./external-JMESPath.html) _external reference_ for more information.
 
 ##### JSONata
 

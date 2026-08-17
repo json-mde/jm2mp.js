@@ -254,8 +254,8 @@ if (jsonataAvailable) {
       const { createJsonataAdapter } = await import("../../../adapters/jsonata.js");
       const adapterSinTimeout = await createJsonataAdapter();
       const adapterConTimeout = await createJsonataAdapter({ timeout: 1000 });
-      assert.match(adapterSinTimeout.fallbackPolicy.timeout, /no configurado/i);
-      assert.match(adapterConTimeout.fallbackPolicy.timeout, /1000ms/);
+      assert.match(adapterSinTimeout.fallbackPolicy.timeout, /0 \(no\)/i);
+      assert.match(adapterConTimeout.fallbackPolicy.timeout, /1000 \(yes/);
     });
   });
 } else {

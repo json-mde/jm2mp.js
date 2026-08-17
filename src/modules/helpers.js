@@ -14,9 +14,10 @@
 import { ValidationError } from "../errors.js";
 
 /**
- * @constant {string} "$"
+ * @constant {string}
  * @description
  * The name of the **root template** of any **JM2MP projection**.
+ * Its value is `'$'`.
  */
 export const ROOT_TEMPLATE_NAME = '$' ;
 

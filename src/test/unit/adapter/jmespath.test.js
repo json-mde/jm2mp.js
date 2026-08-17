@@ -389,7 +389,7 @@ if (!jmespathAvailable) {
       // explícitamente para que el usuario sepa que las proyecciones
       // mantienen su aridad sintáctica.
       assert.match(adapter.fallbackPolicy.multipleMatches, /array/i);
-      assert.match(adapter.fallbackPolicy.multipleMatches, /no\s+se\s+desempaqueta/i);
+      assert.match(adapter.fallbackPolicy.multipleMatches, /even on single value/i);
     });
   });
 }

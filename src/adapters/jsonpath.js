@@ -2,140 +2,206 @@
  * @author Luis Maria CAMARA ROSSI
  * @copyright Universidad Nacional de Educación a Distancia (U.N.E.D.) 2026
  * @license BSD-3-Clause
- * @file Adaptador para sintaxis JSONPath.
- *
- * Versión soportada: jsonpath-plus 10.x EXCLUSIVAMENTE. Otras versiones
- * mayores no están soportadas y requerirán nuevos adaptadores en el futuro.
- *
- * COMPORTAMIENTO UNIFORMIZADO (replica el contrato del adaptador nativo):
- *  - Array vacío del motor → null (propagación absorbente).
- *  - Array de un único elemento → ese elemento (desempaquetado).
- *  - Array de múltiples elementos → array tal cual.
- *  - Input null → null sin invocar la librería.
- *  - Errores de la librería → EvaluationError (en evaluación) o ValidationError
- *    (en validación previa).
- *
- * La librería 'jsonpath-plus' se carga dinámicamente al construir el
- * adaptador. Si no está instalada, lanza AdapterError con mensaje claro.
- */
+ * @file
+ * The module [JSONPath]{@link module:jm2mp/adapters/jsonpath} implements
+ * the [QueryAdapter]{@link module:jm2mp/adapters/registry.QueryAdapter}
+ * interface to use **JSONPath** _query language_ as part of `JM2MP`
+ * _projection documents_.
+**/
 
 /**
  * @module jm2mp/adapters/jsonpath
+ * @description
+ * This module implements the
+ * [QueryAdapter]{@link module:jm2mp/adapters/registry.QueryAdapter}
+ * interface to use the [JSONPath](https://goessner.net/articles/JsonPath/)
+ *  _query language_ as part of `JM2MP` _projection documents_.
+ * 
+ * This module _only_ supports **jsonpath-plus 10.x** _versions_.
+ * Other versions must be tested previously to be considered as well.
+ *
+ * By compliance with `JM2MP`, the
+ * [QueryAdapter]{@link module:jm2mp/adapters/registry.QueryAdapter}
+ * created by
+ * [createJsonataAdapter]{@link module:jm2mp/adapters/jsonata.createJsonPathAdapter}
+ * maintains the expected behaviour:
+ * - `undefined`, `null` and empty arrays --> `null`.
+ * - `null` input --> `null` output without calling [JSONPath+{@link external:JSONPath} external library.
+ * - Array with just one item --> Unwrap to single result.
+ * - Array with several items --> array (as-is).
+ * - Invalid expression during validation --> [ValidationError]{@link module:jm2mp/errors.ValidationError}.
+ * - Invalid expression during runtime --> [EvaluationError]{@link module:jm2mp/errors.EvaluationError}.
+ *
+ * The [jsonpath-plus](https://www.npmjs.com/package/jsonpath-plus)
+ * library is dynamically loaded when constructing its corresponding
+ * [QueryAdapter]{@link module:jm2mp/adapters/registry.QueryAdapter}.
+ * If not previously installed, an
+ * [AdapterError]{@link module:jm2mp/errors.AdapterError} exception will
+ * be raised from
+ * [createJsonPathAdapter]{@link module:jm2mp/adapters/jsonpath.createJsonPathAdapter}
+ * with a clear message about it.
+ *
+ * @see [JSONPath (external)]{@link external:JSONPath}
 **/
 
-import { AdapterError, ValidationError, EvaluationError } from "../errors.js";
-
 /**
- * @description
- *   **jsonpath-plus** analyses, transforms, and selectively extracts data
- *   from JSON documents (and JavaScript objects).
- *   
- *   **jsonpath-plus** expands on the original **JSON Path** specification
- *   to add some additional operators and makes explicit some behaviors
- *   the original Goessner's work did not spell out.
  * @external JSONPath
+ * @description
+ * **jsonpath-plus** analyses, transforms, and selectively extracts data
+ * from JSON documents (and JavaScript objects). **jsonpath-plus**
+ * expands on the original **JSON Path** specification to add some
+ * additional operators and makes explicit some behaviors the original
+ * Goessner's work did not spell out.
+ *
+ * The module {@link module:jm2mp/adapters/jsonpath} implements the
+ * [QueryAdapter]{@link module:jm2mp/adapters/registry.QueryAdapter}
+ * interface to use [JSONPath](https://goessner.net/articles/JsonPath/)
+ * as part of `JM2MP` _projection documents_.
+ *
  * @see {@link https://goessner.net/articles/JsonPath/}
  * @see {@link https://www.npmjs.com/package/jsonpath-plus}
  * @see {@link https://github.com/JSONPath-Plus/JSONPath}
 **/
 
+/* ------------------------------------------------------------------ */
+/* ------------------------------------------------------------------ */
+
+import { AdapterError, ValidationError, EvaluationError } from "../errors.js";
+
+/* ------------------------------------------------------------------ */
+/* ------------------------------------------------------------------ */
+
 /**
- * Crea el adaptador JSONPath. Carga 'jsonpath-plus' dinámicamente.
+ * @description
+ * It creates a new
+ * [QueryAdapter]{@link module:jm2mp/adapters/registry.QueryAdapter}
+ * dynamically loading
+ * [JSONPath](https://www.npmjs.com/package/jsonpath-plus) version **10.x**.
  *
- * Versión soportada: 10.x. Otras versiones (anteriores o posteriores)
- * pueden funcionar pero NO están oficialmente soportadas.
- *
- * @returns {Promise<module:registry.QueryAdapter>}
+ * @returns {Promise<module:jm2mp/adapters/registry.QueryAdapter>}
  */
 export async function createJsonPathAdapter() {
+  // Trying to load JSONPath external library.
   let JSONPath;
   try {
     const mod = await import("jsonpath-plus");
-    // 'jsonpath-plus' exporta JSONPath como named export y también default en algunas versiones.
     JSONPath = mod.JSONPath ?? mod.default?.JSONPath ?? mod.default;
     if (typeof JSONPath !== "function") {
-      throw new Error("La función 'JSONPath' no está disponible en la librería.");
+      throw new Error("Function 'JSONPath' (from default or named export) not found!");
     }
   } catch (cause) {
     throw new AdapterError(
-      "No se pudo cargar la librería 'jsonpath-plus' v10.x. " +
-      "Asegúrese de instalarla: npm install jsonpath-plus@10.",
+      "Unable to load 'jsonpath-plus 10.x.x' external library. " +
+      "To install it, please use: `npm install jsonpath-plus@10` .",
       { cause }
     );
   }
 
+  /** @type {@link module:jm2mp/adapters/registry.QueryAdapter} */
   return {
     name: "jsonpath",
-    description: "Sintaxis JSONPath (RFC 9535-like). Soportada: jsonpath-plus 10.x.",
+    description: "JSONPath 10.x query adapter.",
 
     /**
-     * Valida una expresión JSONPath ejecutando una invocación de prueba
-     * con un input vacío. En general, jsonpath-plus nunca lanza excpeciones,
-     * ni siquiera cuando se indica una sintaxis inválida.
+     * @description
+     * It validates a JSONPath expression, testing it using an
+     * empty-object as input.
+     * 
+     * Quite rare JSONPath raises exceptions, even on invalid syntaxes.
      */
     async validate(path) {
       if (typeof path !== "string" || path.length === 0) {
         throw new ValidationError(
-          `JSONPath: $path debe ser un string no vacío, recibido ${typeof path}.`
+          `JSONPath: $path must be a non-empty string, instead of '${typeof path}'.`
         );
       }
       try {
         JSONPath({ path, json: {}, wrap: true });
       } catch (cause) {
         throw new ValidationError(
-          `Expresión JSONPath inválida: "${path}".`,
+          `Invalid JSONPath expression: "${path}".`,
           { cause }
         );
       }
     },
 
     /**
-     * Evalúa una expresión JSONPath y uniformiza el resultado al contrato.
-     */
+     * @description
+     * It evaluates a JSONPath expression and normalize its result.
+     *
+     * The `JSONPath` library operates synchronously; `JM2MP.JS` wraps
+     * the signature in `async` to comply with the uniform registry
+     * contract (just like the rest of adapters).
+     *
+     * The `env` parameter is ignored: `JSONPath` does not support
+     * lexical _aliases_ and does not distinguish between roots and
+     * contexts, other than just the input; so the expression is always
+     * evaluated against `input`.
+    **/
     /* eslint-disable-next-line no-unused-vars -- _env */
     async evaluate(path, input, cache, _env) {
-      // Propagación absorbente: input null → null sin invocar.
+      // NULL absorptive propagation.
       if (input === null || input === undefined) return null;
-
-      // jsonpath-plus parsea internamente cada llamada. Marcamos en cache
-      // que la expresión ya ha sido validada al menos una vez para evitar
-      // re-validar en bucle.
+      // jsonpath-plus parses every call, so we use the cache just to
+      // know that such expression is already valid (to validate it just
+      // once), avoiding loops.
       if (!cache.has(path)) {
         try {
           JSONPath({ path, json: {}, wrap: true });
           cache.set(path, true);
         } catch (cause) {
           throw new EvaluationError(
-            `Expresión JSONPath inválida en evaluación: "${path}".`,
+            `Error during JSONPath expressions evaluation for "${path}".`,
             { cause }
           );
         }
       }
 
-      // Ejecutamos la expresión sobre el input real.
+      // Actual query execution.
       let result;
       try {
         result = JSONPath({ path, json: input, wrap: true });
       } catch (cause) {
         throw new EvaluationError(
-          `Error al evaluar JSONPath "${path}".`,
+          `Error evaluating JSONPath expression "${path}".`,
           { cause }
         );
       }
 
-      // Uniformización al contrato:
-      //   array vacío → null; un único elemento → desempaquetado; varios → array.
+      // We normalizes `JSONPath` to `native` behavior:
+      // - not array at all or empty array --> null,
+      // - single item --> unwrap,
+      // - several items --> array (as-is).
       if (!Array.isArray(result) || result.length === 0) return null;
       if (result.length === 1) return result[0];
       return result;
     },
 
+    /**
+     * @type {@link module:jm2mp/adapters/registry.FallbackPolicyObject}
+     * @description
+     * [QueryAdapter]{@link module:jm2mp/adapters/registry.QueryAdapter}
+     * behavior policy for edge cases in `JSONPath`. Note the documented
+     * divergence in `multipleMatches` from the native adapter's
+     * "single match --> scalar" convention.
+    **/
     fallbackPolicy: {
-      missing: "null (la librería devuelve [], que el adaptador convierte a null)",
-      multipleMatches: "array tal cual de la librería",
-      singleMatch: "escalar (desempaquetado del array de un elemento)",
-      typeError: "null (la librería tolera errores de tipo devolviendo [])",
-      nullInput: "null (sin invocar la librería)",
+      missing:
+        "null (an empty array is converted to null)",
+      multipleMatches:
+        "array (as-is; JSONPath always returns arrays, even on single values)",
+      singleMatch:
+        "scalar (unwrapping arrays with single items)",
+      typeError:
+        "null (any error is catched and returned as an empty array)",
+      nullInput:
+        "null (without invoking external library)",
+      timeout:
+        "0 (not async)",
     },
   };
 }
+
+/* ------------------------------------------------------------------ */
+/* ------------------------------------------------------------------ */
+/* End of file: ${JM2MP.JS}/src/adapters/jsonpath.js                  */

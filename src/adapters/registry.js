@@ -49,20 +49,10 @@ import { AdapterError } from "../errors.js";
 /* ------------------------------------------------------------------ */
 
 /**
- * @description
- * Contrato que todo adaptador de sintaxis debe implementar.
- * @typedef {object} QueryAdapter
- * @property {string} name -
- * Identificador de la sintaxis. Se usa como valor de $syntax en $get.
- * @property {string} description -
- * Descripción breve para documentación.
- **/
-
-/* ------------------------------------------------------------------ */
-
-/**
  * @typedef {Function} ValidateFunction
- * *typedef {(path: any) => Promise<void>} ValidateFunction
+ * @memberof module:jm2mp/adapters/registry
+ * @description
+ * typedef {(path: any) => Promise<void>} ValidateFunction
  * @property {ValidateFunction} validate -
  * Valida una expresión $path estáticamente. Lanza ValidationError si
  * es inválida. Es async para permitir adaptadores cuyo parser es async.
@@ -70,9 +60,11 @@ import { AdapterError } from "../errors.js";
 
 /* ------------------------------------------------------------------ */
 
-/*** @typedef {(path: any, input: any, cache: Map<string, any>, env: object) => Promise<any>} EvaluateFunction */
 /**
  * @typedef {Function} EvaluateFunction
+ * @memberof module:jm2mp/adapters/registry
+ * @description
+ * typedef {(path: any, input: any, cache: Map<string, any>, env: object) => Promise<any>} EvaluateFunction
  * @property {EvaluateFunction} evaluate -
  * Evalúa la expresión sobre el input proporcionado. SIEMPRE async.
  *
@@ -94,6 +86,24 @@ import { AdapterError } from "../errors.js";
  * @property {FallbackPolicyObject} fallbackPolicy -
  * Documentación legible por humanos del comportamiento del adaptador.
  * Campos requeridos: missing, multipleMatches, typeError, nullInput.
+**/
+
+/* ------------------------------------------------------------------ */
+
+/**
+ * @typedef {object} QueryAdapter
+ * @memberof module:jm2mp/adapters/registry
+ * @description
+ * Contrato que todo adaptador de sintaxis debe implementar.
+ * @property {string} name
+ * Unique syntax identifier
+ * It is used as `syntax` clause for `get` _templante command_.
+ * @property {string} description
+ * Shrot description for documenting purposes.
+ * @property {ValidateFunction} validate
+ * It validates (tests) the path expression.
+ * @property {EvaluateFunction} evaluate
+ * It evaluates (runs) the path expression.
 **/
 
 /* ------------------------------------------------------------------ */

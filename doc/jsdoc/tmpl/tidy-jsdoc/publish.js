@@ -1,3 +1,10 @@
+/***
+ * @author Luis Maria CAMARA ROSSI
+ * @copyright Universidad Nacional de Educación a Distancia (U.N.E.D.) 2026
+ * @license BSD-3-Clause
+ * @file ${JM2MP.JS}/doc/jsdoc/tmpl/tidy-jsdoc/details.tmpl
+**/
+
 'use strict';
 
 var doop = require('jsdoc/util/doop');

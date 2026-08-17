@@ -2,185 +2,239 @@
  * @author Luis Maria CAMARA ROSSI
  * @copyright Universidad Nacional de Educación a Distancia (U.N.E.D.) 2026
  * @license BSD-3-Clause
- * @file Adaptador para sintaxis JMESPath (https://jmespath.org).
- *
- * JMESPath es un lenguaje de consulta declarativo con especificación
- * cerrada y test-suite oficial, ampliamente desplegado (es el lenguaje
- * que usa la AWS CLI para `--query`). Combina acceso por ruta,
- * proyecciones, segmentos por corchete, filtros, expresiones multi-select
- * (hash y list), pipelines y un catálogo de funciones built-in.
- *
- * Sintaxis (ejemplos):
- *   "foo.bar"               → acceso a propiedad anidada
- *   "users[0].name"         → primer usuario, propiedad name
- *   "users[*].name"         → proyección: nombres de todos
- *   "users[?age > `18`]"    → filtro por predicado
- *   "users[*].{n: name, a: age}"  → multi-select hash
- *   "length(users)"         → función built-in
- *   "people | [0]"          → pipe (reinicia el contexto)
- *
- * COMPORTAMIENTO UNIFORMIZADO (replica el contrato del adaptador nativo):
- *   - Input null → null sin invocar la librería.
- *   - Ausencia → null (JMESPath devuelve null nativamente).
- *   - Proyección que produce varios resultados → array tal cual.
- *   - Proyección que produce un único elemento → array de UN elemento.
- *     Aquí JMESPath DIFIERE del adaptador nativo / jsonpath-plus: no
- *     desempaquetamos. La razón es que en JMESPath la "aridad" de la
- *     expresión es una propiedad sintáctica (las proyecciones siempre
- *     devuelven listas, los accesos simples siempre devuelven escalares).
- *     Desempaquetar rompería esa propiedad y haría que el tipo de retorno
- *     dependa de los datos. Esta divergencia está documentada en la
- *     `fallbackPolicy` del adaptador para que el usuario sepa a qué atenerse.
- *   - Errores de la librería → EvaluationError o ValidationError.
- *
- * Versión soportada: jmespath 0.16.x EXCLUSIVAMENTE (paquete canónico).
- * El fork comunitario @jmespath-community/jmespath es API-compatible para
- * los casos comunes pero requeriría un adaptador propio si se quisiese
- * soportar oficialmente.
- *
- * NOTA SOBRE CACHE: la librería 'jmespath' canónica no expone su
- * TreeInterpreter públicamente, por lo que `jmespath.search(data, expr)`
- * re-parsea internamente la expresión en cada llamada. La cache que
- * mantenemos aquí guarda solo el marcador de "validado al menos una vez"
- * para evitar re-llamar a `compile` desde `evaluate`. No es una cache de
- * AST en sentido estricto.
+ * @file
+ * The module [JMESPath]{@link module:jm2mp/adapters/jmespath} implements
+ * the [QueryAdapter]{@link module:jm2mp/adapters/registry.QueryAdapter}
+ * interface to use **JMESpath** _query language_ as part of `JM2MP`
+ * _projection documents_.
 **/
 
 /**
  * @module jm2mp/adapters/jmespath
+ * @description
+ * This module implements
+ * the [QueryAdapter]{@link module:jm2mp/adapters/registry.QueryAdapter}
+ * interface to use the [JMESPath](https://jmespath.org/) _query language_
+ * as part of `JM2MP` _projection documents_.
+ *
+ * This module _only_ supports **jmespath 0.16.x** _version_ (the canonical package).
+ * There is a [community fork](https://jmespath.site/),
+ * [@jmespath-community/jmespath](https://github.com/jmespath-community/typescript-jmespath),
+ * but its API is different enough that it is not considered compatible.
+ *
+ * By design, **JMESPath** is a declarative _query language_ with a formal
+ * specification and an official test suite. It is widely deployed
+ * (for instance, in the [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/cli-usage-filter.html)).
+ * It combines path access, projections, square-brackets segments,
+ * filtering, multi-selection expressions (for both, lists and maps),
+ * pipelines and a catalogue of built-in functions.
+ *
+ * Examples of syntax:
+ *   "foo.bar"                     --> inner property accessor
+ *   "users[0].name"               --> inner property name of first user
+ *   "users[*].name"               --> all names of every user
+ *   "users[?age > `18`]"          --> filter by predicates
+ *   "users[*].{n: name, a: age}"  --> multi-select hash
+ *   "length(users)"               --> built-in functions
+ *   "people | [0]"                --> pipe (restarting its own context)
+ *
+ * By compliance with `JM2MP`, the
+ * [QueryAdapter]{@link module:jm2mp/adapters/registry.QueryAdapter}
+ * created by {@link module:jm2mp/adapters/jmespath.createJmesPathAdapter}
+ * maintains the expected behaviour:
+ * - `undefined` --> `null` (native for JMESPath).
+ * - `null` input --> `null` output without calling {@link external:JMESpath} external library.
+ * - Expression with multiple resultsets --> array (as is).
+ * - Expression with single result --> array (with single item).
+ *   Aquí JMESPath DIFIERE del adaptador nativo / jsonpath-plus: no
+ *   desempaquetamos. La razón es que en JMESPath la "aridad" de la
+ *   expresión es una propiedad sintáctica (las proyecciones siempre
+ *   devuelven listas, los accesos simples siempre devuelven escalares).
+ *   Desempaquetar rompería esa propiedad y haría que el tipo de retorno
+ *   dependa de los datos. Esta divergencia está documentada en la
+ *   `fallbackPolicy` del adaptador para que el usuario sepa a qué atenerse.
+ * - Invalid expression during validation --> {@link ValidationError}.
+ * - Invalid expression during runtime --> {@link EvaluationError}.
+ * - Expression cache: the canonical `jmespath` library do not publicly
+ *   exposes its TreeInterpreter; because of that, `jmespath.search(data, expr)`
+ *   parses again internally each query in every invocation; this
+ *   [QueryAdapter]{@link module:jm2mp/adapters/registry.QueryAdapter}
+ *   then uses its cache just for _remember queries previously validated_
+ *   to avoid call `compile` from `evaluate`; it is not useful as a proper
+ *   AST cache _stricto sensu_.
+ *
+ * The [jmespath](https://www.npmjs.com/package/jmespath)
+ * library is dynamically loaded when constructing its corresponding
+ * [QueryAdapter]{@link module:jm2mp/adapters/registry.QueryAdapter}.
+ * If not previously installed, an
+ * [AdapterError]{@link module:jm2mp/errors.AdapterError} exception will
+ * be raised from
+ * [createJmesPathAdapter]{@link module:jm2mp/adapters/jsonpath.createJmesPathAdapter}
+ * with a clear message about it.
+ * 
+ * @see [JMESPath (external)]{@link external:JMESPath}
 **/
 
-import { AdapterError, ValidationError, EvaluationError } from "../errors.js";
-
 /**
+ * @external JMESPath
  * @description
- *   **jmespath.js** is a JavaScript implementation of **JMESPath**,
- *   which is a query language for JSON. It will take a JSON document
- *   and transform it into another JSON document through a JMESPath
- *   expression.
- * @external JMESpath
+ * **jmespath.js** is a JavaScript implementation of **JMESPath**, which
+ * is a query language for JSON. It will take a JSON document and
+ * transform it into another JSON document through a JMESPath
+ * expression.
+ *
+ * The module {@link module:jm2mp/adapters/jmespath} implements the
+ * [QueryAdapter]{@link module:jm2mp/adapters/registry.QueryAdapter}
+ * interface to use **JMESPath** as part of `JM2MP`
+ * _projection documents_.
+ *
  * @see {@link https://jmespath.org/}
  * @see {@link https://www.npmjs.com/package/jmespath}
  * @see {@link https://github.com/jmespath/jmespath.js}
 **/
 
+/* ------------------------------------------------------------------ */
+/* ------------------------------------------------------------------ */
+
+import { AdapterError, ValidationError, EvaluationError } from "../errors.js";
+
+/* ------------------------------------------------------------------ */
+/* ------------------------------------------------------------------ */
+
 /**
- * Crea el adaptador JMESPath. Carga 'jmespath' dinámicamente.
- *
- * Versión soportada: jmespath 0.16.x.
- *
- * @returns {Promise<module:registry.QueryAdapter>}
+ * @description
+ * It creates a new
+ * [QueryAdapter]{@link module:jm2mp/adapters/registry.QueryAdapter}
+ * dynamically loading
+ * [jmespath](https://www.npmjs.com/package/jmespath) version **0.16.x**.
+ * @returns {Promise<module:jm2mp/adapters/registry.QueryAdapter>}
  */
-export async function createJmesPathAdapter() {
+export async function createJmesPathAdapter()
+{
+  // Trying to load JMESPath external library.
   let jmespath;
   try {
     const mod = await import("jmespath");
-    // 'jmespath' exporta sus funciones bajo named exports y, según el
-    // bundler, también bajo un default. Aceptamos ambas.
     jmespath = mod.default ?? mod;
-    if (typeof jmespath.search !== "function" || typeof jmespath.compile !== "function") {
-      throw new Error("Las funciones 'search' y 'compile' no están disponibles en la librería.");
+    if ( (typeof jmespath.search !== "function") ||
+         (typeof jmespath.compile !== "function") ) {
+      throw new Error("Functions 'search' and 'compile' must be part of 'jmespath' library.");
     }
   } catch (cause) {
     throw new AdapterError(
-      "No se pudo cargar la librería 'jmespath' v0.16.x. " +
-      "Asegúrese de instalarla: npm install jmespath@0.16.",
+      "Unable to load 'jmespath 0.16.x' external library. " +
+      "To install it, please use: `npm install jmespath@0.16` .",
       { cause }
     );
   }
 
+  /** @type {@link module:jm2mp/adapters/registry.QueryAdapter} */
   return {
     name: "jmespath",
     description:
-      "Sintaxis JMESPath (https://jmespath.org): lenguaje declarativo con " +
-      "proyecciones, filtros, multi-select y funciones built-in. " +
-      "Soportada: jmespath 0.16.x.",
+      "JMESPath 0.16.x query adapter.",
 
     /**
-     * Valida una expresión JMESPath compilándola con la librería.
-     * Si la sintaxis es inválida, `compile` lanza.
+     * @description
+     * It validates a JMESPath expression, trying to compile it.
      */
     async validate(path) {
       if (typeof path !== "string" || path.length === 0) {
         throw new ValidationError(
-          `JMESPath: $path debe ser un string no vacío, recibido ${typeof path}.`
+          `JMESPath: $path must be a non-empty string, instead of '${typeof path}'.`
         );
       }
       try {
         jmespath.compile(path);
       } catch (cause) {
         throw new ValidationError(
-          `Expresión JMESPath inválida: "${path}".`,
+          `Invalid JMESPath expression: "${path}".`,
           { cause }
         );
       }
     },
 
     /**
-     * Evalúa una expresión JMESPath y uniformiza el resultado al contrato.
-     *
-     * La librería trabaja síncronamente; envolvemos la firma en async para
-     * cumplir el contrato uniforme del registro (igual que el adaptador
-     * nativo y el de jsonpath).
-     *
-     * El parámetro `env` se ignora: JMESPath no tiene concepto de alias
-     * léxicos ni de raíz/contexto distintos del input. La expresión
-     * siempre se evalúa contra `input`.
+     * @description
+     * It evaluates a JMESPath expression, trying to standardize the
+     * outcome in accordance with the interface
+     * {@link module:jm2mp/adapters/registry.QueryAdapter}.
+     * 
+     * The `JMESPath` library operates synchronously; `JM2MP.JS` wraps
+     * the signature in `async` to comply with the uniform registry
+     * contract (just like the rest of adapters).
+     * 
+     * The `env` parameter is ignored: `JMESPath` does not support
+     * lexical _aliases_ and does not distinguish between roots and
+     * contexts, other than just the input; so the expression is always
+     * evaluated against `input`.
     **/
     /* eslint-disable-next-line no-unused-vars -- _env */
     async evaluate(path, input, cache, _env) {
-      // Propagación absorbente: input null → null sin invocar.
+      // NULL absorptive propagation.
       if (input === null || input === undefined) return null;
-
-      // Validación perezosa con cache de "ya validado". jmespath.search
-      // re-parsea internamente, así que esta marca no cachea AST, solo
-      // evita re-llamar a compile() desde evaluate().
+      // It validates using `compile`, and cache is just used to know
+      // if an expression is already valid (to validate it just once).
+      // Function `jmespath.search` always re-parses again internally,
+      // so no AST-caching is performed.
       if (!cache.has(path)) {
         try {
           jmespath.compile(path);
           cache.set(path, true);
         } catch (cause) {
           throw new EvaluationError(
-            `Expresión JMESPath inválida en evaluación: "${path}".`,
+            `Error during JMESPath expressions evaluation for "${path}".`,
             { cause }
           );
         }
       }
 
-      // Ejecución de la consulta.
+      // Actual query execution.
       let result;
       try {
         result = jmespath.search(input, path);
       } catch (cause) {
-        // Errores en runtime: tipos incompatibles dentro de funciones
-        // built-in, división por cero en expresiones aritméticas, etc.
+        // Kind of runtime errors: type mismatch inside built-in
+        // functions, division by zero, etc...
         throw new EvaluationError(
-          `Error al evaluar JMESPath "${path}".`,
+          `Error evaluating JMESPath expression "${path}".`,
           { cause }
         );
       }
 
-      // JMESPath devuelve null nativamente para ausencia, lo cual coincide
-      // con la convención del adaptador nativo. Convertimos undefined → null
-      // defensivamente, aunque la librería no debería devolver undefined.
-      return result === undefined ? null : result;
+      // JMESPath natively returns `null` to indicate an absence of
+      // result, which is consistent with the `native adapter`
+      // convention. We defensively convert `undefined` to `null`,
+      // because the library must not return `undefined`.
+      return (result === undefined ? null : result);
     },
 
     /**
-     * Política de comportamiento del adaptador frente a casos límite.
-     * Atención a la divergencia documentada en `multipleMatches` respecto
-     * a la convención de "match único → escalar" del adaptador nativo.
-     */
+     * @type {@link module:jm2mp/adapters/registry.FallbackPolicyObject}
+     * @description
+     * [QueryAdapter]{@link module:jm2mp/adapters/registry.QueryAdapter}
+     * behavior policy for edge cases in `JMESPath`. Note the documented
+     * divergence in `multipleMatches` from the native adapter's
+     * "single match --> scalar" convention.
+    **/
     fallbackPolicy: {
-      missing: "null (JMESPath devuelve null nativamente para rutas inexistentes)",
+      missing:
+        "null (JMESPath default behavior)",
       multipleMatches:
-        "array tal cual (las proyecciones JMESPath siempre devuelven lista " +
-        "por especificación, incluso con un solo elemento; NO se desempaqueta)",
+        "array (as-is; JMESPath always returns arrays, even on single values results it never wraps)",
       singleMatch:
-        "escalar tal cual cuando la expresión es un acceso simple; " +
-        "array de un elemento cuando la expresión es una proyección",
-      typeError: "EvaluationError (los errores de tipo en runtime se propagan envueltos)",
-      nullInput: "null (sin invocar la librería)",
+        "scalar (for single access expressions), and " +
+        "array (for multiselect expressions)",
+      typeError:
+        "EvaluationError (wrapping errors)",
+      nullInput:
+        "null (without invoking external library)",
+      timeout:
+        "0 (not async)"
     },
   };
 }
+
+/* ------------------------------------------------------------------ */
+/* ------------------------------------------------------------------ */
+/* End of file: ${JM2MP.JS}/src/adapters/jmespath.js                  */

@@ -2,85 +2,132 @@
  * @author Luis Maria CAMARA ROSSI
  * @copyright Universidad Nacional de Educación a Distancia (U.N.E.D.) 2026
  * @license BSD-3-Clause
- * @file Adaptador para sintaxis JSONata.
- *
- * Versión soportada: jsonata 2.x EXCLUSIVAMENTE. Versiones 1.x no están
- * soportadas (su API era distinta). Versiones 3.x futuras requerirán
- * nuevos adaptadores.
- *
- * NOTA IMPORTANTE: JSONata 2.x es ASYNC-ONLY por construcción. La librería
- * fue reescrita en v2 para usar async/await internamente y no ofrece modo
- * síncrono. Esto no es problema porque el contrato de los adaptadores ya
- * exige que `evaluate` sea async.
- *
- * COMPORTAMIENTO UNIFORMIZADO (replica el contrato del adaptador nativo):
- *  - undefined del motor → null.
- *  - Errores de tipo del motor → EvaluationError envolviendo causa.
- *  - Input null → null sin invocar la librería.
- *  - Compilación de expresión inválida en validación → ValidationError.
- *  - Compilación de expresión inválida en evaluación → EvaluationError.
- *
- * MECANISMO DE TIMEOUT: el adaptador acepta un `timeout` opcional en
- * milisegundos. Si la evaluación tarda más, se rechaza con EvaluationError
- * indicando timeout. La evaluación de JSONata sigue corriendo en background
- * hasta su finalización natural, pero su resultado se descarta. Para
- * proyecciones bien escritas esto es aceptable; para proyecciones
- * potencialmente maliciosas, considere también limitar entradas.
- */
+ * @file
+ * The module [JSONata]{@link module:jm2mp/adapters/jsonata} implements
+ * the [QueryAdapter]{@link module:jm2mp/adapters/registry.QueryAdapter}
+ * interface to use **JSONata** _query language_ as part of `JM2MP`
+ * _projection documents_.
+**/
 
 /**
  * @module jm2mp/adapters/jsonata
+ * @description
+ * This module implements the
+ * [QueryAdapter]{@link module:jm2mp/adapters/registry.QueryAdapter}
+ * interface to use the [JSONata](https://jsonata.org/) _query language_
+ * as part of `JM2MP` _projection documents_.
+ *
+ * This module _only_ supports **JSONata 2.x** _versions_. Older version
+ * 1.x uses another incompatible API, as well as possibily future
+ * versions (3.x).
+ *
+ * By design, **JSONata 2.x** is **async only**, as well as
+ * {@link QueeryAdapter.evaluate} interface contract.
+ *
+ * By compliance with `JM2MP`, the
+ * [QueryAdapter]{@link module:jm2mp/adapters/registry.QueryAdapter}
+ * created by [createJsonataAdapter]{@link module:jm2mp/adapters/jsonata.createJsonataAdapter}
+ * maintains the expected behaviour:
+ * - `undefined` --> `null`.
+ * - Type errors --> {@link module:jm2mp/errors.EvaluationError} with `cause`.
+ * - `null` input --> `null` output without calling [JSONata]{@link external:JSONata} external library.
+ * - Invalid expression during validation --> [ValidationError]{@link module:jm2mp/errors.ValidationError}.
+ * - Invalid expression during runtime --> [EvaluationError]{@link module:jm2mp/errors.EvaluationError}.
+ *
+ * **Timeout mechanism**: this adapter supports an optional `timeout`
+ * parameter (expressed in milliseconds). If the evaluation of an
+ * expression takes too long, it will be rejected and a
+ * {@link module:jm2mp/errors.EvaluationError} exception will be raised,
+ * referencing such _timeout_. But the actual evaluation will continue
+ * to run in the background until it naturally completes, although its
+ * result will be discarded.
+ * 
+ * This _timeout mechanism_ is acceptable for well written expressions
+ * but maybe insufficient for potentially malicious queries.
+ *
+ * The [jsonata](https://www.npmjs.com/package/jsonata)
+ * library is dynamically loaded when constructing its corresponding
+ * [QueryAdapter]{@link module:jm2mp/adapters/registry.QueryAdapter}.
+ * If not previously installed, an
+ * [AdapterError]{@link module:jm2mp/errors.AdapterError} exception will
+ * be raised from
+ * [createJsonataAdapter]{@link module:jm2mp/adapters/jsonpath.createJsonataAdapter}
+ * with a clear message about it.
+ *
+ * @see [JSONata (external)]{@link external:JSONata}
 **/
 
-import { AdapterError, ParseError, ValidationError, EvaluationError } from "../errors.js";
-
 /**
- * @description
- * **JSONata** is a JavaScript implementation of **JSONata**,
- * which is a JSON query and transformation language.
- * This packages is the reference implementation of the JSONata query and transformation language.
  * @external JSONata
+ * @description
+ * **jsonata** is a JavaScript implementation of **JSONata**, which is a
+ * JSON query and transformation language. This package is the reference
+ * implementation of the JSONata query and transformation language.
+ *
+ * The module {@link module:jm2mp/adapters/jsonata} implements the
+ * [QueryAdapter]{@link module:jm2mp/adapters/registry.QueryAdapter}
+ * interface to use **JSONata** as part of `JM2MP`
+ * _projection documents_.
+ *
  * @see {@link http://jsonata.org/}
  * @see {@link https://www.npmjs.com/package/jsonata}
  * @see {@link https://github.com/jsonata-js/jsonata}
 **/
 
+/* ------------------------------------------------------------------ */
+/* ------------------------------------------------------------------ */
+
+import { AdapterError, ParseError, ValidationError, EvaluationError } from "../errors.js";
+
+/* ------------------------------------------------------------------ */
+/* ------------------------------------------------------------------ */
+
 /**
- * Crea el adaptador JSONata.
- *
- * Versión soportada: jsonata 2.x EXCLUSIVAMENTE.
- *
+ * @description
+ * It creates a new
+ * [QueryAdapter]{@link module:jm2mp/adapters/registry.QueryAdapter}
+ * dynamically loading
+ * [JSONata](https://www.npmjs.com/package/jsonata) version **2.x**.
+ * 
  * @param {object} [options]
- * @param {number} [options.timeout] - Timeout en milisegundos para cada
- *     evaluación. Si > 0, las evaluaciones que excedan este tiempo lanzan
- *     EvaluationError. Si se omite o es <= 0, no hay timeout.
- * @returns {Promise<module:registry.QueryAdapter>}
+ * @param {number} [options.timeout]
+ * Timeout (expressed in _milliseconds_) for evaluating each query.
+ * If its value is greater than zero, any evaluation that exceeds this
+ * _timeout_ will raise an [EvaluationError]{@link module:jm2mp/errors.EvaluationError}
+ * exception. If it is not defined, is zero or is less than zero, no
+ * _timeout_ will be applied.
+ * @returns {Promise<module:jm2mp/adapters/registry.QueryAdapter>}
  */
-export async function createJsonataAdapter(options = {}) {
+export async function createJsonataAdapter(options = {})
+{
+  // Trying to load JSONata external library.
   let jsonata;
   try {
     const mod = await import("jsonata");
-    // 'jsonata' exporta su función como default en v2.
     jsonata = mod.default ?? mod.jsonata ?? mod;
     if (typeof jsonata !== "function") {
-      throw new Error("La función 'jsonata' no está disponible en la librería.");
+      throw new Error("Function 'jsonata' (default or named export) not found!");
     }
   } catch (cause) {
     throw new AdapterError(
-      "No se pudo cargar la librería 'jsonata' v2.x. " +
-      "Asegúrese de instalarla: npm install jsonata@2.",
+      "Unable to load 'jsonata 2.x.x' external library. " +
+      "To install it, please use: `npm install jsonata@2` .",
       { cause }
     );
   }
 
-  // Timeout configurable. 0 o negativo = sin timeout.
+  // Configuring timeout (<=0 --> no timeout).
   const timeout = (typeof options.timeout === "number" && options.timeout > 0)
     ? options.timeout
     : 0;
 
   /**
+   * @description
    * Compila o recupera de caché una expresión JSONata.
    * Devuelve el objeto JSONata compilado (con .evaluate()).
+   * @param {*} expr 
+   * @param {*} cache The {@link }
+   * @returns {*} The equivalent compiled JSONata expression.
    */
   function compileWithCache(expr, cache) {
     if (cache.has(expr)) return cache.get(expr);
@@ -97,79 +144,93 @@ export async function createJsonataAdapter(options = {}) {
     return compiled;
   }
 
+  /** @type {@link module:jm2mp/adapters/registry.QueryAdapter} */
   return {
     name: "jsonata",
-    description: "Sintaxis JSONata (lenguaje funcional de consulta y transformación). Soportada: jsonata 2.x.",
+    description: "JSONata 2.x query adapter.",
 
     /**
-     * Valida una expresión JSONata intentando compilarla con la librería.
+     * @description
+     * It validates a JSONata expression, trying to compile it.
      */
     async validate(path) {
       if (typeof path !== "string" || path.length === 0) {
         throw new ValidationError(
-          `JSONata: $path debe ser un string no vacío, recibido ${typeof path}.`
+          `JSONata: $path must be a non-empty string, instead of '${typeof path}'.`
         );
       }
       try {
         jsonata(path);
       } catch (cause) {
         throw new ValidationError(
-          `Expresión JSONata inválida: "${path}".`,
+          `Invalid JSONata expression: "${path}".`,
           { cause }
         );
       }
     },
 
     /**
-     * Evalúa una expresión JSONata. Usa caché de expresiones compiladas
-     * para amortizar el coste de compilación en bucles.
+     * @description
+     * It evaluates a JSONata expression and normalize its result:
+     * - It will return `null` whenever `input` is `null` or `undefined`.
+     * - It will use a pre-compiled expression cache (specially useful
+     * in loops).
+     * - It _timeout_ (>0) is configured, then it applies `Promise.race`
+     *   with `setTimeout`; when evaluation exceeds such timeout, an
+     *   [EvaluationError]{@link module:jm2mp/errors.EvaluationError}
+     *   exception will be raised (but actual JSONata expressions
+     *   evaluation will be running in background until finished; only
+     *   result is fast discarded).
      *
-     * Si timeout está configurado (> 0), aplica Promise.race con un
-     * setTimeout. Si la evaluación excede el tiempo, lanza EvaluationError.
-     * NOTA: la evaluación JSONata sigue ejecutándose en background hasta
-     * terminar; solo se descarta el resultado.
-     */
+     * The `env` parameter is ignored: `JSONPath` does not support
+     * lexical _aliases_ and does not distinguish between roots and
+     * contexts, other than just the input; so the expression is always
+     * evaluated against `input`.
+    **/
     /* eslint-disable-next-line no-unused-vars -- _env */
     async evaluate(path, input, cache, _env) {
-      // Propagación absorbente.
+      // NULL absorptive propagation.
       if (input === null || input === undefined) return null;
-
-      // Recuperamos o compilamos con caché.
+      // Compiling using cache.
       let compiled;
       try {
         compiled = compileWithCache(path, cache);
       } catch (cause) {
         throw new EvaluationError(
-          `Compilación JSONata falló para "${path}".`,
+          `Error during JSONata expressions compilation for "${path}".`,
           { cause }
         );
       }
 
-      // Función que ejecuta y normaliza undefined → null.
+      /**
+       * @description
+       * Function to normalize the NULL absorptive propagation:
+       * undefined --> null.
+       * @returns {*}
+      **/
       const evalFn = async () => {
         let result;
         try {
           result = await compiled.evaluate(input);
         } catch (cause) {
           throw new EvaluationError(
-            `Error al evaluar JSONata "${path}".`,
+            `Error evaluating JSONata expression "${path}".`,
             { cause }
           );
         }
-        return result === undefined ? null : result;
+        return (result === undefined ? null : result);
       };
 
-      // Si no hay timeout, ejecutar directamente.
+      // When no timeout is configured, just evaluate.
       if (timeout === 0) {
         return await evalFn();
       }
-
-      // Con timeout: race entre evaluación y temporizador.
+      // If timeout is configured, then wait/race between evaluation and timeout.
       let timeoutHandle;
       const timeoutPromise = new Promise((_, reject) => {
         timeoutHandle = setTimeout(() => {
           reject(new EvaluationError(
-            `Evaluación JSONata "${path}" excedió el timeout de ${timeout}ms.`
+            `JSONata evaluation of "${path}" exceeds the timeout of '${timeout}'ms.`
           ));
         }, timeout);
       });
@@ -177,20 +238,39 @@ export async function createJsonataAdapter(options = {}) {
       try {
         return await Promise.race([evalFn(), timeoutPromise]);
       } finally {
-        // Limpiamos el setTimeout para evitar handles colgantes en Node.
+        // In Node.JS a setTimeout always must be ended with clearTimeout.
         if (timeoutHandle) clearTimeout(timeoutHandle);
       }
-    },
+    },  // async inner function evaluate()
 
+    /**
+     * @type {@link module:jm2mp/adapters/registry.FallbackPolicyObject}
+     * @description
+     * [QueryAdapter]{@link module:jm2mp/adapters/registry.QueryAdapter}
+     * behavior policy for `JSONata`.
+    **/
     fallbackPolicy: {
-      missing: "null (cuando JSONata devuelve undefined)",
-      multipleMatches: "array (cuando la expresión genera secuencia)",
-      singleMatch: "escalar tal cual",
-      typeError: "EvaluationError (los errores de tipo se propagan envueltos)",
-      nullInput: "null (sin invocar la librería)",
-      timeout: timeout > 0
-        ? `EvaluationError tras ${timeout}ms (evaluación sigue en background)`
-        : "no configurado",
+      missing:
+        "null (when JSONata returns undefined)",
+      multipleMatches:
+        "array (when JSONata expression returns a sequence)",
+      singleMatch:
+        "scalar (as-is)",
+      typeError:
+        "EvaluationError (wrapping errors)",
+      nullInput:
+        "null (without invoking external library)",
+      timeout:
+        ( ( timeout > 0 )
+          ? `${timeout} (yes, in milliseconds; raising EvaluationError but continue running in background)`
+          : "0 (no)" ),
     },
   };
-}
+
+/* ------------------------------------------------------------------ */
+
+}  // export async function createJsonataAdapter
+
+/* ------------------------------------------------------------------ */
+/* ------------------------------------------------------------------ */
+/* End of file: ${JM2MP.JS}/src/adapters/jsonata.js                   */
