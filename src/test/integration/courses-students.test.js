@@ -2,30 +2,37 @@
  * @author Luis Maria CAMARA ROSSI
  * @copyright Universidad Nacional de Educación a Distancia (U.N.E.D.) 2026
  * @license BSD-3-Clause
- * @file Test de integración: ejercicio 3 (cursos × alumnos con $let).
- *
- * Reproduce el ejercicio donde la información dispersa en cursos × inscripciones
- * se reorganiza por alumno, calculando créditos aprobados, suma de notas,
- * cursos terminados y nota media.
- *
- * Ejercita:
- *   - foldObj (cursos) × fold (inscripciones) anidados.
- *   - $let para capturar contexto exterior (créditos del curso actual).
- *   - lookup O(1) sobre el acumulador por nombre de alumno.
- *   - Doble pasada: acumulación + cálculo derivado (nota_media).
- *
- * Resultado esperado:
- *   - Luis María:    15 cred, 16.5 notas, 2 cursos, media 8.25.
- *   - Inés:           6 cred, 11.0 notas, 2 cursos, media 5.50.
- *   - Elena:         15 cred, 18.0 notas, 3 cursos, media 6.00.
- *   - José Antonio:  15 cred, 13.5 notas, 2 cursos, media 6.75.
- */
+ * @file
+ * The module [courses_students]{@link module:jm2mp/test/integration/courses_students}
+ * implements several **integration test** for `courses & students`
+ * _use cases_.
+**/
 
 /**
- * @module jm2mp/test/integration/cursos_alumnos
+ * @module jm2mp/test/integration/courses_students
  * @description
- * Test de integración: ejercicio 3 (cursos × alumnos con $let).
+ * This module implements several **integration test** for
+ * `courses & students` _use cases_.
+ *
+ * It exercises when information is scattered across courses & enrollments
+ * and then reorganized by student, calculating earned credits, final
+ * grades, completed courses, and average marks.
+ *
+ * It demonstrates:
+ * - nested `foldObj` (courses) inside `foldArr` (enrollments).
+ * - Use `let` to capture external context (credits for the current course).
+ * - Complexity O(1) using `lookup` on the accumulator by student name.
+ * - Makes two passes: first for accumulation and second for derived calculation (average_grade).
+ *
+ * Expected results:
+ *   - Luis María:    15 credits, 16.5 grades, 2 courses, average marks 8.25.
+ *   - Inés:           6 credits, 11.0 grades, 2 courses, average marks 5.50.
+ *   - Elena:         15 credits, 18.0 grades, 3 courses, average marks 6.00.
+ *   - José Antonio:  15 credits, 13.5 grades, 2 courses, average marks 6.75.
 **/
+
+/* ------------------------------------------------------------------ */
+/* ------------------------------------------------------------------ */
 
 import { describe, it } from "node:test";
 import { strict as assert } from "node:assert";
@@ -34,10 +41,30 @@ import { normalizeModule } from "../../modules/normalizer.js";
 import { createNativeRegistry } from "../../adapters/helpers.js";
 import { moduleOf } from "../../modules/helpers.js";
 
+/* ------------------------------------------------------------------ */
+/* ------------------------------------------------------------------ */
+
+/**
+ * @constant {@link module:jm2mp/adapters/registry.AdapterRegistry}
+ * @description
+ * The [AdapterRegistry]{@link module:jm2mp/adapters/registry.AdapterRegistry}
+ * created as _singleton_ an used in every integration test.
+**/
 const registry = createNativeRegistry();
 
+/* ------------------------------------------------------------------ */
+/* ------------------------------------------------------------------ */
+
 describe("Integration test: courses per student", () => {
-  const documento = {
+
+/* ------------------------------------------------------------------ */
+
+  /**
+   * @constant {object}
+   * @description
+   * The object used as _source document_ in every integration test.
+  **/
+  const source_document = {
     "university": "Universidad Nacional de Educación a Distancia (U.N.E.D.)",
     "period": "2026-Q1",
     "passing_grade": 5.0,
@@ -73,12 +100,14 @@ describe("Integration test: courses per student", () => {
     }
   };
 
+/* ------------------------------------------------------------------ */
+
   it("agrega cursos por alumno con créditos, suma_notas, cursos_terminados y nota_media", async () => {
     // Plantilla raíz: foldObj sobre cursos, dentro $let para capturar créditos,
     // dentro fold sobre inscripciones que actualiza el acumulador por alumno.
     // Tras todos los cursos, segundo foldObj para añadir nota_media a cada alumno.
 
-    const mod = normalizeModule(moduleOf({
+    const projection_module = normalizeModule(moduleOf({
       "university":  { "$op": "get", "$path": "$.university" },
       "period": { "$op": "get", "$path": "$.period" },
       "students": {
@@ -208,37 +237,42 @@ describe("Integration test: courses per student", () => {
         }
       }));
 
-    const result = await evaluate(mod, documento, { registry });
+    const resultant_document = await evaluate(projection_module, source_document, { registry });
 
-    assert.equal(result.university, "Universidad Nacional de Educación a Distancia (U.N.E.D.)");
-    assert.equal(result.period, "2026-Q1");
+    assert.equal(resultant_document.university, "Universidad Nacional de Educación a Distancia (U.N.E.D.)");
+    assert.equal(resultant_document.period, "2026-Q1");
 
-    assert.deepEqual(Object.keys(result.students).sort(), [
-      "Elena", "Inés", "José Antonio", "Luis María"
-    ]);
+    assert.deepEqual(
+      Object.keys(resultant_document.students).sort(),
+      [ "Luis María", "Inés", "Elena", "José Antonio" ].sort()
+    );
 
     // Luis María.
-    assert.equal(result.students["Luis María"].passing_credits, 10);
-    assert.equal(result.students["Luis María"].sum_of_grades, 16.5);
-    assert.equal(result.students["Luis María"].enrolled_courses, 2);
-    assert.equal(result.students["Luis María"].average_grade, 8.25);
+    assert.equal(resultant_document.students["Luis María"].passing_credits, 10);
+    assert.equal(resultant_document.students["Luis María"].sum_of_grades, 16.5);
+    assert.equal(resultant_document.students["Luis María"].enrolled_courses, 2);
+    assert.equal(resultant_document.students["Luis María"].average_grade, 8.25);
 
     // Inés.
-    assert.equal(result.students["Inés"].passing_credits, 9);
-    assert.equal(result.students["Inés"].sum_of_grades, 11.0);
-    assert.equal(result.students["Inés"].enrolled_courses, 2);
-    assert.equal(result.students["Inés"].average_grade, 5.5);
+    assert.equal(resultant_document.students["Inés"].passing_credits, 9);
+    assert.equal(resultant_document.students["Inés"].sum_of_grades, 11.0);
+    assert.equal(resultant_document.students["Inés"].enrolled_courses, 2);
+    assert.equal(resultant_document.students["Inés"].average_grade, 5.5);
 
-    // Elena (BD-301 no aprobado, no suma créditos pero sí cuenta como terminado).
-    assert.equal(result.students["Elena"].passing_credits, 10);
-    assert.equal(result.students["Elena"].sum_of_grades, 18.0);
-    assert.equal(result.students["Elena"].enrolled_courses, 3);
-    assert.equal(result.students["Elena"].average_grade, 6.0);
+    // Elena (BD-301 not passed, so it not adds credits but it counts as enrolled).
+    assert.equal(resultant_document.students["Elena"].passing_credits, 10);
+    assert.equal(resultant_document.students["Elena"].sum_of_grades, 18.0);
+    assert.equal(resultant_document.students["Elena"].enrolled_courses, 3);
+    assert.equal(resultant_document.students["Elena"].average_grade, 6.0);
 
-    // José Antonio (ALG-101 sin nota, excluido).
-    assert.equal(result.students["José Antonio"].passing_credits, 15);
-    assert.equal(result.students["José Antonio"].sum_of_grades, 13.5);
-    assert.equal(result.students["José Antonio"].enrolled_courses, 2);
-    assert.equal(result.students["José Antonio"].average_grade, 6.75);
+    // José Antonio (ALG-101 do not have grades, so it is excluded).
+    assert.equal(resultant_document.students["José Antonio"].passing_credits, 15);
+    assert.equal(resultant_document.students["José Antonio"].sum_of_grades, 13.5);
+    assert.equal(resultant_document.students["José Antonio"].enrolled_courses, 2);
+    assert.equal(resultant_document.students["José Antonio"].average_grade, 6.75);
   });
 });
+
+/* ------------------------------------------------------------------ */
+/* ------------------------------------------------------------------ */
+/* End of file: ${JM2MP.JS}/src/test/integration/courses-students.test.js */

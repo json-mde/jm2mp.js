@@ -2,21 +2,28 @@
  * @author Luis Maria CAMARA ROSSI
  * @copyright Universidad Nacional de Educación a Distancia (U.N.E.D.) 2026
  * @license BSD-3-Clause
- * @file Test de integración: ejercicio 1 (extraer el primer usuario).
- *
- * Recreamos el ejercicio diseñado durante el modelado del lenguaje.
- *
- * La técnica usa fold con @.index == 0 para identificar al primer elemento.
- * Como fold itera por la derecha, el primer elemento se procesa AL FINAL,
- * y su valor sobrescribe el acumulador en ese paso. Los demás pasos
- * preservan el acumulador (rama $else devuelve @.acc).
- */
+ * @file
+ * The module [users]{@link module:jm2mp/test/integration/users}
+ * implements several **integration test** for `user` _use cases_.
+**/
 
 /**
- * @module jm2mp/test/integration/primer_usuario
+ * @module jm2mp/test/integration/users
  * @description
- * Test de integración: ejercicio 1 (extraer el primer usuario).
-**/
+ * This module implements several **integration test** for `user`
+ * _use cases_:
+ * 
+ * - Extract first user.
+ *   This technique uses `foldArr` with `@.index === 0` to identify the
+ *   first element.
+ *   Because `foldArr` iterates right-to-left, the first item is
+ *   processed at last, and its value overwrites the accumulator in
+ *   every step; the rest of steps just preserve the accumulator
+ *   (branch `else` returns `@.acc`).
+ **/
+
+/* ------------------------------------------------------------------ */
+/* ------------------------------------------------------------------ */
 
 import { describe, it } from "node:test";
 import { strict as assert } from "node:assert";
@@ -25,9 +32,17 @@ import { createNativeRegistry } from "../../adapters/helpers.js";
 import { normalizeModule } from "../../modules/normalizer.js";
 import { moduleWith } from "../../modules/helpers.js";
 
+/* ------------------------------------------------------------------ */
+
 const registry = createNativeRegistry();
 
-describe("Integración: extraer primer usuario", () => {
+/* ------------------------------------------------------------------ */
+/* ------------------------------------------------------------------ */
+
+describe("Integration test: users", () => {
+
+/* ------------------------------------------------------------------ */
+
   const documento = {
     "Users": [
       { "name": "Luis Maria", "emails": ["Alpha.One", "Alpha.Two"] },
@@ -35,7 +50,9 @@ describe("Integración: extraer primer usuario", () => {
     ]
   };
 
-  it("extrae el primer usuario usando fold con @.index", async () => {
+/* ------------------------------------------------------------------ */
+
+  it("It extracts the first user using foldArr with @.index", async () => {
     const proj = {
       "$op": "foldArr",
       "$over": { "$op": "get", "$path": "$.Users" },
@@ -59,7 +76,9 @@ describe("Integración: extraer primer usuario", () => {
     });
   });
 
-  it("array vacío devuelve null (el $init)", async () => {
+/* ------------------------------------------------------------------ */
+
+  it("Empty array returns $init (its actual null value)", async () => {
     const proj = {
       "$op": "foldArr",
       "$over": [],
@@ -80,7 +99,9 @@ describe("Integración: extraer primer usuario", () => {
     assert.equal(result, null);
   });
 
-  it("usuarios null absorbe la proyección", async () => {
+/* ------------------------------------------------------------------ */
+
+  it("Undefined $over returns $init (its actual null value)", async () => {
     const proj = {
       "$op": "foldArr",
       "$over": { "$op": "get", "$path": "$.NoExisten" },
@@ -92,7 +113,9 @@ describe("Integración: extraer primer usuario", () => {
     assert.equal(result, null);
   });
 
-  it("un solo usuario también es el primero", async () => {
+/* ------------------------------------------------------------------ */
+
+  it("Single user is also a first user", async () => {
     const proj = {
       "$op": "foldArr",
       "$over": { "$op": "get", "$path": "$.Users" },
@@ -113,4 +136,11 @@ describe("Integración: extraer primer usuario", () => {
     const result = await evaluate(mod, docMini, { registry });
     assert.deepEqual(result, { name: "Single" });
   });
-});
+
+/* ------------------------------------------------------------------ */
+
+});  // describe
+
+/* ------------------------------------------------------------------ */
+/* ------------------------------------------------------------------ */
+/* End of file: ${JM2MP.JS}/src/test/integration/users.test.js        */
