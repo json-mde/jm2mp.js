@@ -51,7 +51,7 @@ const registry = createNativeRegistry();
  * @constant {object}
  * @description
  * The object used as _source document_ in every integration test.
- */
+**/
 const source_document = {
   "store": "Madrid-01",
   "threshold": 10,

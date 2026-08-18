@@ -34,6 +34,12 @@ import { moduleWith } from "../../modules/helpers.js";
 
 /* ------------------------------------------------------------------ */
 
+/**
+ * @constant {@link module:jm2mp/adapters/registry.AdapterRegistry}
+ * @description
+ * The [AdapterRegistry]{@link module:jm2mp/adapters/registry.AdapterRegistry}
+ * created as _singleton_ an used in every integration test.
+**/
 const registry = createNativeRegistry();
 
 /* ------------------------------------------------------------------ */
@@ -43,7 +49,12 @@ describe("Integration test: users", () => {
 
 /* ------------------------------------------------------------------ */
 
-  const documento = {
+  /**
+   * @constant {object}
+   * @description
+   * The object used as _source document_ in every integration test.
+  **/
+  const source_document = {
     "Users": [
       { "name": "Luis Maria", "emails": ["Alpha.One", "Alpha.Two"] },
       { "name": "Inés",       "emails": ["Bravo.One", "Bravo.Two"] }
@@ -69,7 +80,7 @@ describe("Integration test: users", () => {
       }
     };
     const mod = normalizeModule(moduleWith(proj));
-    const result = await evaluate(mod, documento, { registry });
+    const result = await evaluate(mod, source_document, { registry });
     assert.deepEqual(result, {
       "name": "Luis Maria",
       "emails": ["Alpha.One", "Alpha.Two"]
@@ -109,7 +120,7 @@ describe("Integration test: users", () => {
       "$step": { "$op": "get", "$path": "@.acc" }
     };
     const mod = normalizeModule(moduleWith(proj));
-    const result = await evaluate(mod, documento, { registry });
+    const result = await evaluate(mod, source_document, { registry });
     assert.equal(result, null);
   });
 

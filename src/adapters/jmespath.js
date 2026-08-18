@@ -5,8 +5,8 @@
  * @file
  * The module [JMESPath]{@link module:jm2mp/adapters/jmespath} implements
  * the [QueryAdapter]{@link module:jm2mp/adapters/registry.QueryAdapter}
- * interface to use **JMESpath** _query language_ as part of `JM2MP`
- * _projection documents_.
+ * interface to use the external [JMESPath]{@link external:JMESPath}
+ * _query language_ as part of `JM2MP` _projection documents_.
 **/
 
 /**
@@ -128,8 +128,14 @@ export async function createJmesPathAdapter()
     );
   }
 
-  /** @type {@link module:jm2mp/adapters/registry.QueryAdapter} */
-  return {
+  /**
+   * @constant {@link module:jm2mp/adapters/registry.QueryAdapter}
+   * @description
+   * The newly created
+   * [QueryAdapter]{@link module:jm2mp/adapters/registry.QueryAdapter}
+   * for the [JMESPath]{@link external:JMESPath} query language.
+  **/
+  const new_jmespath_query_adapter = {
     name: "jmespath",
     description:
       "JMESPath 0.16.x query adapter.",
@@ -210,12 +216,12 @@ export async function createJmesPathAdapter()
     },
 
     /**
-     * @type {@link module:jm2mp/adapters/registry.FallbackPolicyObject}
+     * @property {@link module:jm2mp/adapters/registry.FallbackPolicyObject}
      * @description
      * [QueryAdapter]{@link module:jm2mp/adapters/registry.QueryAdapter}
-     * behavior policy for edge cases in `JMESPath`. Note the documented
-     * divergence in `multipleMatches` from the native adapter's
-     * "single match --> scalar" convention.
+     * behavior policy for edge cases in [JMESPath]{@link external:JMESPath}.
+     * Note the documented divergence in `multipleMatches` from the native
+     * adapter's "single match --> scalar" convention.
     **/
     fallbackPolicy: {
       missing:
@@ -233,7 +239,12 @@ export async function createJmesPathAdapter()
         "0 (not async)"
     },
   };
-}
+
+  return new_jmespath_query_adapter;
+
+/* ------------------------------------------------------------------ */
+
+}  // export async function createJmesPathAdapter
 
 /* ------------------------------------------------------------------ */
 /* ------------------------------------------------------------------ */

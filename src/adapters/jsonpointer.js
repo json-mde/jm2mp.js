@@ -5,8 +5,8 @@
  * @file
  * The module [JSON Pointer]{@link module:jm2mp/adapters/jsonpointer} implements
  * the [QueryAdapter]{@link module:jm2mp/adapters/registry.QueryAdapter}
- * interface to use **JSON Pointer** _query language_ as part of `JM2MP`
- * _projection documents_.
+ * interface to use the external [JSON Pointer]{@link external JSONPointer}
+ * _query language_ as part of `JM2MP` _projection documents_.
 **/
 
 /**
@@ -95,7 +95,6 @@ import { AdapterError, ValidationError, EvaluationError } from "../errors.js";
  * [QueryAdapter]{@link module:jm2mp/adapters/registry.QueryAdapter}
  * dynamically loading
  * [JSON Pointer](https://www.npmjs.com/package/json-pointer) version **0.6.x**.
- *
  * @returns {Promise<module:jm2mp/adapters/registry.QueryAdapter>}
  */
 export async function createJsonPointerAdapter() {
@@ -159,8 +158,12 @@ export async function createJsonPointerAdapter() {
     }
   }
 
-  /** @type {@link module:jm2mp/adapters/registry.QueryAdapter} */
-  return {
+  /**
+   * @constant {@link module:jm2mp/adapters/registry.QueryAdapter}
+   * @description
+   * .
+  **/
+  const new_jsonpointer_query_adapter = {
     name: "jsonpointer",
     description: "JSON Pointer (RFC 6901) 0.60.x query adapter.",
 
@@ -238,10 +241,10 @@ export async function createJsonPointerAdapter() {
     },
 
     /**
-     * @type {@link module:jm2mp/adapters/registry.FallbackPolicyObject}
+     * @property {@link module:jm2mp/adapters/registry.FallbackPolicyObject}
      * @description
      * [QueryAdapter]{@link module:jm2mp/adapters/registry.QueryAdapter}
-     * behavior policy for edge cases in `JSON Pointer`.
+     * behavior policy for edge cases in [JSON Pointer]{@link external:JSONPointer}.
      */
     fallbackPolicy: {
       missing:
@@ -260,6 +263,8 @@ export async function createJsonPointerAdapter() {
         "full root document (empty string is root, RFC 6901 §5)",
     },
   };
+
+  return new_jsonpointer_query_adapter;
 
 /* ------------------------------------------------------------------ */
 

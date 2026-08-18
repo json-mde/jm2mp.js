@@ -5,8 +5,8 @@
  * @file
  * The module [JSONata]{@link module:jm2mp/adapters/jsonata} implements
  * the [QueryAdapter]{@link module:jm2mp/adapters/registry.QueryAdapter}
- * interface to use **JSONata** _query language_ as part of `JM2MP`
- * _projection documents_.
+ * interface to use the external [JMESPath]{@link external:JMESPath}
+ * _query language_ as part of `JM2MP` _projection documents_.
 **/
 
 /**
@@ -22,14 +22,14 @@
  * versions (3.x).
  *
  * By design, **JSONata 2.x** is **async only**, as well as
- * {@link QueeryAdapter.evaluate} interface contract.
+ * [QueryAdapter.evaluate]{@link module:jm2mp/adapters/registry.QueryAdapter.evaluate} interface contract.
  *
  * By compliance with `JM2MP`, the
  * [QueryAdapter]{@link module:jm2mp/adapters/registry.QueryAdapter}
  * created by [createJsonataAdapter]{@link module:jm2mp/adapters/jsonata.createJsonataAdapter}
  * maintains the expected behaviour:
  * - `undefined` --> `null`.
- * - Type errors --> {@link module:jm2mp/errors.EvaluationError} with `cause`.
+ * - Type errors --> [EvaluationError]{@link module:jm2mp/errors.EvaluationError} with `cause`.
  * - `null` input --> `null` output without calling [JSONata]{@link external:JSONata} external library.
  * - Invalid expression during validation --> [ValidationError]{@link module:jm2mp/errors.ValidationError}.
  * - Invalid expression during runtime --> [EvaluationError]{@link module:jm2mp/errors.EvaluationError}.
@@ -37,10 +37,10 @@
  * **Timeout mechanism**: this adapter supports an optional `timeout`
  * parameter (expressed in milliseconds). If the evaluation of an
  * expression takes too long, it will be rejected and a
- * {@link module:jm2mp/errors.EvaluationError} exception will be raised,
- * referencing such _timeout_. But the actual evaluation will continue
- * to run in the background until it naturally completes, although its
- * result will be discarded.
+ * [EvaluationError]{@link module:jm2mp/errors.EvaluationError} exception
+ * will be raised, referencing such _timeout_. But the actual evaluation
+ * will continue to run in the background until it naturally completes,
+ * although its result will be discarded.
  * 
  * This _timeout mechanism_ is acceptable for well written expressions
  * but maybe insufficient for potentially malicious queries.
@@ -125,8 +125,8 @@ export async function createJsonataAdapter(options = {})
    * @description
    * Compila o recupera de caché una expresión JSONata.
    * Devuelve el objeto JSONata compilado (con .evaluate()).
-   * @param {*} expr 
-   * @param {*} cache The {@link }
+   * @param {*} expr The expression literal to be compiled.
+   * @param {*} cache The expression cache to save compilation's result.
    * @returns {*} The equivalent compiled JSONata expression.
    */
   function compileWithCache(expr, cache) {
@@ -144,8 +144,14 @@ export async function createJsonataAdapter(options = {})
     return compiled;
   }
 
-  /** @type {@link module:jm2mp/adapters/registry.QueryAdapter} */
-  return {
+  /**
+   * @constant {@link module:jm2mp/adapters/registry.QueryAdapter}
+   * @description
+   * The newly created
+   * [QueryAdapter]{@link module:jm2mp/adapters/registry.QueryAdapter}
+   * for the [JSONata]{@link external:JSONata} query language.
+  **/
+  const new_jsonata_query_adapter = {
     name: "jsonata",
     description: "JSONata 2.x query adapter.",
 
@@ -244,7 +250,7 @@ export async function createJsonataAdapter(options = {})
     },  // async inner function evaluate()
 
     /**
-     * @type {@link module:jm2mp/adapters/registry.FallbackPolicyObject}
+     * @property {@link module:jm2mp/adapters/registry.FallbackPolicyObject}
      * @description
      * [QueryAdapter]{@link module:jm2mp/adapters/registry.QueryAdapter}
      * behavior policy for `JSONata`.
@@ -266,6 +272,8 @@ export async function createJsonataAdapter(options = {})
           : "0 (no)" ),
     },
   };
+
+  return new_jsonata_query_adapter;
 
 /* ------------------------------------------------------------------ */
 

@@ -5,8 +5,8 @@
  * @file
  * The module [JSONPath]{@link module:jm2mp/adapters/jsonpath} implements
  * the [QueryAdapter]{@link module:jm2mp/adapters/registry.QueryAdapter}
- * interface to use **JSONPath** _query language_ as part of `JM2MP`
- * _projection documents_.
+ * interface to use the external [JSONPath]{@link external:JSONPath}
+ * _query language_ as part of `JM2MP` _projection documents_.
 **/
 
 /**
@@ -97,8 +97,14 @@ export async function createJsonPathAdapter() {
     );
   }
 
-  /** @type {@link module:jm2mp/adapters/registry.QueryAdapter} */
-  return {
+  /**
+   * @constant {@link module:jm2mp/adapters/registry.QueryAdapter}
+   * @description
+   * The newly created
+   * [QueryAdapter]{@link module:jm2mp/adapters/registry.QueryAdapter}
+   * for the [JSONPath]{@link external:JSONPath} query language.
+  **/
+  const new_jsonpath_query_adapter = {
     name: "jsonpath",
     description: "JSONPath 10.x query adapter.",
 
@@ -108,6 +114,8 @@ export async function createJsonPathAdapter() {
      * empty-object as input.
      * 
      * Quite rare JSONPath raises exceptions, even on invalid syntaxes.
+     * 
+     * @param {string} path The JSONPath expression to validate.
      */
     async validate(path) {
       if (typeof path !== "string" || path.length === 0) {
@@ -137,6 +145,10 @@ export async function createJsonPathAdapter() {
      * lexical _aliases_ and does not distinguish between roots and
      * contexts, other than just the input; so the expression is always
      * evaluated against `input`.
+     * @param {*} path The JSONPath expression to evaluate.
+     * @param {*} input The input context (source document?).
+     * @param {*} cache The expression cache.
+     * @param {*} _env Unused by JSONPath (only root context is allowed).
     **/
     /* eslint-disable-next-line no-unused-vars -- _env */
     async evaluate(path, input, cache, _env) {
@@ -178,7 +190,7 @@ export async function createJsonPathAdapter() {
     },
 
     /**
-     * @type {@link module:jm2mp/adapters/registry.FallbackPolicyObject}
+     * @property {@link module:jm2mp/adapters/registry.FallbackPolicyObject}
      * @description
      * [QueryAdapter]{@link module:jm2mp/adapters/registry.QueryAdapter}
      * behavior policy for edge cases in `JSONPath`. Note the documented
@@ -200,6 +212,8 @@ export async function createJsonPathAdapter() {
         "0 (not async)",
     },
   };
+
+  return new_jsonpath_query_adapter;
 }
 
 /* ------------------------------------------------------------------ */

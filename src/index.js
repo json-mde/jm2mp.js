@@ -43,6 +43,7 @@ export { normalizeModule } from "./modules/normalizer.js";
 // Adaptadores: contrato y factorías individuales.
 // ----------------------------------------------------------------------------
 export { AdapterRegistry } from "./adapters/registry.js";
+//// export { createNativeRegistry } from './adapters/helpers.js';
 export { createNativeAdapter } from "./adapters/native.js";
 export { createJsonPathAdapter } from "./adapters/jsonpath.js";
 export { createJsonataAdapter } from "./adapters/jsonata.js";
@@ -127,9 +128,9 @@ import { createNativeAdapter } from "./adapters/native.js";
  * @returns {Promise<AdapterRegistry>}
  */
 export async function createAdapterRegistry(
-  defaultAdaptersToLoad = {},
-  ...otherAdaptersToLoad
-) {
+                                            defaultAdaptersToLoad = {},
+                                            ...otherAdaptersToLoad )
+{
   const registry = new AdapterRegistry();
   // El adaptador nativo siempre está disponible.
   registry.register(createNativeAdapter());
