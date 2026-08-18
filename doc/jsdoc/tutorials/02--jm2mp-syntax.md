@@ -1646,14 +1646,12 @@ See [JSON Query](./external-JSONQuery.html) _external reference_ for more inform
 
 #### Other Query Languages
 
-It is possible to use other query languages not initially referenced by
-`JM2MP.JS`. In order to do that, it is required to develop an _adapter
-class_, same as any other external reference previosly mentioned.
-
-<span style="color:yellow; background:red;"> ... FALTA ... </span>
-Please, refer to the [QueryAdapter](./module-jm2mp_adapters_helpers.html#QueryAdapter)
-interface for more information.
-
+It is possible to use other _query languages_ not initially referenced
+by `JM2MP.JS`... or even create your own! In order to do so, it is
+required to develop an _adapter class_ that complies with the
+[QueryAdapter](./module-jm2mp_adapters_registry.html#.QueryAdapter)
+interface, same as any other external reference that has already been
+mentioned.
 
 Remember that any _JM2MP module_ that will use any _query language_
 different than `native`, needs to declare its usage as part of
