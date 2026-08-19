@@ -18,8 +18,8 @@
  * as part of `JM2MP` _projection documents_.
  *
  * This module _only_ supports **jmespath 0.16.x** _version_ (the canonical package).
- * There is a [community fork](https://jmespath.site/),
- * [@jmespath-community/jmespath](https://github.com/jmespath-community/typescript-jmespath),
+ * There is a [community fork](https://jmespath.site/) (with its own library
+ * [@jmespath-community/jmespath](https://github.com/jmespath-community/typescript-jmespath)),
  * but its API is different enough that it is not considered compatible.
  *
  * By design, **JMESPath** is a declarative _query language_ with a formal
@@ -30,20 +30,21 @@
  * pipelines and a catalogue of built-in functions.
  *
  * Examples of syntax:
- *   "foo.bar"                     --> inner property accessor
- *   "users[0].name"               --> inner property name of first user
- *   "users[*].name"               --> all names of every user
- *   "users[?age > `18`]"          --> filter by predicates
- *   "users[*].{n: name, a: age}"  --> multi-select hash
- *   "length(users)"               --> built-in functions
- *   "people | [0]"                --> pipe (restarting its own context)
+ * - `"foo.bar"`:                     inner property accessor.
+ * - `"users[0].name"`:               inner property name of first user.
+ * - `"users[*].name"`:               all names of every user.
+ * - `"users[?age > 18]"`:            filter by predicates.
+ * - `"users[*].{n: name, a: age}"`:  multi-select hash.
+ * - `"length(users)"`:               built-in functions.
+ * - `"people | [0]"`:                pipe (restarting its own context).
  *
  * By compliance with `JM2MP`, the
  * [QueryAdapter]{@link module:jm2mp/adapters/registry.QueryAdapter}
- * created by {@link module:jm2mp/adapters/jmespath.createJmesPathAdapter}
+ * created by
+ * [createJmesPathAdapter]{@link module:jm2mp/adapters/jmespath.createJmesPathAdapter}
  * maintains the expected behaviour:
- * - `undefined` --> `null` (native for JMESPath).
- * - `null` input --> `null` output without calling {@link external:JMESpath} external library.
+ * - `undefined` --> `null` (native for [JMESpath]{@link external:JMESpath}).
+ * - `null` input --> `null` output without calling [JMESpath]{@link external:JMESpath} external library.
  * - Expression with multiple resultsets --> array (as is).
  * - Expression with single result --> array (with single item).
  *   Aquí JMESPath DIFIERE del adaptador nativo / jsonpath-plus: no
@@ -53,8 +54,8 @@
  *   Desempaquetar rompería esa propiedad y haría que el tipo de retorno
  *   dependa de los datos. Esta divergencia está documentada en la
  *   `fallbackPolicy` del adaptador para que el usuario sepa a qué atenerse.
- * - Invalid expression during validation --> {@link ValidationError}.
- * - Invalid expression during runtime --> {@link EvaluationError}.
+ * - Invalid expression during validation --> [ValidationError]{@link module:jm2mp/errors.ValidationError}.
+ * - Invalid expression during runtime --> [EvaluationError]{@link module:jm2mp/errors.EvaluationError}.
  * - Expression cache: the canonical `jmespath` library do not publicly
  *   exposes its TreeInterpreter; because of that, `jmespath.search(data, expr)`
  *   parses again internally each query in every invocation; this
@@ -78,15 +79,16 @@
 /**
  * @external JMESPath
  * @description
- * **jmespath.js** is a JavaScript implementation of **JMESPath**, which
- * is a query language for JSON. It will take a JSON document and
- * transform it into another JSON document through a JMESPath
+ * [jmespath (package)](https://www.npmjs.com/package/jmespath) is a
+ * JavaScript implementation of [JMESPath syntax](https://jmespath.org/),
+ * which is a _query language_ for JSON. It will take a JSON document and
+ * transform it into another JSON document through a `JMESPath`
  * expression.
  *
- * The module {@link module:jm2mp/adapters/jmespath} implements the
- * [QueryAdapter]{@link module:jm2mp/adapters/registry.QueryAdapter}
- * interface to use **JMESPath** as part of `JM2MP`
- * _projection documents_.
+ * The [JMESPath module]{@link module:jm2mp/adapters/jmespath} implements
+ * the [QueryAdapter]{@link module:jm2mp/adapters/registry.QueryAdapter}
+ * interface to use `JMESPath` syntax as part of `JM2MP` _projection
+ * documents_.
  *
  * @see {@link https://jmespath.org/}
  * @see {@link https://www.npmjs.com/package/jmespath}
@@ -108,7 +110,7 @@ import { AdapterError, ValidationError, EvaluationError } from "../errors.js";
  * dynamically loading
  * [jmespath](https://www.npmjs.com/package/jmespath) version **0.16.x**.
  * @returns {Promise<module:jm2mp/adapters/registry.QueryAdapter>}
- */
+**/
 export async function createJmesPathAdapter()
 {
   // Trying to load JMESPath external library.
@@ -129,21 +131,25 @@ export async function createJmesPathAdapter()
   }
 
   /**
-   * @constant {@link module:jm2mp/adapters/registry.QueryAdapter}
+   * @constant
+   * @type {@link module:jm2mp/adapters/registry.QueryAdapter}
    * @description
    * The newly created
    * [QueryAdapter]{@link module:jm2mp/adapters/registry.QueryAdapter}
    * for the [JMESPath]{@link external:JMESPath} query language.
   **/
   const new_jmespath_query_adapter = {
-    name: "jmespath",
+    name:
+      "jmespath",
     description:
       "JMESPath 0.16.x query adapter.",
 
     /**
      * @description
      * It validates a JMESPath expression, trying to compile it.
-     */
+     * 
+     * @param {string} path The JMESPath path to validate.
+    **/
     async validate(path) {
       if (typeof path !== "string" || path.length === 0) {
         throw new ValidationError(
@@ -164,7 +170,7 @@ export async function createJmesPathAdapter()
      * @description
      * It evaluates a JMESPath expression, trying to standardize the
      * outcome in accordance with the interface
-     * {@link module:jm2mp/adapters/registry.QueryAdapter}.
+     * [QueryAdapter]{@link module:jm2mp/adapters/registry.QueryAdapter}.
      * 
      * The `JMESPath` library operates synchronously; `JM2MP.JS` wraps
      * the signature in `async` to comply with the uniform registry
@@ -212,7 +218,7 @@ export async function createJmesPathAdapter()
       // result, which is consistent with the `native adapter`
       // convention. We defensively convert `undefined` to `null`,
       // because the library must not return `undefined`.
-      return (result === undefined ? null : result);
+      return ((result === undefined) ? null : result);
     },
 
     /**
@@ -241,8 +247,6 @@ export async function createJmesPathAdapter()
   };
 
   return new_jmespath_query_adapter;
-
-/* ------------------------------------------------------------------ */
 
 }  // export async function createJmesPathAdapter
 

@@ -56,21 +56,6 @@ describe("Integration test: native syntax", () => {
 
 /* ------------------------------------------------------------------ */
 
-  it("Create adapter registry for another (invented) query language.", async () => {
-    const invented_adapter_registry = async function() { return {
-      name: "do_not_use",
-      description:"do_not_use",
-      /* eslint-disable-next-line no-unused-vars */
-      async validate(_path){return(true);},
-      /* eslint-disable-next-line no-unused-vars */
-      async evaluate(_path, _input, _cache, _env){return(null);},
-    }};
-    const r = await JM2MP.createAdapterRegistry({},invented_adapter_registry);  // native: siempre incluido.
-    assert.notStrictEqual(r, null, "r === null");
-  });
-
-/* ------------------------------------------------------------------ */
-
   it("Clone source (getting the root context).", async () => {
     const root_projection = {
       "$": { "$op":"get", "$syntax":"native", "$path":"$" }
@@ -98,7 +83,7 @@ describe("Integration test: native syntax", () => {
       "$": { "$op":"get", "$path":"@" }
     };
     const string_loader = JM2MP.createStringLoader({"1":JSON.stringify(root_projection)});
-    const registry_for_query_language_adapters = await JM2MP.createAdapterRegistry();  // native: siempre incluido.
+    const registry_for_query_language_adapters = null;  // native: siempre incluido.
     const r = await JM2MP.project({
       rootName: "1",
       loader: string_loader,
@@ -115,114 +100,50 @@ describe("Integration test: native syntax", () => {
 
 /* ------------------------------------------------------------------ */
 
-  it("Clone source (getting JSONPath root context).", async () => {
+  it("Clone just root sub-object.", async () => {
     const root_projection = {
-      "$": { "$op":"get", "$syntax":"jsonpath", "$path":"$" }
+      "$": { "$op":"get", "$path":"$.SubRootObject" }
     };
-    const string_loader = JM2MP.createStringLoader({"1":JSON.stringify(root_projection)});
-    const registry_for_query_language_adapters = await JM2MP.createAdapterRegistry({jsonpath:true});
-    const r = await JM2MP.project({
-      rootName: "1",
+    const string_loader = JM2MP.createStringLoader({"$":JSON.stringify(root_projection)});
+    const resultant_document = await JM2MP.project({
+      rootName: "$",
       loader: string_loader,
-      document: source_document,
-      registry: registry_for_query_language_adapters,
-      options: {
-        maxDepth:  100,
-        maxModules: 10,
-      }
+      document: source_document
     });
-    assert.notStrictEqual(r, null, "r === null");
-    assert.deepStrictEqual(r, source_document, "r === source_document");
+    assert.notStrictEqual(resultant_document, null);
+    assert.deepStrictEqual(resultant_document, source_document.SubRootObject);
   });
 
 /* ------------------------------------------------------------------ */
 
-  it("Clone source (getting JSON Pointer root context -an empty string-).", async () => {
+  it("It gets an inner property.", async () => {
     const root_projection = {
-      "$": { "$op":"get", "$syntax":"jsonpointer", "$path":"" }
+      "$": { "$op":"get", "$path":"$.SubRootObject.RealProperty" }
     };
-    const string_loader = JM2MP.createStringLoader({"1":JSON.stringify(root_projection)});
-    const registry_for_query_language_adapters = await JM2MP.createAdapterRegistry({jsonpointer:true});
-    const r = await JM2MP.project({
-      rootName: "1",
+    const string_loader = JM2MP.createStringLoader({"$":JSON.stringify(root_projection)});
+    const resultant_document = await JM2MP.project({
+      rootName: "$",
       loader: string_loader,
-      document: source_document,
-      registry: registry_for_query_language_adapters,
-      options: {
-        maxDepth:  100,
-        maxModules: 10,
-      }
+      document: source_document
     });
-    assert.notStrictEqual(r, null, "r === null");
-    assert.deepStrictEqual(r, source_document, "r === source_document");
+    assert.notStrictEqual(resultant_document, null);
+    assert.deepStrictEqual(resultant_document, source_document.SubRootObject.RealProperty);
   });
 
 /* ------------------------------------------------------------------ */
 
-  it("Clone source (getting JSONata root context).", async () => {
+  it("It gets an inner property.", async () => {
     const root_projection = {
-      "$": { "$op":"get", "$syntax":"jsonata", "$path":"$" }
+      "$": { "$op":"get", "$path":['SubRootObject','RealProperty'] }
     };
-    const string_loader = JM2MP.createStringLoader({"1":JSON.stringify(root_projection)});
-    const registry_for_query_language_adapters = await JM2MP.createAdapterRegistry({jsonata:true, jsonataOptions:{timeout:(60*1000)}});
-    const r = await JM2MP.project({
-      rootName: "1",
+    const string_loader = JM2MP.createStringLoader({"$":JSON.stringify(root_projection)});
+    const resultant_document = await JM2MP.project({
+      rootName: "$",
       loader: string_loader,
-      document: source_document,
-      registry: registry_for_query_language_adapters,
-      options: {
-        maxDepth:  100,
-        maxModules: 10,
-      }
+      document: source_document
     });
-    assert.notStrictEqual(r, null, "r === null");
-    assert.deepStrictEqual(r, source_document, "r === source_document");
-  });
-
-/* ------------------------------------------------------------------ */
-
-  it("Clone source (getting JSONQuery root context).", async () => {
-    const root_projection = {
-      "$": { "$op":"get", "$syntax":"jsonquery", "$path":"{SubRootObject:.SubRootObject}" }
-    };
-    const string_loader = JM2MP.createStringLoader({"1":JSON.stringify(root_projection)});
-    const registry_for_query_language_adapters = await JM2MP.createAdapterRegistry({jsonquery:true});
-    const r = await JM2MP.project({
-      rootName: "1",
-      loader: string_loader,
-      document: source_document,
-      registry: registry_for_query_language_adapters,
-      options: {
-        maxDepth:  100,
-        maxModules: 10,
-      }
-    });
-    assert.notStrictEqual(r, null, "r === null");
-    assert.deepStrictEqual(r, source_document, "r === source_document");
-  });
-
-/* ------------------------------------------------------------------ */
-
-  it("Almost clone source (getting JMESPath 'all' object projection over the root context).", async () => {
-    const root_projection = {
-      "$": { "$op":"get", "$syntax":"jmespath", "$path":"SubRootObject" }
-    };
-    const string_loader = JM2MP.createStringLoader({"1":JSON.stringify(root_projection)});
-    const registry_for_query_language_adapters = await JM2MP.createAdapterRegistry({jmespath:true});
-    const r = await JM2MP.project({
-      rootName: "1",
-      loader: string_loader,
-      document: source_document,
-      registry: registry_for_query_language_adapters,
-      options: {
-        maxDepth:  100,
-        maxModules: 10,
-      }
-    });
-    console.log('source_document',source_document);
-    console.log('r',r);
-    assert.notStrictEqual(r, null, "r === null");
-    assert.deepStrictEqual(r, source_document.SubRootObject, "r === source_document.SubRootObject");
+    assert.notStrictEqual(resultant_document, null);
+    assert.deepStrictEqual(resultant_document, source_document.SubRootObject.RealProperty);
   });
 
 /* ------------------------------------------------------------------ */

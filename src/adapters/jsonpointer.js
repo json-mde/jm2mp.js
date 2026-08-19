@@ -159,9 +159,12 @@ export async function createJsonPointerAdapter() {
   }
 
   /**
-   * @constant {@link module:jm2mp/adapters/registry.QueryAdapter}
+   * @constant
+   * @type {@link module:jm2mp/adapters/registry.QueryAdapter}
    * @description
-   * .
+   * The newly created
+   * [QueryAdapter]{@link module:jm2mp/adapters/registry.QueryAdapter}
+   * for the [JSONPointer]{@link external:JSONPointer} query language.
   **/
   const new_jsonpointer_query_adapter = {
     name: "jsonpointer",
