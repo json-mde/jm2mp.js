@@ -25,9 +25,9 @@
   "recurseDepth": 100,
   "source": {
     "include": [ "./" ],
-    "exclude": [ "node_modules/", "test/" ],
+    "exclude": [ "node_modules/", "test/", "json-pointer-rfc6901--processor.js" ],
     "includePattern": ".+\\.(c|m)?js(doc|x)?$",
-    "excludePattern": "(node_modules/)|(test/)|((^|\\/|\\\\)_)"
+    "excludePattern": "(node_modules/)|(test/)|(json-pointer-rfc6901--processor\\.js)|((^|\\/|\\\\)_)"
   },
   "tags": {
     "allowUnknownTags": true,

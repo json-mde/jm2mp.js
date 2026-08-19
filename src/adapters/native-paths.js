@@ -53,7 +53,6 @@ import { ParseError, EvaluationError } from "../errors.js";
 /* ------------------------------------------------------------------ */
 
 /**
- * @namespace
  * @constant {object}
  * @enum
  * @description
@@ -93,7 +92,7 @@ export const EXECUTION_ENVIRONMENT_FROM = {
  * The base kind of the parsed path.
  * @property {string|null} aliasName
  * The name of the alias only if `kind` is `'alias'`; otherwise, it is `null`.
- * @property {Array<string|number>} accessors
+ * @property {Array.<string|number>} accessors
  * The accessors after the base (it is always an array, empty or not).
  * @description
  * It represents a parsed path (from string-based syntax).
@@ -102,98 +101,119 @@ export const EXECUTION_ENVIRONMENT_FROM = {
 /* ------------------------------------------------------------------ */
 
 /**
- * Parsea un string como ruta nativa.
- *
- * @param {string} input - El string a parsear.
- * @returns {ParsedPath} El AST de la ruta.
- * @throws {ParseError} Si el string no es una ruta nativa válida.
+ * @default
+ * It parses 'input' string as a native path.
+ * @param {string} input
+ * The input path to parse.
+ * @returns {ParsedPath}
+ * The _abstract syntax tree_ (AST) of 'input' path.
+ * @throws {module:jm2mp/errors.ParseError}
+ * Whenever 'input' string were not a valid path.
  */
 export function parsePath(input)
 {
-  if (typeof input !== "string" || input.length === 0) {
-    throw new ParseError("La ruta nativa debe ser una cadena no vacía.");
+  // Argument validation.
+  if ( ((typeof input) !== "string") || (input.length === 0) ) {
+    throw new ParseError("Syntax error: a native path must be a non-empty string.");
   }
   else
   {
-    // Posición actual del parser dentro del string.
+    // Initial position of the parse inside the input string (path).
     let pos = 0;
-    // Helper: consume el siguiente carácter si coincide; lanza error en caso contrario.
+
+    /**
+     * @description
+     * Helper function to consume the next character if it is the expected;
+     * otherwise, it will raise an exception.
+     * @param {string} ch The character to look for.
+     * @throws {ParseError} Whenever 'ch' were not the next 'input' character.
+     */
     const expect = (ch) => {
       if (input[pos] !== ch) {
         throw new ParseError(
-          `Se esperaba '${ch}' en posición ${pos} de la ruta "${input}".`
+          `Syntax error: unexpected character '${input[pos]}' instead of '${ch}' at position '${pos}' of input path '${input}'.`
         );
       }
       pos++;
     };
-    // Determinamos la raíz a partir del primer carácter.
+
+    // It determines the kind of root depending of first character.
     let kind, aliasName = null;
-    //
     if (input[0] === "$") {
-      // Raíz "$": documento de origen.
+      // "$" means root document's value.
       kind = EXECUTION_ENVIRONMENT_FROM.ROOT;
       pos = 1;
     } else if (input[0] === "@") {
-      // Raíz "@": contexto actual.
+      // "@" means current context.
       kind = EXECUTION_ENVIRONMENT_FROM.CTX;
       pos = 1;
     } else if (input[0] === "%") {
-      // Raíz "%nombre": alias léxico. Tras "%" debe haber un identificador.
+      // "%name" means a lexical alias.
       kind = EXECUTION_ENVIRONMENT_FROM.ALIAS;
       pos = 1;
       aliasName = readIdentifier(input, pos);
       if (aliasName === null) {
         throw new ParseError(
-          `Se esperaba un identificador tras '%' en la ruta "${input}".`
+          `Syntax error: missing identifier right after '%' in input path '${input}'.`
         );
       }
-      // Avanzamos pos hasta el final del identificador.
+      // It advances the current position until the end of the alias identifier.
       pos += aliasName.length;
     } else {
       throw new ParseError(
-        `Raíz de ruta desconocida en "${input}". Se esperaba '$', '@' o '%'.`
+        `Syntax error: unknown root path in input '${input}'; only '$', '@' or '%' is expected.`
       );
     }
-    // Lista de accesores que se van extrayendo tras la raíz.
+    // The list of accessors, which will be extracted from 'input' path
+    // after the execution context.
+    /** @type {Array.<string|number>} */
     const accessors = [];
-    // Parseamos accesores hasta agotar el string.
+    // It parses accessors until the end of the 'input' string.
     while (pos < input.length) {
+      // Current character.
       const ch = input[pos];
-      //
-      if (ch === ".") {
-        // Accesor por punto: ".identificador".
+      if (ch === ".")
+      {
+        // It is an accessor by dot: ".identifier".
         pos++;
         const id = readIdentifier(input, pos);
         if (id === null) {
           throw new ParseError(
-            `Se esperaba un identificador tras '.' en posición ${pos} de "${input}".`
+            `Syntax error: missing identifier after dot ('.') at position '${pos}' of input path '${input}'.`
           );
         }
         accessors.push(id);
         pos += id.length;
-      } else if (ch === "[") {
-        // Accesor por corchetes: "[índice]" o "[string-citado]".
+      }
+      else if (ch === "[")
+      {
+        // It is an accessor by square brackts: "[number (array index)]" or "[string (property name)]".
         pos++;
-        // Decidimos si lo siguiente es un número o un string citado.
-        if (input[pos] === '"') {
-          // String citado.
+        // String: property name.
+        if (input[pos] === '"')
+        {
           const { value, length } = readQuotedString(input, pos);
           accessors.push(value);
           pos += length;
-        } else if (isDigit(input[pos])) {
-          // Número.
+        }
+        // Number: array index.
+        else if ( isDigit(input[pos]) )
+        {
           const { value, length } = readNonNegativeInteger(input, pos);
           accessors.push(value);
           pos += length;
-        } else {
+        }
+        // Else, meaning... syntax error.
+        else
+        {
           throw new ParseError(
-            `Se esperaba número o string citado tras '[' en posición ${pos} de "${input}".`
+            `Syntax error: expected number (array-index) or string (property-name) after '[' at position '${pos}' of input path '${input}'.`
           );
         }
         expect("]");
       } else {
         throw new ParseError(
-          `Carácter inesperado '${ch}' en posición ${pos} de "${input}".`
+          `Syntax error: unexpected character '${ch}' at position '${pos}' of input path '${input}'.`
         );
       }
     }
@@ -207,43 +227,56 @@ export function parsePath(input)
 /* ------------------------------------------------------------------ */
 
 /**
- * Lee un identificador (letra o subrayado seguido de alfanuméricos o subrayados)
- * a partir de la posición dada. Devuelve el identificador encontrado, o null si no había.
- *
- * @param {string} input - El string completo.
- * @param {number} start - Posición inicial.
- * @returns {string|null} El identificador, o null si no hay uno válido en esa posición.
- */
+ * @description
+ * It reads an identifier from 'input' with starting delimiter character
+ * 'start'. An identifier starts by `[A-Za-z_]` (see {@link isIdentifierStart})
+ * and continues by `[A-Za-z_0-9]` (see {@link isIdentifierContinue}).
+ * It returns the identifier found, or `null` otherwise.
+ * @param {string} input
+ * The input string containing the full path.
+ * @param {number} start
+ * The initial position to read the expected identifier.
+ * @returns {string|null}
+ * The identifier found, or `null` if no one valid is in such position.
+**/
 function readIdentifier(input, start) {
-  // Comprobamos que el primer carácter sea letra o subrayado.
+  // Current start at input must be a valid identifier-start-character.
   if (start >= input.length || !isIdentifierStart(input[start])) {
     return null;
   }
+  // It continues until no identifier-character is found.
   let end = start + 1;
-  // Consumimos caracteres alfanuméricos o subrayados.
   while (end < input.length && isIdentifierContinue(input[end])) {
     end++;
   }
+  // It returns the slice for the identifier.
   return input.slice(start, end);
 }
 
 /* ------------------------------------------------------------------ */
 
 /**
- * Lee un entero no negativo a partir de la posición dada.
- *
- * @param {string} input - El string completo.
- * @param {number} start - Posición inicial.
- * @returns {{value: number, length: number}} Valor entero y número de caracteres consumidos.
- */
+ * @description
+ * It reads a natural number (non-negative integer) from 'start'
+ * position in 'input', and returns its numeric value.
+ * @param {string} input
+ * The input string containing the full path.
+ * @param {number} start
+ * The initial position to read the expected natural number.
+ * @returns {{value: number, length: number}}
+ * Tuple with both: numeric value and number of characters consumed by
+ * the parser.
+**/
 function readNonNegativeInteger(input, start) {
   let end = start;
-  while (end < input.length && isDigit(input[end])) {
+  while ( ( end < input.length ) && isDigit(input[end]) )
+  {
     end++;
   }
-  if (end === start) {
+  if (end === start)
+  {
     throw new ParseError(
-      `Se esperaba un dígito en posición ${start} de "${input}".`
+      `Syntax error: missing digit at position '${start}' of input path '${input}'.`
     );
   }
   const value = Number(input.slice(start, end));
@@ -253,129 +286,229 @@ function readNonNegativeInteger(input, start) {
 /* ------------------------------------------------------------------ */
 
 /**
- * Lee un string citado al estilo JSON a partir de la posición dada.
- * Soporta los escapes JSON estándar: \" \\ \/ \b \f \n \r \t \uXXXX.
- *
- * @param {string} input - El string completo.
- * @param {number} start - Posición de la comilla de apertura.
- * @returns {{value: string, length: number}} Valor desescapado y longitud incluyendo comillas.
+ * @description
+ * It reads an string quoted only as JSON supports (`&quote;` is allowed
+ * but not `&apos;`) from 'input' path, starting at 'start' position
+ * character. It also supports escaping characters like JSON:
+ * `\"`, `\\`, `\/`, `\b`, `\f`, `\n`, `\r`, `\t`, and `\uXXXX`.
+ * @param {string} input
+ * The input string containing the full path.
+ * @param {integer} start
+ * The initial position to read the quoted string, considering that
+ * `input[start]` must be a `&quote;`.
+ * @returns {{value: string, length: integer}}
+ * Tuple with both: unquoted string value and the number of characters
+ * consumed by the parser reading the value (and both `&quote;s`).
  */
 function readQuotedString(input, start) {
-  if (input[start] !== '"') {
-    throw new ParseError(`Se esperaba '"' en posición ${start} de "${input}".`);
+  if (input[start] !== '"')
+  {
+    throw new ParseError(`Syntax error: expected '"' at position '${start}' of input path '${input}'.`);
   }
-  let pos = start + 1;
-  let value = "";
-  while (pos < input.length) {
-    const ch = input[pos];
-    if (ch === '"') {
-      return { value, length: pos - start + 1 };
-    }
-    if (ch === "\\") {
-      // Procesamos escape JSON estándar.
-      pos++;
-      if (pos >= input.length) {
-        throw new ParseError(`Escape incompleto en "${input}".`);
+  else
+  {
+    // Resulting value (unquoted string).
+    /** @type {string} */
+    let value = "";
+    /** @type {boolean} */
+    let found = false ;
+    // It consumes characters until the end of the 'input' path.
+    let pos = start + 1;
+    while ( (!found) && (pos < input.length) )
+    {
+      // It inspects the current character.
+      const ch = input[pos];
+      if (ch === '"')
+      {
+        found = true ;
       }
-      const esc = input[pos];
-      switch (esc) {
-        case '"': value += '"'; break;
-        case "\\": value += "\\"; break;
-        case "/":  value += "/"; break;
-        case "b":  value += "\b"; break;
-        case "f":  value += "\f"; break;
-        case "n":  value += "\n"; break;
-        case "r":  value += "\r"; break;
-        case "t":  value += "\t"; break;
-        case "u": {
-          // Escape unicode \uXXXX.
-          if (pos + 4 >= input.length) {
-            throw new ParseError(`Escape \\u incompleto en "${input}".`);
-          }
-          const hex = input.slice(pos + 1, pos + 5);
-          if (!/^[0-9A-Fa-f]{4}$/.test(hex)) {
-            throw new ParseError(`Escape \\u inválido en "${input}".`);
-          }
-          value += String.fromCharCode(parseInt(hex, 16));
-          pos += 4;
-          break;
+      else if (ch === "\\")
+      {
+        // Escaping characters like JSON.
+        pos++;
+        if (pos >= input.length)
+        {
+          throw new ParseError(`Syntax error: incomplete escape character at the end of input path '${input}'.`);
         }
-        default:
-          throw new ParseError(`Escape \\${esc} no reconocido en "${input}".`);
+        const esc = input[pos];
+        switch (esc)
+        {
+          case '"':  value += '"';  break;
+          case "\\": value += "\\"; break;
+          case "/":  value += "/";  break;
+          case "b":  value += "\b"; break;
+          case "f":  value += "\f"; break;
+          case "n":  value += "\n"; break;
+          case "r":  value += "\r"; break;
+          case "t":  value += "\t"; break;
+          case "u": {
+            // Escape unicode \uXXXX.
+            if (pos + 4 >= input.length) {
+              throw new ParseError(`Syntax error: incomplete Unicode escape '\\uXXXX' at '${pos}' in input path '${input}'.`);
+            }
+            const hex = input.slice(pos + 1, pos + 5);
+            if (!/^[0-9A-Fa-f]{4}$/.test(hex)) {
+              throw new ParseError(`Syntax error: invalid Unicode escape '\\uXXXX' at '${pos}' in pinput path '${input}'.`);
+            }
+            value += String.fromCharCode(parseInt(hex, 16));
+            pos += 4;
+            break;
+          }
+          default: throw new ParseError(`Syntax error: unrecognized escape character '\\X' at '${pos}' of input path '${input}'.`);
+        }
+        pos++;
       }
-      pos++;
-    } else {
-      value += ch;
-      pos++;
+      else
+      {
+        value += ch;
+        pos++;
+      }
+    }
+    // It returns the result found, or raises an exception otherwise.
+    if (found)
+    {
+      const result = { value, length: pos - start + 1 };
+      return result;
+    }
+    else
+    {
+      throw new ParseError(`Syntax error: quoted string not closed at the end of input path '${input}'.`);
     }
   }
-  throw new ParseError(`String citado sin cerrar en "${input}".`);
-}
-
-/* ------------------------------------------------------------------ */
-
-/** True si ch puede iniciar un identificador (letra ASCII o subrayado). */
-function isIdentifierStart(ch) {
-  return (ch >= "A" && ch <= "Z") ||
-         (ch >= "a" && ch <= "z") ||
-         ch === "_";
-}
-
-/* ------------------------------------------------------------------ */
-
-/** True si ch puede continuar un identificador (alfanumérico ASCII o subrayado). */
-function isIdentifierContinue(ch) {
-  return isIdentifierStart(ch) || isDigit(ch);
-}
-
-/* ------------------------------------------------------------------ */
-
-/** True si ch es un dígito ASCII. */
-function isDigit(ch) {
-  return ch >= "0" && ch <= "9";
 }
 
 /* ------------------------------------------------------------------ */
 
 /**
- * Aplica una secuencia de accesores a un valor JSON, navegando dentro de él.
- *
- * Sigue la regla absorbente: si en algún paso el valor es null o el accesor
- * no es aplicable (clave inexistente, índice fuera de rango, navegación por
- * punto sobre array/primitivo, etc.), el resultado es null.
- *
- * @param {*} value - Valor JSON inicial.
- * @param {Array<string|number>} accessors - Lista de accesores a aplicar en orden.
- * @returns {*} El valor tras la navegación, o null si la navegación falla.
+ * @description
+ * True whenever 'ch' can starts an identifier
+ * (ASCII letter or underline characters).
+ * @param {string} ch
+ * The character to test.
+ * @returns {boolean}
+ * Is 'ch' in [A-Za-z_] ?
+**/
+function isIdentifierStart(ch) {
+  return (
+    (ch >= "A" && ch <= "Z") ||
+    (ch >= "a" && ch <= "z") ||
+    ( ch === "_" )
+  );
+}
+
+/* ------------------------------------------------------------------ */
+
+/**
+ * @description
+ * True whenever 'ch' can continue an identifier
+ * (ASCII letter, digit or underline characters).
+ * @param {string} ch
+ * The character to test.
+ * @returns {boolean}
+ * Is 'ch' in {@link isIdentifierStart} and {@link isDigit} ?
+**/
+function isIdentifierContinue(ch) {
+  return ( isIdentifierStart(ch) || isDigit(ch) );
+}
+
+/* ------------------------------------------------------------------ */
+
+/**
+ * @description
+ * True whenever 'ch' is an ASCII digit.
+ * @param {string} ch
+ * The character to test.
+ * @returns {boolean}
+ * Is 'ch' in [0-9] ?
+**/
+function isDigit(ch) {
+  return ( ( ch >= "0" ) && ( ch <= "9" ) );
+}
+
+/* ------------------------------------------------------------------ */
+
+/**
+ * @description
+ * It applies the sequence of accessors to an initial JSON value,
+ * navigating/location inside of such value.
+ * 
+ * It follows the _null absorption_ rule: if in any step the resulting
+ * value is `null` or the _accessor_ is not applicable (not named
+ * property found, index out of range, dot navigation over scalar value,
+ * ...), then the final resultant value will be `null`.
+ * @param {*} value
+ * The initial JSON value.
+ * @param {Array<string|number>} accessors
+ * The list of accessors to be orderly applied.
+ * @returns {*}
+ * El valor tras la navegación, o null si la navegación falla.
+ * The resultant JSON value found after the navigation/locate.
+ * @throws {EvaluationError}
+ * Whenever ... is not supported.
  */
 export function navigate(value, accessors)
 {
-  // Recorremos los accesores uno por uno, actualizando el valor actual.
-  let current = value;
-  for (const acc of accessors) {
-    // Cualquier null absorbe la navegación.
-    if (current === null || current === undefined) return null;
-
-    if (typeof acc === "string") {
-      // Accesor de objeto: solo aplicable si el valor es un objeto plano (no array).
-      if (typeof current !== "object" || Array.isArray(current)) {
-        return null;
-      }
-      // Object.hasOwn evita usar propiedades del prototipo.
-      current = Object.hasOwn(current, acc) ? current[acc] : null;
-    } else if (typeof acc === "number") {
-      // Accesor de array: solo aplicable a arrays.
-      if (!Array.isArray(current)) {
-        return null;
-      }
-      current = (acc >= 0 && acc < current.length) ? current[acc] : null;
-    } else {
-      throw new EvaluationError(
-        `Tipo de accesor no soportado: ${typeof acc}`
-      );
-    }
+  // Argument validation.
+  if (!Array.isArray(accessors))
+  {
+    throw new ParseError('Accessors must be an array, empty or not!');
   }
-  return current;
+  else
+  {
+    // It follows every accessor, one by one, updating the
+    // current value, to determine the resultant value.
+    let current = value;
+    for (const acc of accessors)
+    {
+      // Null absorption rule.
+      if (current === null || current === undefined)
+      {
+        break;
+      }
+      // String accessor means property name, only supported by object traversal.
+      else if (typeof acc === "string")
+      {
+        if (typeof current !== "object" || Array.isArray(current))
+        {
+          // Semantic error, actually, but resolved as 'not found' without raising errors.
+          current = null;
+        }
+        else
+        {
+          // Only owned properties and not from the prototype.
+          current = (
+            Object.hasOwn(current, acc)
+            ? current[acc]
+            : null
+          );
+        }
+      }
+      else if ( (typeof acc === "number") && Number.isSafeInteger(acc) )
+      {
+        // Numeric accessor means an index, only supported by array traversal.
+        if ( ! Array.isArray(current) )
+        {
+          // Semantic error, actually, but resolved as 'not found' without raising error.
+          current = null;
+        }
+        else
+        {
+          current = (
+            ( ( acc >= 0 ) && ( acc < current.length ) )
+            ? current[acc]
+            : null
+          );
+        }
+      }
+      else
+      {
+        throw new EvaluationError(
+          `Parser error: unsupported kind of accessor '${(typeof acc)}'.`
+        );
+      }
+    }
+    return current;
+  }
 }
 
 /* ------------------------------------------------------------------ */

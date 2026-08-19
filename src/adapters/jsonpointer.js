@@ -160,7 +160,7 @@ export async function createJsonPointerAdapter() {
 
   /**
    * @constant
-   * @type {@link module:jm2mp/adapters/registry.QueryAdapter}
+   * @type {module:jm2mp/adapters/registry.QueryAdapter}
    * @description
    * The newly created
    * [QueryAdapter]{@link module:jm2mp/adapters/registry.QueryAdapter}

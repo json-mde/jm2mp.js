@@ -22,7 +22,7 @@ complete transformations between JSON documents.
 
 The `native query language` features two syntactically different but
 semantically equivalent notations: one based on text strings and another
-based on JSON syntax.
+based on an structured JSON syntax.
 
 In addition, the `JM2MP.JS` library allows you to use several _external
 query languages_ by default (see
