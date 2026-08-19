@@ -273,12 +273,6 @@ function readNonNegativeInteger(input, start) {
   {
     end++;
   }
-  if (end === start)
-  {
-    throw new ParseError(
-      `Syntax error: missing digit at position '${start}' of input path '${input}'.`
-    );
-  }
   const value = Number(input.slice(start, end));
   return { value, length: end - start };
 }
@@ -303,6 +297,7 @@ function readNonNegativeInteger(input, start) {
 function readQuotedString(input, start) {
   if (input[start] !== '"')
   {
+    // Assert (argument validation, theoric but not possible).
     throw new ParseError(`Syntax error: expected '"' at position '${start}' of input path '${input}'.`);
   }
   else
@@ -313,11 +308,11 @@ function readQuotedString(input, start) {
     /** @type {boolean} */
     let found = false ;
     // It consumes characters until the end of the 'input' path.
-    let pos = start + 1;
-    while ( (!found) && (pos < input.length) )
+    let end = start + 1;
+    while ( (!found) && (end < input.length) )
     {
       // It inspects the current character.
-      const ch = input[pos];
+      const ch = input[end];
       if (ch === '"')
       {
         found = true ;
@@ -325,12 +320,12 @@ function readQuotedString(input, start) {
       else if (ch === "\\")
       {
         // Escaping characters like JSON.
-        pos++;
-        if (pos >= input.length)
+        end++;
+        if (end >= input.length)
         {
           throw new ParseError(`Syntax error: incomplete escape character at the end of input path '${input}'.`);
         }
-        const esc = input[pos];
+        const esc = input[end];
         switch (esc)
         {
           case '"':  value += '"';  break;
@@ -343,31 +338,31 @@ function readQuotedString(input, start) {
           case "t":  value += "\t"; break;
           case "u": {
             // Escape unicode \uXXXX.
-            if (pos + 4 >= input.length) {
-              throw new ParseError(`Syntax error: incomplete Unicode escape '\\uXXXX' at '${pos}' in input path '${input}'.`);
+            if (end + 4 >= input.length) {
+              throw new ParseError(`Syntax error: incomplete Unicode escape '\\uXXXX' at '${end}' in input path '${input}'.`);
             }
-            const hex = input.slice(pos + 1, pos + 5);
+            const hex = input.slice(end + 1, end + 5);
             if (!/^[0-9A-Fa-f]{4}$/.test(hex)) {
-              throw new ParseError(`Syntax error: invalid Unicode escape '\\uXXXX' at '${pos}' in pinput path '${input}'.`);
+              throw new ParseError(`Syntax error: invalid Unicode escape '\\uXXXX' at '${end}' in pinput path '${input}'.`);
             }
             value += String.fromCharCode(parseInt(hex, 16));
-            pos += 4;
+            end += 4;
             break;
           }
-          default: throw new ParseError(`Syntax error: unrecognized escape character '\\X' at '${pos}' of input path '${input}'.`);
+          default: throw new ParseError(`Syntax error: unrecognized escape character '\\X' at '${end}' of input path '${input}'.`);
         }
-        pos++;
+        end++;
       }
       else
       {
         value += ch;
-        pos++;
+        end++;
       }
     }
     // It returns the result found, or raises an exception otherwise.
     if (found)
     {
-      const result = { value, length: pos - start + 1 };
+      const result = { value, length: end - start + 1 };
       return result;
     }
     else

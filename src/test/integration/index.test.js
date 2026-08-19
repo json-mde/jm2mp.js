@@ -89,8 +89,8 @@ describe("Integration test: ./src/index.js", () => {
         maxModules: 10,
       }
     });
-    console.log('source_document',source_document);
-    console.log('r',r);
+    //// console.log('source_document',source_document);
+    //// console.log('r',r);
     assert.notStrictEqual(r, null, "r === null");
     assert.deepStrictEqual(r, source_document.SubRootObject, "r === source_document.SubRootObject");
   });

@@ -135,6 +135,18 @@ describe("parsePath: accesores por corchetes", () => {
   it("rechaza escape no reconocido", () => {
     assert.throws(() => parsePath('$["\\q"]'), ParseError);
   });
+
+  it("rechaza números no naturales", () => {
+    assert.throws(()=> parsePath('$[-1]'), ParseError);
+  });
+
+  it("rechaza escapes no terminados", () => {
+    assert.throws(()=> parsePath('$["\\'), ParseError);
+  });
+
+  it("rechaza escapes unicode sin terminar", () => {
+    assert.throws(()=> parsePath('$["\\u12'), ParseError);
+  });
 });
 
 describe("parsePath: combinaciones", () => {
@@ -209,4 +221,9 @@ describe("navigate: navegación absorbente", () => {
   it("rechaza índice negativo (fuera de rango)", () => {
     assert.equal(navigate([1, 2, 3], [-1]), null);
   });
+
+  it("Throws ParseError when accessors are not an array", () => {
+    assert.throws(() => navigate(null, null), ParseError);
+  });
+
 });
