@@ -28,7 +28,7 @@ import { parsePath } from "./adapters/native-paths.js";
  */
 const KNOWN_OPS = new Set([
   // Núcleo
-  "pipe", "get", "if", "fold", "foldObj", "cons", "insert", "let", "call",
+  "pipe", "get", "if", "foldArr", "foldObj", "cons", "insert", "let", "call",
   "eq", "lt", "gt", "lte", "gte", "neq", "not", "and", "or",
   "add", "sub", "mul", "div", "mod", "neg", "abs",
   "concat", "length", "substring", "upper", "lower",

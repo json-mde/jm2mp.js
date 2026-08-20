@@ -100,7 +100,7 @@ describe("Integration test: native syntax", () => {
 
 /* ------------------------------------------------------------------ */
 
-  it("Clone just root sub-object.", async () => {
+  it("Clone just root sub-object (string).", async () => {
     const root_projection = {
       "$": { "$op":"get", "$path":"$.SubRootObject" }
     };
@@ -116,7 +116,23 @@ describe("Integration test: native syntax", () => {
 
 /* ------------------------------------------------------------------ */
 
-  it("It gets an inner property.", async () => {
+  it("Clone just root sub-object (array).", async () => {
+    const root_projection = {
+      "$": { "$op":"get", "$path":['SubRootObject'] }
+    };
+    const string_loader = JM2MP.createStringLoader({"$":JSON.stringify(root_projection)});
+    const resultant_document = await JM2MP.project({
+      rootName: "$",
+      loader: string_loader,
+      document: source_document
+    });
+    assert.notStrictEqual(resultant_document, null);
+    assert.deepStrictEqual(resultant_document, source_document.SubRootObject);
+  });
+
+/* ------------------------------------------------------------------ */
+
+  it("It gets an inner property (string).", async () => {
     const root_projection = {
       "$": { "$op":"get", "$path":"$.SubRootObject.RealProperty" }
     };
@@ -132,7 +148,7 @@ describe("Integration test: native syntax", () => {
 
 /* ------------------------------------------------------------------ */
 
-  it("It gets an inner property.", async () => {
+  it("It gets an inner property (array).", async () => {
     const root_projection = {
       "$": { "$op":"get", "$path":['SubRootObject','RealProperty'] }
     };

@@ -19,7 +19,7 @@
  */
 
 /**
- * @module jm2mp/test/unit/adapter/adapter_contract_v2
+ * @module jm2mp/test/unit/adapter/adapter_contract
  * @description
  * Tests de contrato que TODOS los adaptadores deben pasar.
 **/

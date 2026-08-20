@@ -70,7 +70,11 @@ export function createNativeAdapter()
      * It statically validates a native '$path'.
      * It accepts both syntaxes: text string (parsed using EBNF) and an
      * array of accesors (with every item be a string or natural number).
-     * @param {string|Array<string|number>} path The native path to validate.
+     * @param {string|Array<string|number>} path
+     * The native path to validate.
+     * @throws {ValidationError}
+     * - Whenever {@link parsePath} throwns a ParseError, it is wrapped as `cause` into a new {@link ValidationError}.
+     * - Whenever `path` were ill-formed.
      */
     async validate(path) {
       if ((typeof path) === "string") {
@@ -130,6 +134,15 @@ export function createNativeAdapter()
      * root, '@' for current context, and '%' for aliases. In this case,
      * `from` clause is ignored because `path` already defines it own
      * starting point.
+     *
+     * @param {*} path
+     * The path to evaluate.
+     * @param {*} input
+     * The input where evaluate 'path'.
+     * @param {*} cache
+     * The cache for native query expressions to test 'path'.
+     * @param {*} env
+     * The execution environment where evaluate 'path'.
     **/
     async evaluate(path, input, cache, env) {
       /** @type {*} */

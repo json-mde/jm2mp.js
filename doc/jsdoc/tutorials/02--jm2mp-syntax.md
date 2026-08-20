@@ -396,6 +396,15 @@ As part of any _named template_, you can use the _template commands_
 obtain a new _execution environment_ to work with (because, remember,
 they are immutable).
 
+In its current version, `JM2MP.JS` will only allow access to the
+_execution environment_ using these prefixes for the
+[textual variant](./tutorial-03--nql-syntax.html#textual-string-variant)
+of the [native query language](#native). Thanks to the definition of the
+[QueryAdapter interface](./module-jm2mp_adapters_registry.html#.QueryAdapter),
+any implementation could propose minor modifications to its represented
+_external query language_ to allow it to access to this _execution
+environment_ as well.
+
 #### let
 
 The `let` _template command_ is used to create new _alias bindings_.
@@ -730,7 +739,7 @@ The `foldArr` _projection_ changes the _context_ in every `step`
 evaluation, considering the following object as its _current context_:
 
 ```JavaScript
-const current_step_context = {
+const foldArr_step_context = {
   // The current item from OVER array.
   /** @type {*} */ item: over[i],
   // The current value of the accumulator.
@@ -810,7 +819,7 @@ The `foldObj` _projection_ changes the _context_ in every `step`
 evaluation, considering the following object as its _current context_:
 
 ```JavaScript
-const current_step_context = {
+const foldObj_step_context = {
   // The current property's name from OVER object.
   /** @type {string} */ key,
   // The current property's value from OVER object.

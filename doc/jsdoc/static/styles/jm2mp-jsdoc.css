@@ -87,6 +87,10 @@
             content: counter(counter-h2,decimal) "." counter(counter-h3,decimal) "." counter(counter-h4,decimal) "." counter(counter-h5,decimal) "." counter(counter-h6,decimal) ".- ";
         }
 
+    } /* .tutorial */
+
+    pre.source + pre.source {
+        margin-top : 1.5em ;
     }
 
 }
@@ -106,6 +110,38 @@
 
     span.external {
         color : Silver !important ;
+    }
+
+    pre.source {
+        border-radius: 25px ;
+        box-shadow:    0px 0px 10px 1px rgb(0 80 0 / 0.5) ;
+    }
+
+}
+
+/* ------------------------------------------------------------------ */
+
+@media print {
+
+    body header.layout-header {
+        display: none;
+    }
+
+    body main.layout-main {
+        margin:   0px ;
+        padding:  0px ;
+        width:   100% ;
+    }
+
+    body footer.layout-footer {
+        margin: 5em 0em 0em 0em ;
+        padding: 0px ;
+        width: 100% ;
+    }
+
+    pre.source {
+        border: 1px solid rgb(0 80 0 / 0.25) ;
+        border-radius: 10px ;
     }
 
 }
