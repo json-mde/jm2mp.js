@@ -48,9 +48,11 @@ function runContractTests(syntaxName, createAdapter, pathSelector, contractOptio
   const { unwrapsSingleMatch = true } = contractOptions;
 
   describe(`Contrato del adaptador: ${syntaxName}`, () => {
+
     let adapter;
 
-    it("se construye correctamente", async () => {
+      // Inicialización antes de los tests.
+      it("se construye correctamente", async () => {
       adapter = await createAdapter();
       assert.equal(adapter.name, syntaxName);
       assert.equal(typeof adapter.evaluate, "function");
@@ -88,9 +90,9 @@ function runContractTests(syntaxName, createAdapter, pathSelector, contractOptio
     }
 
     if (pathSelector.missingField) {
-      it("acceso a campo inexistente devuelve null", async () => {
+      it("acceso a un campo inexistente devuelve null", async () => {
         const cache = new Map();
-        const input = { otro: 1 };
+        const input = { otro: 24 };
         const env = { ctx: input, root: input, aliases: {} };
         const result = await adapter.evaluate(
           pathSelector.missingField,
@@ -114,12 +116,50 @@ function runContractTests(syntaxName, createAdapter, pathSelector, contractOptio
       assert.equal(result, null);
     });
 
+    it("input undefined devuelve null sin invocar la librería", async () => {
+      const cache = new Map();
+      const env = { ctx: null, root: null, aliases: {} };
+      // Usamos cualquier path "razonable" para esta sintaxis: si no
+      // existe simpleField, no podemos llamar; pero en la práctica todos
+      // los selectores definen al menos uno.
+      const path = pathSelector.simpleField ?? pathSelector.missingField;
+      if (!path) return;
+      const result = await adapter.evaluate(path, undefined, cache, env);
+      assert.equal(result, null);
+    });
+
     if (pathSelector.invalidExpression) {
       it("expresión inválida es rechazada en validate()", async () => {
         await assert.rejects(adapter.validate(pathSelector.invalidExpression));
       });
     }
+
+    it("expone fallbackPolicy con campos documentados", () => {
+      const policy = adapter.fallbackPolicy;
+      assert.equal(typeof policy.missing, "string");
+      assert.equal(typeof policy.typeError, "string");
+      assert.equal(typeof policy.nullInput, "string");
+    });
+
+    it("evaluate y validate son asíncronos (devuelven Promise)", async () => {
+      if (pathSelector.simpleField) {
+        const cache = new Map();
+        const input = { campo: 1 };
+        const env = { ctx: input, root: input, aliases: {} };
+        const evalResult = adapter.evaluate(pathSelector.simpleField, input, cache, env);
+        assert.ok(evalResult && typeof evalResult.then === "function",
+          "adapter.evaluate debe devolver Promise");
+        await evalResult;
+
+        const validateResult = adapter.validate(pathSelector.simpleField);
+        assert.ok(validateResult && typeof validateResult.then === "function",
+          "adapter.validate debe devolver Promise");
+        await validateResult;
+      }
+    });
+
   });
+
 }
 
 
@@ -135,6 +175,7 @@ runContractTests("native", async () => createNativeAdapter(), {
 
 // Test extra específico del nativo: acceso a array por índice.
 describe("Contrato extra del nativo: $path como array", () => {
+
   it("array de accesores funciona como string equivalente", async () => {
     const adapter = createNativeAdapter();
     const cache = new Map();
@@ -142,8 +183,41 @@ describe("Contrato extra del nativo: $path como array", () => {
     const result = await adapter.evaluate(["a", "b", 1], env.ctx, cache, env);
     assert.equal(result, 20);
   });
-});
 
+  it("array vacío de accesores devuelve el input", async () => {
+    const adapter = createNativeAdapter();
+    const cache = new Map();
+    const env = { ctx: null, root: null, aliases: {} };
+    const input = { a: 1 };
+    const result = await adapter.evaluate([], input, cache, env);
+    assert.deepEqual(result, input);
+  });
+
+  it("validate acepta $path string", async () => {
+    const adapter = createNativeAdapter();
+    await adapter.validate("$.a.b");
+    await adapter.validate("@.x");
+    await adapter.validate("%alias");
+  });
+
+  it("validate acepta $path array bien formado", async () => {
+    const adapter = createNativeAdapter();
+    await adapter.validate(["a", 0, "b"]);
+    await adapter.validate([]);
+  });
+
+  it("validate rechaza $path con segmento inválido", async () => {
+    const adapter = createNativeAdapter();
+    await assert.rejects(adapter.validate(["a", true]), /Error/);
+  });
+
+  it("validate rechaza $path de tipo no soportado", async () => {
+    const adapter = createNativeAdapter();
+    await assert.rejects(adapter.validate(42), /Error/);
+    await assert.rejects(adapter.validate(null), /Error/);
+  });
+
+});  // describe
 
 // ============================================================================
 // Adaptador JSONPath (si jsonpath-plus está instalado).

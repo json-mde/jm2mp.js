@@ -4,6 +4,12 @@
  * @license BSD-3-Clause
  * @file
  * Tests específicos del adaptador JSON Query.
+**/
+
+/**
+ * @module jm2mp/test/unit/adapter/jsonquery
+ * @description
+ * Tests específicos del adaptador JSON Query.
  *
  * Estos tests son COMPLEMENTARIOS al de contrato
  * (test/contract/adapter-contract.test.js): cubren detalles propios de
@@ -22,12 +28,6 @@
  *   - Forma del adaptador: name, description, fallbackPolicy.
  *
  * Se saltan automáticamente si 'jsonquery' no está instalada.
- */
-
-/**
- * @module jm2mp/test/unit/adapter/jsonquery
- * @description
- * Tests específicos del adaptador JSON Query.
 **/
 
 /* ------------------------------------------------------------------ */
@@ -35,7 +35,7 @@
 
 import { describe, it } from "node:test";
 import { strict as assert } from "node:assert";
-import { ValidationError, EvaluationError } from "../../../errors.js";
+import { ValidationError } from "../../../errors.js";
 import { isModuleAvailable } from "../../../modules/helpers.js";
 
 /* ------------------------------------------------------------------ */
@@ -50,19 +50,33 @@ if (jsonquery_is_available)
 
   describe("Integration tests for 'JSON Query':", () => {
 
-    it("It rejects null path.", async () => {
+    it("Validate: it rejects null path.", async () => {
       const a = await createJsonQueryAdapter();
       assert.rejects(a.validate(null), ValidationError);
     });
 
-    it("It rejects empty-string path.", async () => {
+    it("Validate: it rejects empty-string path.", async () => {
       const a = await createJsonQueryAdapter();
       assert.rejects(a.validate(""), ValidationError);
     });
 
-    it("It accepts empty array path.", async () => {
+    it("Validate: it accepts empty array path.", async () => {
       const a = await createJsonQueryAdapter();
       assert.doesNotReject(a.validate([]));
+    });
+
+    it("Evaluate: it accepts empty input.", async () => {
+      const a = await createJsonQueryAdapter();
+      assert.strictEqual(await a.evaluate(null, null, null, null), null);
+    });
+
+    it("Evaluate: It accepts empty array path.", async () => {
+      const a = await createJsonQueryAdapter();
+      const path = ".Rp";
+      const input = {Rp:"Rv"};
+      const cache = new Map();
+      const _env = null;
+      assert.strictEqual(await a.evaluate(path, input, cache, _env), "Rv");
     });
 
   });

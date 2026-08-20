@@ -144,8 +144,11 @@ function runContractTests(syntaxName, createAdapter, pathSelector) {
         await validateResult;
       }
     });
+
   });
+
 }
+
 
 // ============================================================================
 // Adaptador nativo (siempre disponible).
@@ -159,6 +162,7 @@ runContractTests("native", async () => createNativeAdapter(), {
 
 // Test extra específico del nativo: acceso a array por índice.
 describe("Contrato extra del nativo: $path como array", () => {
+
   it("array de accesores funciona como string equivalente", async () => {
     const adapter = createNativeAdapter();
     const cache = new Map();
@@ -204,7 +208,7 @@ describe("Contrato extra del nativo: $path como array", () => {
     await assert.rejects(adapter.validate(42), /Error/);
     await assert.rejects(adapter.validate(null), /Error/);
   });
-});
+});  // describe
 
 // ============================================================================
 // Adaptador JSONPath (si jsonpath-plus está instalado).
@@ -224,6 +228,7 @@ if (jsonpathAvailable) {
     it("se omite porque jsonpath-plus no está instalado", { skip: true }, () => {});
   });
 }
+
 
 // ============================================================================
 // Adaptador JSONata (si jsonata está instalado).
@@ -263,6 +268,7 @@ if (jsonataAvailable) {
     it("se omite porque jsonata no está instalado", { skip: true }, () => {});
   });
 }
+
 
 // ============================================================================
 // Adaptador JSON Query (si la librería está instalada).

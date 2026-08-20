@@ -158,9 +158,14 @@ export async function createJsonQueryAdapter()
      * The `JSONQuery` library operates synchronously; `JM2MP.JS` wraps
      * the signature in `async` to comply with the uniform registry
      * contract (just like the rest of adapters).
-     * 
+     *
+     * @param {*} path
+     * The JSON Query path.
+     * @param {*} input
+     * The input used instead of execution environment.
+     * @param {*} cache
      * It caches parsed query only when `$path` is a `string`.
-     * 
+     * @param {*} _env
      * The `env` parameter is ignored: `JSONQuery` does not support
      * lexical _aliases_ and does not distinguish between roots and
      * contexts, other than just the input; so the expression is always
