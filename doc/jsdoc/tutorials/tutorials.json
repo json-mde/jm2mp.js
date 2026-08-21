@@ -9,18 +9,7 @@
         "title" : "Native Query Language"
     },
     "04--examples" : {
-        "title" : "Examples",
-        "children": {
-            "04.01--examples--first-user": {
-                "title":"First User Example"
-            },
-            "04.02--examples--alumni": {
-                "title":"Alumni"
-            },
-            "04.03--examples--inventory": {
-                "title":"Inventory"
-            }
-        }
+        "title" : "Examples"
     },
     "05--how-to-project-other-formats" : {
         "title" : "How to Project Other Usual Document Formats"

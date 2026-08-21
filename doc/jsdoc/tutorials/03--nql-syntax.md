@@ -5,7 +5,9 @@
 - [JSON Variant](#json-version)
 - [Textual String Variant](#textual-string-variant)
 - [Combining Operations](#combining-operations)
-  - [Pipelining filters and aggregations (map and reduce)](#pipelining-filters-and-aggregations-map-and-reduce)
+  - [Filtering](#filtering)
+  - [Aggregation](#aggregation)
+  - [Composition](#composition)
 
 
 ## Introduction
@@ -281,17 +283,16 @@ written using textual string variant:
 "B"
 ```
 
-## Combining operations
+## Combining Operations
 
-To fully understand the power and versatility of `JM2MP`, it is helpful
-to show some examples of how, when combined with the `native` _query
-language_, it is possible to perform and link common data processing
-operations such as _filtering_ (_map_) and _aggregating_ (_reduce_)
-information.
+To fully understand the potential and versatility of `JM2MP`, it is
+helpful to show some examples of how, by combining it with the `native`
+_query language_ (but also with any other equally capable language), it
+is possible to perform and link common data processing operations, such
+as _compose_ (_pipe_), _filter_ (_map_) and _aggregate_ (_reduce_) data.
 
-### Pipelining filters and aggregations (map and reduce)
-
-Considering the following _source document_:
+For all the examples presented below, we will always consider the
+following _source document_:
 
 ```JSON
 {
@@ -306,19 +307,28 @@ Considering the following _source document_:
 }
 ```
 
+To embed _comments_ within JSON values, all `JM2MP` _projection
+documents_ that are displayed will use the
+[JSONC](./tutorial-05--how-to-project-other-formats.html#jsonc) format;
+simply remove those comments to obtain fully compliant JSON documents.
+
+
+### Filtering
+
 A typical filter operation to get only records with a value less than or
 equal to 6 should be like this:
 
 ```JavaScript
+// https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/filter
 const expected_document = {
   Name: source_document.Name,
-  Records: source_document.Records.filter( (i) => (i.Value <= 6) )
+  Records: source_document.Records
+                          .filter( (i) => (i.Value <= 6) )
 };
 ```
 
-Its equivalent `JM2MP` _projection document_ (well... written in
-[JSONC](./tutorial-05--how-to-project-other-formats.html#jsonc)
-or previously removing all the comments) would be:
+where its equivalent `JM2MP` _projection document_ would be (using the
+appropriate _template command_ [foldArr](./tutorial-02--jm2mp-syntax.html#foldarr)):
 
 ```JSON
 {
@@ -330,9 +340,13 @@ or previously removing all the comments) would be:
     // filtering using a condition.
     "Records":
       { "$op" : "foldArr",
-         // Array to iterate over; remember: FoldArr is a right-to-left operation.
+        // Array to iterate over; remember that 'foldArr'
+        // is a from-right-to-left operation.
         "$over": { "$op":"get", "$path":"@.Records" },
-        // Initial array, empty array as neutral element.
+        // The initial value defines the data type of the result;
+        // in this case it will be an array.
+        // An the initial value is the empty array because it
+        // serves as the neutral element of array concatenation.
         "$init": [],
         // Step function, which actually is the filter.
         "$step": {
@@ -359,5 +373,156 @@ or previously removing all the comments) would be:
 }
 ```
 
+### Aggregation
 
+Then, we can include the _aggregation_ operation (sometimes called
+_reduce_ or _fold_) using the appropriate _template commands_
+[if](./tutorial-02--jm2mp-syntax.html#if) and
+[add](./tutorial-02--jm2mp-syntax.html#foldarr):
+
+```JSON
+{
+  // The root template, always mandatory!
+  "$": {
+    // Literal property name, which copies its property name.
+    "Name": { "$op":"get", "$path":"@.Name" },
+    // Literal property name, which iterates each item (foldArr)
+    // filtering using a condition... and then aggregates them all
+    // (reducing them to just a number).
+    "SumOfRecordValues":
+      { "$op" : "foldArr",
+         // Array to iterate over; remember that 'foldArr'
+         // is a from-right-to-left operation.
+        "$over": { "$op":"get", "$path":"@.Records" },
+        // Because the final result will be a number, we need the
+        // neutral element for the addition of numbers, that is, zero.
+        "$init": 0 ,
+        "$step": {
+          // In this case, we are composing two operations: 'if'
+          // and 'add'; this way, we are making just one pass.
+          "$op": "if",
+          // First, we filter: value <= 6.
+          "$cond":
+            { "$op"    : "gt",
+              "$left"  : { "$op":"get", "$path":"@.item.Value"},
+              "$right" : 6 },
+          // Second, but at the same time, we aggregate
+          // the value from the filtered items.
+          "$then":
+            { "$op"    : "add",
+              "$left"  : { "$op":"get", "$path":"@.item.Value" },
+              "$right" : { "$op":"get", "$path":"@.acc" } },
+          "$else":
+            { "$op":"get", "$path":"@.acc" }
+        }
+    }
+  }
+}
+```
+
+The JavaScript code equivalent to filtering all records whose value is
+strictly greater than 6 and then adding all their values to return a
+single aggregate result would be as follows:
+
+```JavaScript
+// The algorithm actually defined using JM2MP that
+// requires only a single pass.
+const expected_document = {
+  Name: source_document.Name,
+  SumOfRecordValues: source_document
+                     .Records
+                     .reduceRight( (acc, i)=>( (i.Value > 6)
+                                               ? (acc + i.Value)
+                                               : acc ),
+                                   0 ) 
+};
+// https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/reduceRight
+```
+
+### Composition
+
+However, another way to _compose_ (combine) _filtering_ and _aggregation_
+operations (although potentially less efficient, since each operation
+requires its own pass over the results) could be as follows:
+
+```JavaScript
+// Another similar algorithm, but it requires two passes:
+// filtering and reduction.
+const expected_document_two_passes = {
+  Name: source_document.Name,
+  SumOfRecordValues: source_document
+                     .Records
+                     .filter( (i)=>(i.Value > 6) )
+                     .reduceRight( (acc, i)=>(acc + i.Value),
+                                   0 )
+};
+```
+
+which `JM2MP` equivalence involves the use of the
+[pipe](./tutorial-02--jm2mp-syntax.html#pipe) _template command_:
+
+```JSON
+{
+  // The root template, always mandatory!
+  "$": {
+    // Literal property name, which copies its property name.
+    "Name": { "$op":"get", "$path":"@.Name" },
+    // Literal property name for the final combined result (pipe).
+    "SumOfRecordValues": {
+      "$op" : "pipe",
+      "$stages" : [
+        // First stage: filtering (i-th.Value > 6).
+        {
+          "$op" : "foldArr",
+          "$over": { "$op":"get", "$path":"@.Records" },
+          // The resultant JSON value from
+          // this stage will be an array.
+          "$init": [],
+          "$step": {
+            // Actual filter.
+            "$op": "if",
+            "$cond": {
+              "$op"    : "gt",
+              "$left"  : { "$op":"get", "$path":"@.item.Value"},
+              "$right" : 6
+            },
+            // Preliminary results.
+            "$then": {
+              "$op" : "cons",
+              "$head" : { "$op":"get", "$path":"@.item" },
+              "$tail" : { "$op":"get", "$path":"@.acc"  }
+            },
+            "$else": {
+              "$op":"get", "$path":"@.acc"
+            }
+          }
+        },
+        // Second stage: aggregation (0 + acc + i-th.Value).
+        {
+          "$op" : "foldArr",
+          // Its input will be the output from the previous stage;
+          // that is, the current context.
+          "$over": { "$op":"get", "$path":"@" },
+          "$init": 0,
+          "$step": {
+            "$op": "if",
+            "$cond": {
+              "$op"    : "gt",
+              "$left"  : { "$op":"get", "$path":"@.item.Value"},
+              "$right" : 6
+            },
+            "$then": {
+              "$op" : "add",
+              "$left" : { "$op":"get", "$path":"@.item.Value" },
+              "$right" : { "$op":"get", "$path":"@.acc" }
+            },
+            "$else":
+              { "$op":"get", "$path":"@.acc" }
+          }
+        }
+      ]
+    }
+  }
+}
+```
 

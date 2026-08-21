@@ -237,7 +237,55 @@ describe("Integration test: courses per student", () => {
         }
       }));
 
+    // Actual projection's resultant document.
     const resultant_document = await evaluate(projection_module, source_document, { registry });
+    // Manually calculated projection's result.
+    const all_enrollments =
+      Object.entries(source_document.courses)
+            .map( ([course_name,course_info]) => (
+                    course_info.enrollments
+                               .map( (enrollment)=>({
+                                       course:course_name,
+                                       title:course_info.title,
+                                       credits:course_info.credits,
+                                       student:enrollment.student,
+                                       grade:enrollment.grade
+                                     }) )
+                  )
+            )
+            .flat();
+    const expected_resultant_document = {
+      university: source_document.university,
+      period: source_document.period,
+      students: {},
+    };
+    all_enrollments.forEach( (enrollment) => {
+      if (!Object.hasOwn(expected_resultant_document.students, enrollment.student)) {
+        expected_resultant_document.students[enrollment.student] = {
+          /** @type {number} */ passing_credits: 0,
+          /** @type {number} */ sum_of_grades: 0,
+          /** @type {number} */ enrolled_courses: 0,
+          /** @type {number} */ average_grade: 0
+        };
+      }
+      if ( enrollment.grade >= source_document.passing_grade) {
+        expected_resultant_document.students[enrollment.student].passing_credits += enrollment.credits;
+      }
+      if ( enrollment.grade ) {
+        expected_resultant_document.students[enrollment.student].sum_of_grades += enrollment.grade;
+        expected_resultant_document.students[enrollment.student].enrolled_courses += 1;
+      }
+    });
+    Object.keys(expected_resultant_document.students).forEach( (student) => {
+      const current_student = expected_resultant_document.students[student];
+      if ( current_student.enrolled_courses > 0 ) {
+        current_student.average_grade = ( current_student.sum_of_grades / current_student.enrolled_courses ) ;
+      }
+    });
+    //// console.log('resultant_document',resultant_document);
+    //// console.log('all_enrollments',all_enrollments);
+    //// console.log('expected_resultant_document',expected_resultant_document);
+    assert.deepStrictEqual(resultant_document,expected_resultant_document);
 
     assert.equal(resultant_document.university, "Universidad Nacional de Educación a Distancia (U.N.E.D.)");
     assert.equal(resultant_document.period, "2026-Q1");

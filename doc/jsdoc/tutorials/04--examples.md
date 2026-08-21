@@ -1,24 +1,375 @@
+## Table of Contents
+
+- [Introduction](#introduction)
+- [Courses and Students](#courses-and-studentss)
+  - [Source Document](#source-document)
+  - [Projection Document](#projection-document)
+  - [Resultant Document](#resultant-document)
+- [Inventory Management](#inventory-management)
+  - [Source Document](#source-document-1)
+  - [Projection Document](#projection-document-1)
+  - [Resultant Document](#resultant-document-1)
+
+
 ## Introduction
 
+Apart from the simple examples described in the
+[Combining Operations](./tutorial-03--nql-syntax.html#combining-operations)
+section from the
+[Native Query Language](./tutorial-03--nql-syntax.html)
+tutorial, here we will present to more complex examples:
+[Courses and Students](#courses-and-students) and
+[Inventory Management](#inventory-management).
+
+
+## Courses and Students
+
+This example of _courses and students_ shows how to generate a report
+that displays, for each student, their aggregated results over a
+specific time period, based on the enrollment data for each course.
+
+The equivalent in a database environment would be an SQL query similar
+to:
+
+```SQL
+SELECT
+  S.Name AS "student",
+  SUM( CASE ( E.Grade >= Passing_Grade )
+            THEN C.Credits
+            ELSE 0.00
+            END ) AS "passing_credits",
+  SUM( E.Grade ) AS "sum_of_grades",
+  COUNT( DISTINCT E.Id ) AS "enrolled_courses",
+  AVG( E.Grade ) AS "average_grade"
+FROM
+  Students AS S
+  INNER JOIN
+  Enrollments AS E
+  ON ( S.Id = E.Student_Id )
+  INNER JOIN
+  Courses AS C
+  ON ( E.Course_Id = C.Id )
+WHERE
+  ( University = 'Universidad Nacional de Educación a Distancia (U.N.E.D.)' )
+  AND
+  ( Period = '2026-Q1' )
+  AND
+  ( E.Grade IS NOT NULL )
+GROUP BY
+  S.Name
+ORDER BY
+  S.Name ASC
+```
+
+Using a JavaScript _script_, its source code should be like:
+
+```JavaScript
+const all_enrollments =
+    Object.entries(source_document.courses)
+        .map( ([course_name,course_info]) => (
+                course_info.enrollments
+                            .map( (enrollment)=>({
+                                    course:course_name,
+                                    title:course_info.title,
+                                    credits:course_info.credits,
+                                    student:enrollment.student,
+                                    grade:enrollment.grade
+                                    }) )
+                )
+        )
+        .flat();
+const expected_resultant_document = {
+    university: source_document.university,
+    period: source_document.period,
+    students: {},
+};
+all_enrollments.forEach( (enrollment) =>
+{
+  if (!Object.hasOwn(expected_resultant_document.students, enrollment.student))
+  {
+    expected_resultant_document.students[enrollment.student] = {
+        passing_credits: 0,
+        sum_of_grades: 0,
+        enrolled_courses: 0,
+        average_grade: 0
+    };
+  }
+  if ( enrollment.grade >= source_document.passing_grade) {
+    expected_resultant_document.students[enrollment.student].passing_credits += enrollment.credits;
+  }
+  if ( enrollment.grade ) {
+    expected_resultant_document.students[enrollment.student].sum_of_grades += enrollment.grade;
+    expected_resultant_document.students[enrollment.student].enrolled_courses += 1;
+  }
+});
+Object.keys(expected_resultant_document.students).forEach( (student) =>
+{
+  const current_student = expected_resultant_document.students[student];
+  if ( current_student.enrolled_courses > 0 ) {
+    current_student.average_grade = ( current_student.sum_of_grades / current_student.enrolled_courses ) ;
+  }
+});
+```
+
+### Source Document
+
+```JSON
+{
+  "university": "Universidad Nacional de Educación a Distancia (U.N.E.D.)",
+  "period": "2026-Q1",
+  "passing_grade": 5.0,
+  "courses": {
+    "ALG-101": {
+      "title": "Linear Algebra",
+      "credits": 4,
+      "enrollments": [
+        { "student": "Luis María",   "grade": 7.5 },
+        { "student": "Inés",         "grade": 4.0 },
+        { "student": "Elena",        "grade": 8.5 },
+        { "student": "José Antonio", "grade": null }
+      ]
+    },
+    "PROG-201": {
+      "title": "Functional Programming",
+      "credits": 6,
+      "enrollments": [
+        { "student": "Luis María",   "grade": 9.0 },
+        { "student": "Elena",        "grade": 6.5 },
+        { "student": "José Antonio", "grade": 5.5 }
+      ]
+    },
+    "BD-301": {
+      "title": "Databases",
+      "credits": 9,
+      "enrollments": [
+        { "student": "Inés",         "grade": 7.0 },
+        { "student": "Elena",        "grade": 3.0 },
+        { "student": "José Antonio", "grade": 8.0 }
+      ]
+    }
+  }
+}
+```
+
+### Projection Document
+
+```JSON
+{
+  // The $schema and $options metadata.
+  "$schema": "https://json-mde.tech/schemas/jm2mp/",
+  "$options": {
+    "$version": "1.0",
+    "$default-query-language": "native",
+    "annotations": "Projection document for 'courses and students' example."
+  },
+  // The root template.
+  "$": {
+    // Literal property: copy its value as is.
+    "university": { "$op": "get", "$path": "$.university" },
+    // Literal property: copy its value as is.
+    "period": { "$op": "get", "$path": "$.period" },
+    // Literal property: create the name but project its values (foldObj).
+    "students": {
+      // Second pass: calculate aggregated marks
+      // for each student using first pass result.
+      "$op": "foldObj",
+      "$over": {
+        // First pass: gets courses and enrollments for each student.
+        "$op": "foldObj",
+        "$over": { "$op": "get", "$path": "$.courses" },  // Starting at root context.
+        "$init": {},  // Empty object as neutral element; see insert in step.
+        "$step": {
+          // It gets the credits for each course using an alias.
+          "$op": "let",
+          "$bindings": {
+            "credits": { "$op": "get", "$path": "@.value.credits" }
+          },
+          "$in": {
+            // It iterates for each courses' enrollments.
+            "$op": "foldArr",
+            "$over": { "$op": "get", "$path": "@.value.enrollments" },
+            "$init": { "$op": "get", "$path": "@.acc" },
+            "$step": {
+              // Null grades means that such enrollment is ignored.
+              "$op": "if",
+              "$cond": {
+                "$op": "eq",
+                "$left":  { "$op": "get", "$path": "@.item.grade" },
+                "$right": null
+              },
+              "$then": { "$op": "get", "$path": "@.acc" },
+              "$else": {
+                // Numeric grades means that such enrollment counts toward student's marks.
+                "$op": "let",
+                "$bindings": {
+                  "student": { "$op": "get", "$path": "@.item.student" },
+                  "grade":   { "$op": "get", "$path": "@.item.grade" },
+                  "accI":    { "$op": "get", "$path": "@.acc" }
+                },
+                "$in": {
+                  // Inner scope to accumulate (count and sum) by student's name,
+                  // outer scope for final statistics per student.
+                  "$op": "let",
+                  "$bindings": {
+                    "previous_step": {
+                      "$op": "lookup",
+                      "$key": { "$op": "get", "$path": "%student" },
+                      "$in":  { "$op": "get", "$path": "%accI" }
+                    }
+                  },
+                  "$in": {
+                    // Ad-hoc accumulator object for each student with three properties:
+                    // passing_credits, sum_of_grades, and enrolled_courses.
+                    // Each iteration's step accumulates its values.
+                    // Remember that {...{k:old},...{k:new}} => {...,k:new,...}
+                    "$op": "insert",
+                    "$key": { "$op": "get", "$path": "%student" },
+                    "$value": {
+                      // %accI[%student].passing_credits += (
+                      //   ( %accI[%student].grade ) >= $.passing_grade )
+                      //   ? %credits
+                      //   : 0 );
+                      "passing_credits": {
+                        "$op": "add",
+                        "$left": {
+                          "$op": "coalesce",
+                          "$value": {
+                            "$op": "lookup",
+                            "$key": "passing_credits",
+                            "$in": { "$op": "get", "$path": "%previous_step" }
+                          },
+                          "$default": 0
+                        },
+                        "$right": {
+                          "$op": "if",
+                          "$cond": {
+                            "$op": "gte",
+                            "$left":  { "$op": "get", "$path": "%grade" },
+                            "$right": { "$op": "get", "$path": "$.passing_grade" }
+                          },
+                          "$then": { "$op": "get", "$path": "%credits" },
+                          "$else": 0
+                        }
+                      },
+                      // %accI[%student].sum_of_grades +=
+                      //   ( %previous_step[%student].sum_of_grades ?? 0 ) ;
+                      "sum_of_grades": {
+                        "$op": "add",
+                        "$left": {
+                          "$op": "coalesce",
+                          "$value": {
+                            "$op": "lookup",
+                            "$key": "sum_of_grades",
+                            "$in":  { "$op": "get", "$path": "%previous_step" }
+                          },
+                          "$default": 0
+                        },
+                        "$right": { "$op": "get", "$path": "%grade" }
+                      },
+                      // %accI[%student].enrolled_courses +=
+                      //   ( %previous_step[%student].grade ? 1 : 0 );
+                      "enrolled_courses": {
+                        "$op": "add",
+                        "$left": {
+                          "$op": "coalesce",
+                          "$value": {
+                            "$op": "lookup",
+                            "$key": "enrolled_courses",
+                            "$in":  { "$op": "get", "$path": "%previous_step" }
+                          },
+                          "$default": 0
+                        },
+                        "$right": 1
+                      }
+                    },
+                    "$into": { "$op": "get", "$path": "%accI" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      // The final resultant value will be an object,
+      // initially empty as neutral element (foldObj), which
+      // keys will be the name of each student.
+      "$init": {},
+      // For each student of first pass, in this second pass
+      // we calculate the average marks.
+      "$step": {
+        // For each student from first pass,
+        // it calculates their average marks.
+        "$op": "insert",
+        "$key": { "$op": "get", "$path": "@.key" },
+        "$value": {
+          "passing_credits": { "$op": "get", "$path": "@.value.passing_credits" },
+          "sum_of_grades": { "$op": "get", "$path": "@.value.sum_of_grades" },
+          "enrolled_courses": { "$op": "get", "$path": "@.value.enrolled_courses" },
+          "average_grade": {
+            "$op": "div",
+            "$left":  { "$op": "get", "$path": "@.value.sum_of_grades" },
+            "$right": { "$op": "get", "$path": "@.value.enrolled_courses" }
+          }
+        },
+        "$into": { "$op": "get", "$path": "@.acc" }
+      }
+   }
+  }
+}
+```
+
+### Resultant Document
+
+```JSON
+{
+  "university": "Universidad Nacional de Educación a Distancia (U.N.E.D.)",
+  "period": "2026-Q1",
+  "students": {
+    "Elena": {
+      "passing_credits":  10,
+      "sum_of_grades":    18,
+      "enrolled_courses":  3,
+      "average_grade":     6
+    },
+    "Inés": {
+      "passing_credits":   9,
+      "sum_of_grades":    11,
+      "enrolled_courses":  2,
+      "average_grade":     5.5
+    },
+    "Luis María": {
+      "passing_credits":  10,
+      "sum_of_grades":    16.5,
+      "enrolled_courses":  2,
+      "average_grade":     8.25
+    },
+    "José Antonio": {
+      "passing_credits":  15,
+      "sum_of_grades":    13.5,
+      "enrolled_courses":  2,
+      "average_grade":     6.75
+    }
+  }
+}
+```
+
+
+## Inventory Management
+
 ...
 
-## Simple Examples
+### Source Document
 
-...
+```JSON
+```
 
-## Complex Examples
+### Projection Document
 
-...
+```JSON
+```
 
-### First User
+### Resultant Document
 
-...
-
-### Alumni
-
-...
-
-### Inventory
-
-...
+```JSON
+```
 

@@ -1825,7 +1825,7 @@ can be used to specifify the current version of `JM2MP` using
 
 ## Examples
 
-Please, refer to the [examples tutorial](./tutorial-03--examples.html)
-for various examples of how to use the `JM2MP` format to transform JSON
-documents.
+Please, refer to the [Native Query Language](./tutorial-03--nql-syntax.html#combining-operations)
+and [Examples](./tutorial-04--examples.html) tutorials, for various
+examples of how to use the `JM2MP` format to transform JSON documents.
 

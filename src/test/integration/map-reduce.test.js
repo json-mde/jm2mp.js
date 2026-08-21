@@ -84,6 +84,122 @@ describe("Integration test: map-reduce", () => {
   });
 
 /* ------------------------------------------------------------------ */
+
+  it("It sums every value greater than to 6.", async () => {
+    const projection_projection = {
+      "$": {
+        "Name": { "$op":"get", "$path":"@.Name" },
+        "SumOfRecordValues":
+          { "$op" : "foldArr",
+            "$over": { "$op":"get", "$path":"@.Records" },
+            "$init": 0 ,
+            "$step": {
+              "$op": "if",
+              "$cond":
+                { "$op"    : "gt",
+                  "$left"  : { "$op":"get", "$path":"@.item.Value"},
+                  "$right" : 6 },
+              "$then":
+                { "$op" : "add",
+                  "$left" : { "$op":"get", "$path":"@.item.Value" },
+                  "$right" : { "$op":"get", "$path":"@.acc" } },
+              "$else":
+                { "$op":"get", "$path":"@.acc" }
+            }
+        }
+      }
+    };
+    const string_loader = JM2MP.createStringLoader({"$":JSON.stringify(projection_projection)});
+    const resultant_document = await JM2MP.project({
+      rootName: "$",
+      loader: string_loader,
+      document: source_document
+    });
+    //// console.log('resultant_document',resultant_document);
+    assert.notStrictEqual(resultant_document, null, "resultant_document === null");
+    const expected_document = {
+      Name: source_document.Name,
+      SumOfRecordValues: source_document
+                         .Records
+                         .reduceRight( (acc, i)=>( (i.Value > 6)
+                                                        ? (acc + i.Value)
+                                                        : acc ),
+                                            0 ) } ;
+    assert.deepStrictEqual(resultant_document, expected_document, "resultant_document === expected_document");
+  });
+
+/* ------------------------------------------------------------------ */
+
+  it("It sums every value greater than to 6.", async () => {
+    const projection_projection = {
+      "$": {
+        "Name": { "$op":"get", "$path":"@.Name" },
+        "SumOfRecordValues": {
+          "$op" : "pipe",
+          "$stages" : [
+            {
+              "$op" : "foldArr",
+              "$over": { "$op":"get", "$path":"@.Records" },
+              "$init": [],
+              "$step": {
+                "$op": "if",
+                "$cond": {
+                  "$op"    : "gt",
+                  "$left"  : { "$op":"get", "$path":"@.item.Value"},
+                  "$right" : 6
+                },
+                "$then": {
+                  "$op" : "cons",
+                  "$head" : { "$op":"get", "$path":"@.item" },
+                  "$tail" : { "$op":"get", "$path":"@.acc"  }
+                },
+                "$else": {
+                  "$op":"get", "$path":"@.acc"
+                }
+              }
+            },
+            {
+              "$op" : "foldArr",
+              "$over": { "$op":"get", "$path":"@" },
+              "$init": 0,
+              "$step": {
+                "$op": "if",
+                "$cond": {
+                  "$op"    : "gt",
+                  "$left"  : { "$op":"get", "$path":"@.item.Value"},
+                  "$right" : 6
+                },
+                "$then": {
+                  "$op" : "add",
+                  "$left" : { "$op":"get", "$path":"@.item.Value" },
+                  "$right" : { "$op":"get", "$path":"@.acc" }
+                },
+                "$else":
+                  { "$op":"get", "$path":"@.acc" }
+              }
+            }
+          ]
+        }
+      }
+    };
+    const string_loader = JM2MP.createStringLoader({"$":JSON.stringify(projection_projection)});
+    const resultant_document = await JM2MP.project({
+      rootName: "$",
+      loader: string_loader,
+      document: source_document
+    });
+    //// console.log('resultant_document',resultant_document);
+    assert.notStrictEqual(resultant_document, null, "resultant_document === null");
+    const expected_document = {
+      Name: source_document.Name,
+      SumOfRecordValues: source_document
+                         .Records
+                         .filter( (i)=>(i.Value > 6) )
+                         .reduceRight( (acc, i)=>(acc + i.Value), 0 ) } ;
+    assert.deepStrictEqual(resultant_document, expected_document, "resultant_document === expected_document");
+  });
+
+/* ------------------------------------------------------------------ */
 /* ------------------------------------------------------------------ */
 
 });  // describe
