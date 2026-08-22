@@ -28,91 +28,9 @@ This example of _courses and students_ shows how to generate a report
 that displays, for each student, their aggregated results over a
 specific time period, based on the enrollment data for each course.
 
-This section of the tutorial is based on the integration test you found
-in file `${JM2MP.JS}/src/test/integration/courses-students.test.js`.
+This section of the tutorial is based on the integration test found in
+the file `${JM2MP.JS}/src/test/integration/courses-students.test.js`.
 
-The equivalent in a database environment would be an SQL query similar
-to:
-
-```SQL
-SELECT
-  S.Name AS "student",
-  SUM( CASE ( E.Grade >= Passing_Grade )
-            THEN C.Credits
-            ELSE 0.00
-            END ) AS "passing_credits",
-  SUM( E.Grade ) AS "sum_of_grades",
-  COUNT( DISTINCT E.Id ) AS "enrolled_courses",
-  AVG( E.Grade ) AS "average_grade"
-FROM
-  Students AS S
-  INNER JOIN
-  Enrollments AS E
-  ON ( S.Id = E.Student_Id )
-  INNER JOIN
-  Courses AS C
-  ON ( E.Course_Id = C.Id )
-WHERE
-  ( University = 'Universidad Nacional de Educación a Distancia (U.N.E.D.)' )
-  AND
-  ( Period = '2026-Q1' )
-  AND
-  ( E.Grade IS NOT NULL )
-GROUP BY
-  S.Name
-ORDER BY
-  S.Name ASC
-```
-
-Using a JavaScript _script_, its source code should be like:
-
-```JavaScript
-const all_enrollments =
-    Object.entries(source_document.courses)
-        .map( ([course_name,course_info]) => (
-                course_info.enrollments
-                            .map( (enrollment)=>({
-                                    course:course_name,
-                                    title:course_info.title,
-                                    credits:course_info.credits,
-                                    student:enrollment.student,
-                                    grade:enrollment.grade
-                                    }) )
-                )
-        )
-        .flat();
-const expected_resultant_document = {
-    university: source_document.university,
-    period: source_document.period,
-    students: {},
-};
-all_enrollments.forEach( (enrollment) =>
-{
-  if (!Object.hasOwn(expected_resultant_document.students, enrollment.student))
-  {
-    expected_resultant_document.students[enrollment.student] = {
-        passing_credits: 0,
-        sum_of_grades: 0,
-        enrolled_courses: 0,
-        average_grade: 0
-    };
-  }
-  if ( enrollment.grade >= source_document.passing_grade) {
-    expected_resultant_document.students[enrollment.student].passing_credits += enrollment.credits;
-  }
-  if ( enrollment.grade ) {
-    expected_resultant_document.students[enrollment.student].sum_of_grades += enrollment.grade;
-    expected_resultant_document.students[enrollment.student].enrolled_courses += 1;
-  }
-});
-Object.keys(expected_resultant_document.students).forEach( (student) =>
-{
-  const current_student = expected_resultant_document.students[student];
-  if ( current_student.enrolled_courses > 0 ) {
-    current_student.average_grade = ( current_student.sum_of_grades / current_student.enrolled_courses ) ;
-  }
-});
-```
 
 ### Source Document (CS)
 
@@ -132,7 +50,7 @@ Object.keys(expected_resultant_document.students).forEach( (student) =>
         { "student": "José Antonio", "grade": null }
       ]
     },
-    "PROG-201": {
+    "FPROG-201": {
       "title": "Functional Programming",
       "credits": 6,
       "enrollments": [
@@ -141,7 +59,7 @@ Object.keys(expected_resultant_document.students).forEach( (student) =>
         { "student": "José Antonio", "grade": 5.5 }
       ]
     },
-    "BD-301": {
+    "DB-301": {
       "title": "Databases",
       "credits": 9,
       "enrollments": [
@@ -321,9 +239,95 @@ Object.keys(expected_resultant_document.students).forEach( (student) =>
 }
 ```
 
+The equivalent in a database environment to such projection_ would be an
+SQL query similar to:
+
+```SQL
+SELECT
+  U.Name AS "University",
+  U.Period AS "Period",
+  S.Name AS "Student",
+  SUM( CASE WHEN E.Grade >= U.Passing_Grade
+            THEN C.Credits
+            ELSE 0.00
+            END ) AS "Passing_Credits",
+  SUM( E.Grade ) AS "Sum_of_Grades",
+  COUNT( E.Grade ) AS "Enrolled_Courses",
+  AVG( E.Grade ) AS "Average_Grade"  
+FROM
+  Students AS S
+  LEFT JOIN
+  Enrollments AS E
+  ON ( S.Id = E.Student )
+  INNER JOIN
+  Courses AS C
+  ON ( E.Course = C.Code )
+  INNER JOIN
+  University AS U
+  ON ( C.University = U.Id )
+WHERE
+  ( E.Grade IS NOT NULL )
+GROUP BY
+  S.Id
+ORDER BY
+  S.Id ASC
+```
+
+Using a JavaScript _script_, the equivalent source code of the
+_projection_  would be like:
+
+```JavaScript
+const all_enrollments =
+    Object.entries(source_document.courses)
+        .map( ([course_name,course_info]) => (
+                course_info.enrollments
+                            .map( (enrollment)=>({
+                                    course:course_name,
+                                    title:course_info.title,
+                                    credits:course_info.credits,
+                                    student:enrollment.student,
+                                    grade:enrollment.grade
+                                    }) )
+                )
+        )
+        .flat();
+const expected_resultant_document = {
+    university: source_document.university,
+    period: source_document.period,
+    students: {},
+};
+all_enrollments.forEach( (enrollment) =>
+{
+  if (!Object.hasOwn(expected_resultant_document.students, enrollment.student))
+  {
+    expected_resultant_document.students[enrollment.student] = {
+        passing_credits: 0,
+        sum_of_grades: 0,
+        enrolled_courses: 0,
+        average_grade: 0
+    };
+  }
+  if ( enrollment.grade >= source_document.passing_grade) {
+    expected_resultant_document.students[enrollment.student].passing_credits += enrollment.credits;
+  }
+  if ( enrollment.grade ) {
+    expected_resultant_document.students[enrollment.student].sum_of_grades += enrollment.grade;
+    expected_resultant_document.students[enrollment.student].enrolled_courses += 1;
+  }
+});
+Object.keys(expected_resultant_document.students).forEach( (student) =>
+{
+  const current_student = expected_resultant_document.students[student];
+  if ( current_student.enrolled_courses > 0 ) {
+    current_student.average_grade = ( current_student.sum_of_grades / current_student.enrolled_courses ) ;
+  }
+});
+```
+
+
 ### Resultant Document (CS)
 
-The _resultant document_ that was obtained is presented below:
+The _resultant document_ obtained is presented below:
 
 ```JSON
 {
@@ -361,12 +365,13 @@ The _resultant document_ that was obtained is presented below:
 
 ## Inventory Management
 
-This example of _inventory management_ shows how to generate a report
-that displays, for each stocked product, some statistics about their
-inventory quantity, individual price, and grouping by category.
+This example involves an _inventory management_ and shows how to
+generate a report that displays, for each stored product, some
+statistics about their inventory quantity, individual price, and
+grouping by category.
 
-This section of the tutorial is based on the integration test you found
-in file `${JM2MP.JS}/src/test/integration/inventory.test.js`.
+This section of the tutorial is based on the integration test found
+in the file `${JM2MP.JS}/src/test/integration/inventory.test.js`.
 
 
 ### Source Document (IM)

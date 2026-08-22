@@ -79,7 +79,7 @@ describe("Integration test: courses per student", () => {
           { "student": "José Antonio", "grade": null }
         ]
       },
-      "PROG-201": {
+      "FPROG-201": {
         "title": "Functional Programming",
         "credits": 6,
         "enrollments": [
@@ -88,7 +88,7 @@ describe("Integration test: courses per student", () => {
           { "student": "José Antonio", "grade": 5.5 }
         ]
       },
-      "BD-301": {
+      "DB-301": {
         "title": "Databases",
         "credits": 9,
         "enrollments": [
@@ -318,8 +318,154 @@ describe("Integration test: courses per student", () => {
     assert.equal(resultant_document.students["José Antonio"].sum_of_grades, 13.5);
     assert.equal(resultant_document.students["José Antonio"].enrolled_courses, 2);
     assert.equal(resultant_document.students["José Antonio"].average_grade, 6.75);
-  });
+
+
+    // Projection equivalent using a database.
+    const SQL_DDL = `
+CREATE TABLE University (
+  Id             INTEGER  PRIMARY KEY,
+  Name           TEXT     NOT NULL  UNIQUE,
+  Period         TEXT     NOT NULL  UNIQUE,
+  Passing_Grade  REAL     NOT NULL  CHECK ( ( Passing_Grade >=  0.0 )
+                                            AND
+                                            ( Passing_Grade <= 10.0 ) )
+) STRICT
+;
+CREATE TABLE Courses (
+  Code        TEXT     PRIMARY KEY,
+  Title       TEXT     NOT NULL  UNIQUE,
+  Credits     REAL     NOT NULL,
+  University  INTEGER  NOT NULL  REFERENCES University(Id)
+                                   ON DELETE CASCADE
+                                   ON UPDATE CASCADE
+                                   NOT DEFERRABLE INITIALLY IMMEDIATE
+) STRICT
+;
+CREATE TABLE Students (
+    Id    INTEGER  PRIMARY KEY,
+    Name  TEXT     NOT NULL  UNIQUE  CHECK ( LENGTH(Name) > 0 )
+) STRICT
+;
+CREATE TABLE Enrollments (
+    Course  TEXT     NOT NULL  REFERENCES Courses(Code)
+                                 ON DELETE CASCADE
+                                 ON UPDATE CASCADE
+                                 NOT DEFERRABLE INITIALLY IMMEDIATE,
+    Student INTEGER  NOT NULL  REFERENCES Students(Id)
+                                 ON DELETE CASCADE
+                                 ON UPDATE CASCADE
+                                 NOT DEFERRABLE INITIALLY IMMEDIATE,
+    Grade   REAL     NULL      CHECK (  ( Grade IS NULL )
+                                        OR
+                                        ( ( Grade >= 0.0 )
+                                          AND
+                                          ( Grade <= 10.0 ) )  ),
+    PRIMARY KEY (
+      Course,
+      Student
+    )
+) STRICT
+;
+
+INSERT INTO
+  University
+  ( Id, Name, Period, Passing_Grade )
+VALUES
+  ( 1, 'Universidad Nacional de Educación a Distancia (U.N.E.D.)', '2026-Q1', 5.00 )
+;
+
+INSERT INTO
+  Students
+  ( Id, Name )
+VALUES
+  ( 1, 'Elena'        ),
+  ( 2, 'Inés'         ),
+  ( 3, 'Luis María'   ),
+  ( 4, 'José Antonio' )
+;
+
+INSERT INTO
+  Courses
+  ( Code, Title, Credits, University )
+VALUES
+  ( 'ALG-101',   'Linear Algebra',          4.0,  1 ),
+  ( 'FPROG-201', 'Functional Programming',  6.0,  1 ),
+  ( 'DB-301',    'Databases',               9.0,  1 )
+;
+
+INSERT INTO
+  Enrollments
+  ( Course, Student, Grade )
+VALUES
+  ( 'ALG-101',    3,   7.5 ),
+  ( 'ALG-101',    2,   4.0 ),
+  ( 'ALG-101',    1,   8.5 ),
+  ( 'ALG-101',    4,  NULL ),
+  ( 'FPROG-201',  3,   9.0 ),
+  ( 'FPROG-201',  1,   6.5 ),
+  ( 'FPROG-201',  4,   5.5 ),
+  ( 'DB-301',     2,   7.0 ),
+  ( 'DB-301',     1,   3.0 ),
+  ( 'DB-301',     4,   8.0 )
+;
+`;
+    const SQL_DML = `
+SELECT
+  U.Name AS "University",
+  U.Period AS "Period",
+  S.Name AS "Student",
+  SUM( CASE WHEN E.Grade >= U.Passing_Grade
+            THEN C.Credits
+            ELSE 0.00
+            END ) AS "Passing_Credits",
+  SUM( E.Grade ) AS "Sum_of_Grades",
+  COUNT( E.Grade ) AS "Enrolled_Courses",
+  AVG( E.Grade ) AS "Average_Grade"  
+FROM
+  Students AS S
+  LEFT JOIN
+  Enrollments AS E
+  ON ( S.Id = E.Student )
+  INNER JOIN
+  Courses AS C
+  ON ( E.Course = C.Code )
+  INNER JOIN
+  University AS U
+  ON ( C.University = U.Id )
+WHERE
+  ( E.Grade IS NOT NULL )
+GROUP BY
+  S.Id
+ORDER BY
+  S.Id ASC
+;
+`;
+    const sqlite = await import('node:sqlite');
+    const db = new sqlite.DatabaseSync(':memory:');
+    db.exec(SQL_DDL);
+    const query = db.prepare(SQL_DML);
+    const db_result = query.all();
+    //// console.log(db_result);
+    const db_resultant_document = {
+      university: db_result[0].University,
+      period: db_result[0].Period,
+      students: {}
+    };
+    /* eslint-disable-next-line no-unused-vars -- University, Period */
+    db_result.forEach( ({University,Period,Student,Passing_Credits,Sum_of_Grades,Enrolled_Courses,Average_Grade}) => {
+      db_resultant_document[Student] = {
+        passing_credits:Passing_Credits,
+        sum_of_grades:Sum_of_Grades,
+        enrolled_courses:Enrolled_Courses,
+        average_grade:Average_Grade
+      }
+    });
+    assert.deepStrictEqual(resultant_document,expected_resultant_document);
 });
+
+/* ------------------------------------------------------------------ */
+
+});  // describe
 
 /* ------------------------------------------------------------------ */
 /* ------------------------------------------------------------------ */
