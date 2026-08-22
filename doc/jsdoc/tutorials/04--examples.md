@@ -2,13 +2,13 @@
 
 - [Introduction](#introduction)
 - [Courses and Students](#courses-and-studentss)
-  - [Source Document](#source-document)
-  - [Projection Document](#projection-document)
-  - [Resultant Document](#resultant-document)
+  - [Source Document](#source-document-cs)
+  - [Projection Document](#projection-document-cs)
+  - [Resultant Document](#resultant-document-cs)
 - [Inventory Management](#inventory-management)
-  - [Source Document](#source-document-1)
-  - [Projection Document](#projection-document-1)
-  - [Resultant Document](#resultant-document-1)
+  - [Source Document](#source-document-im)
+  - [Projection Document](#projection-document-im)
+  - [Resultant Document](#resultant-document-im)
 
 
 ## Introduction
@@ -27,6 +27,9 @@ tutorial, here we will present to more complex examples:
 This example of _courses and students_ shows how to generate a report
 that displays, for each student, their aggregated results over a
 specific time period, based on the enrollment data for each course.
+
+This section of the tutorial is based on the integration test you found
+in file `${JM2MP.JS}/src/test/integration/courses-students.test.js`.
 
 The equivalent in a database environment would be an SQL query similar
 to:
@@ -111,7 +114,7 @@ Object.keys(expected_resultant_document.students).forEach( (student) =>
 });
 ```
 
-### Source Document
+### Source Document (CS)
 
 ```JSON
 {
@@ -151,7 +154,7 @@ Object.keys(expected_resultant_document.students).forEach( (student) =>
 }
 ```
 
-### Projection Document
+### Projection Document (CS)
 
 ```JSON
 {
@@ -318,7 +321,9 @@ Object.keys(expected_resultant_document.students).forEach( (student) =>
 }
 ```
 
-### Resultant Document
+### Resultant Document (CS)
+
+The _resultant document_ that was obtained is presented below:
 
 ```JSON
 {
@@ -356,20 +361,186 @@ Object.keys(expected_resultant_document.students).forEach( (student) =>
 
 ## Inventory Management
 
-...
+This example of _inventory management_ shows how to generate a report
+that displays, for each stocked product, some statistics about their
+inventory quantity, individual price, and grouping by category.
 
-### Source Document
+This section of the tutorial is based on the integration test you found
+in file `${JM2MP.JS}/src/test/integration/inventory.test.js`.
 
-```JSON
-```
 
-### Projection Document
-
-```JSON
-```
-
-### Resultant Document
+### Source Document (IM)
 
 ```JSON
+{
+  "store" : "Madrid-01",
+  "threshold" : 10,  // Critical threshold for replenishment (or reorder point).
+  "products" :
+  {
+    "SKU-A100" :
+    {
+      "name" :     "Mechanical Keyboard",
+      "category" : "peripheral",
+      "stock" :    45,
+      "price" :    89.90
+    },
+    "SKU-A101" :
+    {
+      "name" :     "Wireless Mouse",
+      "category" : "peripheral",
+      "stock" :    8,
+      "price" :    35.00
+    },
+    "SKU-B200" :
+    {
+      "name" :     "Monitor 27 inches",
+      "category" : "screen",
+      "stock" :    12,
+      "price" :    320.00
+    },
+    "SKU-B201" :
+    {
+      "name" :     "Monitor 32 inches",
+      "category" : "screen",
+      "stock" :    3,
+      "price" :    480.00
+    },
+    "SKU-C300" :
+    {
+      "name" :     "Webcam HD",
+      "category" : "peripheral",
+      "stock" :    0,
+      "price" :    65.00
+    },
+    "SKU-D400" :
+    {
+      "name" :     "Bluetooth earphones",
+      "category" : "audio",
+      "stock" :    25,
+      "price" :    120.00
+    }
+  }
+}
 ```
 
+### Projection Document (IM)
+
+The `JM2MP` _projection document_ used to transform the
+_source document_ into the _resultant document_ is presented below.
+
+The _projection document_ contains comments explaining the main steps,
+so it should be considered
+[JSONC](./tutorial-05--how-to-project-other-formats.html#jsonc) syntax
+rather than pure JSON; if you wish to use it in `JM2MP.JS`, you must
+first remove the comments or convert the syntax (see
+[How to Project Other Usual Document Formats](./tutorial-05--how-to-project-other-formats.html)
+_tutorial_ for instructions).
+
+```JSON
+{
+  // Store: literal copy.
+  "store": { "$op": "get", "$path": "$.store" },
+  // Total inventory value.
+  "total_inventory_value": {
+    "$op": "foldObj",
+    "$over": { "$op": "get", "$path": "$.products" },
+    "$init": 0,
+    "$step": {
+      "$op": "add",
+      "$left": { "$op": "get", "$path": "@.acc" },
+      "$right": {
+        "$op": "mul",
+        "$left":  { "$op": "get", "$path": "@.value.stock" },
+        "$right": { "$op": "get", "$path": "@.value.price" }
+      }
+    }
+  },
+  // Products below the critical threshold.
+  "products_below_critical_threshold": {
+    "$op": "foldObj",
+    "$over": { "$op": "get", "$path": "$.products" },
+    "$init": {},
+    "$step": {
+      "$op": "if",
+      "$cond": {
+        "$op": "lte",
+        "$left":  { "$op": "get", "$path": "@.value.stock" },
+        "$right": { "$op": "get", "$path": "$.threshold" }
+      },
+      "$then": {
+        "$op": "insert",
+        "$key": { "$op": "get", "$path": "@.key" },
+        "$value": {
+          "name":  { "$op": "get", "$path": "@.value.name"  },
+          "stock": { "$op": "get", "$path": "@.value.stock" }
+        },
+        "$into": { "$op": "get", "$path": "@.acc" }
+      },
+      "$else": { "$op": "get", "$path": "@.acc" }
+    }
+  },
+  // Units in stock, per category (aggregated).
+  "stock_per_category": {
+    "$op": "foldObj",
+    "$over": { "$op": "get", "$path": "$.products" },
+    "$init": {},
+    "$step": {
+      "$op": "insert",
+      "$key": { "$op": "get", "$path": "@.value.category" },
+      "$value": {
+        "$op": "add",
+        "$left": {
+          "$op": "coalesce",
+          "$value": {
+            "$op": "lookup",
+            "$key": { "$op": "get", "$path": "@.value.category" },
+            "$in":  { "$op": "get", "$path": "@.acc" }
+          },
+          "$default": 0
+        },
+        "$right": { "$op": "get", "$path": "@.value.stock" }
+      },
+      "$into": { "$op": "get", "$path": "@.acc" }
+    }
+  }
+}
+```
+
+### Resultant Document (IM)
+
+The _resultant document_ that was obtained is presented below:
+
+```JSON
+{
+  // Store identification.
+  "store": "Madrid-01",
+// Total inventory value.
+  "total_inventory_value": 12605.5,
+  // Products below its critical threshold.
+  "products_below_critical_threshold":
+  {
+    "SKU-A101":
+    {
+      "name"  : "Wireless Mouse",
+      "stock" : 8
+    },
+    "SKU-B201":
+    {
+      "name"  : "Monitor 32 inches",
+      "stock" : 3
+    },
+    "SKU-C300":
+    {
+      "name"  : "Webcam HD",
+      "stock" : 0
+    }
+  },
+  // Units in stock, per category.
+  "stock_per_category":
+  {
+    "peripheral" : 53,
+    "screen"     : 15,
+    "audio"      : 25
+  }
+}
+```
