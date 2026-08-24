@@ -866,12 +866,12 @@ Its JSON form is:
 
 #### sort
 
-The `sort` _template command_ is a _projection_ used to sort a list
-(items of an array, keys of an object) using a specified criteria.
+The `sort` _template command_ is a _projection_ used to sort the items
+of an array, using a specified criteria.
 
 The `sort` _template command_ is actually a derived _projection_,
 included by its reduced algorithmic complexity _O(n)_ againts the
-non-trivial combination of `foldArr/foldObj`, `if` and `lt` _projections_
+non-trivial combination of `foldArr`, `if` and `lt` _projections_
 of complexity _O(n<sup>2</sup>)_.
 
 Its JSON form is:
@@ -890,7 +890,9 @@ where:
 - `by` is an optional _projection_ to produce the ordering key; if
   ommited, then the ordering criteria will be to sort by the items
   themselves.
-- `desc` is an optional clause that must be evaluated as a _logic predicate_ (Boolean); by default, its value `false` will order `over` in ascending order.
+- `desc` is an optional clause that must be evaluated as a _logic
+  predicate_ (Boolean); by default, its value `false` will order
+  `over` in ascending order.
 
 #### lookup
 

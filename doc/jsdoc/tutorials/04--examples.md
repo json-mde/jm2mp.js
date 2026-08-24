@@ -519,7 +519,7 @@ The _resultant document_ that was obtained is presented below:
 {
   // Store identification.
   "store": "Madrid-01",
-// Total inventory value.
+  // Total inventory value.
   "total_inventory_value": 12605.5,
   // Products below its critical threshold.
   "products_below_critical_threshold":

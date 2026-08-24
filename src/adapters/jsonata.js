@@ -18,7 +18,7 @@
  * as part of `JM2MP` _projection documents_.
  *
  * This module _only_ supports **JSONata 2.x** _versions_. Older version
- * 1.x uses another incompatible API, as well as possibily future
+ * 1.x uses another incompatible API, as well as possibly future
  * versions (3.x).
  *
  * By design, **JSONata 2.x** is **async only**, as well as

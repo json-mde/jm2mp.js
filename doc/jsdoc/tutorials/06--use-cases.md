@@ -37,14 +37,14 @@ As a special subcase of [data processing](#data-processing), **batch
 processing** is essential in more traditional contexts, where _shell
 scripts_, _process schedulers_ and _file access_ are used.
 
-Therefore, it is equally important that the `JM2MP.JS` library provide
+Therefore, it is equally important that the `JM2MP.JS` library provides
 its functionality through a _command line interface_ (CLI).
 
 Alternatives like [jq](https://jqlang.org/) or
 [JMESPath jp](https://jmespath.org/libraries.html#jmespath-tools)
 can handle the query or even the aggregation part of the processing, but
 a complete transformation of the data files will require combining
-several steps and, possibily, a complex script to link them together.
+several steps and, possibly, a complex script to link them together.
 
 ## API Gateway
 
@@ -102,8 +102,8 @@ version control and testing) and are processed by specific IaC tools
 (such as [Ansible](https://docs.ansible.com/) or [Terraform](https://developer.hashicorp.com/terraform)),
 which execute these configurations and validate the resulting systems
 against the expected specifications, thereby creating, updating or
-shutting down from a single system to an entire platform with hundreds
-of components.
+shutting down platforms composed from a single system to an entire
+platform with hundreds of components.
 
 The main advantages of treating infrastructure as code can be summarized
 as follows:
@@ -161,7 +161,7 @@ you can build a workflow that translates your own deployment model
 (written in JSON) into the formats supported by these cloud platforms
 (such as [AWS CloudFormation Templates](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/cloudformation-overview.html#cfn-concepts-templates)
 or [Azure ARM Templates](https://learn.microsoft.com/en-us/azure/azure-resource-manager/templates/overview), to name two examples).
-This way, it would enough to simply update the JSON model with the
+This way, it would be enough to simply update the JSON model with the
 desired changes to the architecture and the translation system would
 update the code needed to implement them.
 
