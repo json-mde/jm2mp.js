@@ -82,14 +82,14 @@ describe("validator: $let y alcance de alias", () => {
       validate({
         '$': { "$op": "get", "$path": "%undefined" }
       }),
-      (err) => err instanceof ValidationError && /alcance/i.test(err.message)
+      (err) => err instanceof ValidationError && /out of scope/i.test(err.message)
     );
   });
 
   it("rechaza nombre de alias con prefijo prohibido", async () => {
     await assert.rejects(
       validate({
-        '$': { "$op": "let", "$bindings": { "$malo": 1 }, "$in": null }
+        '$': { "$op": "let", "$bindings": { "$BadPrefix": 1 }, "$in": null }
       }),
       ValidationError
     );
@@ -202,7 +202,7 @@ describe("validator: $get y $syntax", () => {
       validate({
         '$': { "$op": "get", "$path": "$.x", "$syntax": "noExiste" }
       }),
-      (err) => err instanceof ValidationError && /no corresponde a ningún adaptador/.test(err.message)
+      (err) => err instanceof ValidationError && /does not have any registered query-adapter/.test(err.message)
     );
   });
 

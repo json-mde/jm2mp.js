@@ -34,6 +34,16 @@ describe("Unitary tests: native & native-path syntax", () => {
     );
   });
 
+/* ------------------------------------------------------------------ */
+
+  it("Evaluate: invalid path", () => {
+    const adapter = createNativeAdapter();
+    const path = '%-SyntaxError';
+    const input = {'$':{}};
+    const cache = new Map();
+    const env = null;
+    assert.rejects(adapter.evaluate(path, input, cache, env));
+  });
 
 /* ------------------------------------------------------------------ */
 
@@ -47,7 +57,6 @@ describe("Unitary tests: native & native-path syntax", () => {
         adapter.evaluate(path, input, cache, env)
     );
   });
-
 
 /* ------------------------------------------------------------------ */
 

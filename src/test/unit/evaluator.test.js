@@ -689,7 +689,7 @@ describe("evaluator: ramas adicionales", () => {
     const mod = normalizeModule(moduleWith({ "$op": "call", "$ref": "loop" }, aux));
     await assert.rejects(
       evaluate(mod, null, { registry, maxDepth: 50 }),
-      (err) => err instanceof EvaluationError && /[Pp]rofundidad/.test(err.message)
+      (err) => err instanceof EvaluationError && /maximum depth/.test(err.message)
     );
   });
 });

@@ -110,6 +110,8 @@ import { AdapterError, ValidationError, EvaluationError } from "../errors.js";
  * dynamically loading
  * [jmespath](https://www.npmjs.com/package/jmespath) version **0.16.x**.
  * @returns {Promise<module:jm2mp/adapters/registry.QueryAdapter>}
+ * @throws {AdapterError}
+ * Whenever the package `jmespath` cannot be imported.
 **/
 export async function createJmesPathAdapter()
 {

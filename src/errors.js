@@ -3,32 +3,52 @@
  * @copyright Universidad Nacional de Educación a Distancia (U.N.E.D.) 2026
  * @license BSD-3-Clause
  * @file
- * Jerarquía de errores específicos del dominio del lenguaje de proyecciones.
- *
- * Todos los errores derivan de ProjectionError, lo que permite a los consumidores
- * capturar cualquier error del sistema con un solo catch (ProjectionError).
- *
- * Las subclases categorizan el error según su origen:
- *  - ParseError: errores sintácticos durante el parseo (rutas, expresiones).
- *  - ResolutionError: errores durante la resolución de módulos (ciclos, no encontrado).
- *  - ValidationError: errores semánticos previos a la evaluación (alcance, referencias).
- *  - EvaluationError: errores en tiempo de evaluación (tipos, división por cero, etc.).
- *  - AdapterError: errores específicos de un adaptador de sintaxis (registro, librería).
+ * The module [errors]{@link module:jm2mp/errors} implements the
+ * hierarchy of domain-specific errors (exceptions) in the projection
+ * process.
 **/
 
 /**
  * @module jm2mp/errors
  * @description
- * Jerarquía de errores específicos del dominio del lenguaje de proyecciones.
-**/
+ * This module implements the hierarchy of domain-specific errors
+ * (exceptions) in the projection process.
+ *
+ * All errors are derived from
+ * [ProjectionError]{@link module:jm2mp/errors.ProjectionError},
+ * which allows consumers to catch any system error with a single catch.
+ *
+ * Several subclasses has been defined to categorize errors based on
+ * their origin:
+ *
+ * - [ParseError]{@link module:jm2mp/errors.ParseError}:
+ *   syntactic errors during parsing (paths, expressions, ...).
+ *
+ * - [ResolutionError]{@link module:jm2mp/errors.ResolutionError}:
+ *   errors during module resolution (cycles, not found, ...).
+ *
+ * - [ValidationError]{@link module:jm2mp/errors.ValidationError}:
+ *   semantic errors prior to evaluation (scope, references, ...).
+ *
+ * - [EvaluationError]{@link module:jm2mp/errors.EvaluationError}:
+ *   errors at evaluation runtime (types, division by zero, ...).
+ *
+ * - [AdapterError]{@link module:jm2mp/errors.AdapterError}:
+ *   errors specific to a syntax adapter (register, library, ...).
+ **/
 
 /* ------------------------------------------------------------------ */
 /* ------------------------------------------------------------------ */
 
 /**
  * @description
- * Error raíz de la jerarquía.
- * Todos los demás errores del sistema heredan de esta clase.
+ * The `ProjectionError` is the root level exception of the hierarchy of
+ * domain-specific errors (exceptions) in the projection process.
+ * 
+ * The rest of errors inherits from this class.
+ * 
+ * @see {@link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error}
+ * @see {@link https://nodejs.org/api/errors.html}
 **/
 export class ProjectionError extends Error
 {
@@ -36,34 +56,38 @@ export class ProjectionError extends Error
   /**
    * @constructor
    * @description
-   * Default constructor for 'ProjectionError'.
+   * Default constructor for `ProjectionError`.
+   * It creates a new instance.
    * @param {string} message
-   * Mensaje descriptivo del error.
+   * Descriptive message about this error's instance.
    * @param {object} [metadata]
-   * Información contextual adicional.
+   * Additional information about error's context.
    * @param {string} [metadata.path]
-   * Ruta lógica dentro de la proyección donde ocurrió el error.
-   * @param {Error}  [metadata.cause]
-   * Error subyacente que provocó este error, si lo hay.
+   * The logical path inside the _projection document_ where this error
+   * occurs.
+   * @param {Error} [metadata.cause]
+   * Error cause indicating the reason why the current error is thrown,
+   * usually another caught error.
   **/
   constructor(message, metadata = {})
   {
-    // Pasamos a Error la opción cause si fue proporcionada (estándar ES2022).
+    // Constructor inheritance (passing message and cause).
     super(message, ( metadata.cause ? { cause: metadata.cause } : undefined ) );
-    // Asignamos el nombre del error a partir del nombre de la clase concreta.
+    // By convention, the name of the error is the name of the class constructed.
     this.name = this.constructor.name;
-    // Guardamos la ruta lógica para diagnósticos (puede ser null si no aplica).
+    // If specified, it stores the logical path where the error was
+    // raised (for diagnosis), or null when undefined.
     this.path = ( metadata.path ?? null );
   }
 
-}
+}  // export class ProjectionError
 
 /* ------------------------------------------------------------------ */
 
 /**
  * @description
- * Error de parseo sintáctico.
- * Se lanza al analizar rutas o expresiones malformadas.
+ * Class for specifying syntactic errors during parsing
+ * (paths, expressions, ...).
 **/
 export class ParseError extends ProjectionError {}
 
@@ -71,8 +95,8 @@ export class ParseError extends ProjectionError {}
 
 /**
  * @description
- * Error durante la resolución de módulos: ciclos, módulo no encontrado,
- * o ausencia de plantilla raíz 'ROOT_TEMPLATE' en el módulo final.
+ * Class for specifying errors during module resolution
+ * (cycles, not found, ...).
 **/
 export class ResolutionError extends ProjectionError {}
 
@@ -80,8 +104,8 @@ export class ResolutionError extends ProjectionError {}
 
 /**
  * @description
- * Error de validación semántica previa a la evaluación: alias no definido,
- * referencia $call apuntando a plantilla inexistente, sintaxis no registrada, etc.
+ * Class for specifying semantic errors prior to evaluation
+ * (scope, references, ...).
 **/
 export class ValidationError extends ProjectionError {}
 
@@ -89,8 +113,8 @@ export class ValidationError extends ProjectionError {}
 
 /**
  * @description
- * Error en tiempo de evaluación: tipos incorrectos, operación inválida,
- * división por cero, profundidad de pila excedida, etc.
+ * Class for specifying errors at evaluation runtime
+ * (types, division by zero, ...).
 **/
 export class EvaluationError extends ProjectionError {}
 
@@ -98,8 +122,8 @@ export class EvaluationError extends ProjectionError {}
 
 /**
  * @description
- * Error específico de un adaptador de sintaxis: librería no instalada,
- * adaptador ya registrado, fallo en la carga dinámica, etc.
+ * Class for specifying errors specific to a syntax adapter
+ * (register, library, ...).
 **/
 export class AdapterError extends ProjectionError {}
 
