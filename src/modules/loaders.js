@@ -2,189 +2,332 @@
  * @author Luis Maria CAMARA ROSSI
  * @copyright Universidad Nacional de Educación a Distancia (U.N.E.D.) 2026
  * @license BSD-3-Clause
- * @file Implementaciones del loader de módulos.
- * @description
- * Tres loaders predefinidos que satisfacen la interfaz inyectable
- * (name: string) => Promise<object>:
- *  - createStringLoader: carga desde mapa en memoria. Útil para tests.
- *  - createFileLoader: carga desde sistema de ficheros (Node.js exclusivamente).
- *  - createUrlLoader: carga vía fetch (navegador y Node 18+).
- *
- * Los loaders son agnósticos al sistema de adaptadores: simplemente cargan JSON.
+ * @file
+ * The file `loaders.js` contains the module
+ * [helpers]{@link module:jm2mp/modules/loaders}, which implements
+ * predefined loader functions related with `JM2MP` _projection modules_.
 **/
 
 /**
  * @module jm2mp/modules/loaders
  * @description
- * Tres loaders predefinidos que satisfacen la interfaz inyectable:
- * `(name: string) => Promise<object>`:
- * 
- * - **createStringLoader**: carga desde mapa en memoria; útil para tests.
- * - **createFileLoader**: carga desde sistema de ficheros; Node.JS exclusivamente.
- * - **createUrlLoader**: carga vía _fetch_ ; navegador y Node.JS v18+.
+ * The module [loaders]{@link module:jm2mp/modules/loaders} implements
+ * predefined loader functions related with `JM2MP` _projection modules_.
  *
- * Los loaders son agnósticos al sistema de adaptadores: simplemente cargan JSON.
+ * All loaders must implement the interface (contract):
+ * `(name: string) => Promise<object>`.
+ * 
+ * All loaders must be agnostic about _query language adapters_
+ * and just load the corresponding _projection module_ as a JSON value.
+ *
+ * Predefined loader functions are:
+ * - `createStringLoader`: it loads a _projection module_ directly from
+ *   memory; it is usefull for testing.
+ * - `createFileLoader`: it loads a _projection module_ from the
+ *   filesystem; it uses
+ *   [Node.js file system module]{@link https://nodejs.org/api/fs.html},
+ *   so it can be used only in applications and not in web browsers.
+ * - `createUrlLoader`: it loads a _projection module_ using the
+ *   [Fetch API]{@link https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API};
+ *   it can be used within both web browsers and
+ *   [Node.js v18+]{@link https://undici.nodejs.org/best-practices/undici-vs-builtin-fetch}
+ *   applications.
 **/
+
+/* ------------------------------------------------------------------ */
+/* ------------------------------------------------------------------ */
 
 import { ResolutionError } from "../errors.js";
 
-/**
- * *typedef {(name: string) => Promise<object>} StringLoaderResult
- * @typedef {Function} StringLoaderResult
-**/
+/* ------------------------------------------------------------------ */
 
 /**
- * Loader basado en un mapa nombre → string-JSON.
- *
- * Útil para tests y para escenarios donde los módulos están embebidos en código.
- *
- * @param {Object<string, string>} stringMap - Mapa nombre → JSON serializado.
- * @returns {StringLoaderResult}
+ * @typedef {Function} StringLoaderResult
+ * @description
+ * *typedef {(name: string) => Promise<object>} StringLoaderResult
 **/
-export function createStringLoader(stringMap) {
-  if (typeof stringMap !== "object" || stringMap === null) {
-    throw new TypeError("createStringLoader: el argumento debe ser un objeto.");
+
+/* ------------------------------------------------------------------ */
+
+/**
+ * @description
+ * Loader based on a simple (in memory) map of names and
+ * [serialized]{@link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify}
+ * JSON values.
+ * 
+ * It is usefull for testing purposes or when the _projection modules_
+ * are actually integrated into the code.
+ *
+ * @param {Object<string, string>} stringMap
+ * The map of names and serialized JSON values.
+ * @returns {StringLoaderResult}
+ * The just created
+ * [StringLoaderResult]{@link module:jm2mp/modules/loaders.StringLoaderResult}.
+ * @throws {module:jm2mp/modules/LookupAddress.TypeError}
+ * Whenever 'stringMap' is not an object or is null.
+**/
+export function createStringLoader(stringMap)
+{
+  if (typeof stringMap !== "object" || stringMap === null)
+  {
+    throw new TypeError("createStringLoader: 'stringMap' must be a non-null object.");
   }
-  return async function stringLoader(name) {
-    if (!Object.hasOwn(stringMap, name)) {
-      throw new ResolutionError(
-        `Módulo no encontrado en el mapa de strings: "${name}".`
-      );
-    }
-    const raw = stringMap[name];
-    if (typeof raw !== "string") {
-      throw new ResolutionError(
-        `El valor para "${name}" no es una cadena JSON.`
-      );
-    }
-    try {
-      return JSON.parse(raw);
-    } catch (cause) {
-      throw new ResolutionError(
-        `JSON malformado en el módulo "${name}".`,
-        { cause }
-      );
-    }
-  };
+  else
+  {
+    /**
+     * @description
+     * It loads (retrieves) the _projection module_ of name `name`.
+     * @param {string} name
+     * The name of the loaded _projection module_ to load (retrieve).
+     * @returns {*}
+     * The parsed JSON value of the _module_.
+     * @throws {module:jm2mp/modules/LookupAddress.ResolutionError}
+     * Whenever trying to resolve a `name` for a _projection module_ that is
+     * no part of this
+     * [StringLoaderResult]{@link module:jm2mp/modules/loaders.StringLoaderResult}
+     * or its serialized JSON value not is of type 'string'.
+    **/
+    return async function stringLoader(name)
+    {
+      if ( ! Object.hasOwn(stringMap, name) )
+      {
+        throw new ResolutionError(
+          `stringLoader: module '${name}' not found inside stringMap.`
+        );
+      }
+      const string_content = stringMap[name];
+      if (typeof string_content !== "string")
+      {
+        throw new ResolutionError(
+          `stringLoader: module '${name}' does not have an string as associated serialized JSON value.`
+        );
+      }
+      try
+      {
+        const module_content = JSON.parse(string_content);
+        return module_content;
+      }
+      catch (cause)
+      {
+        throw new ResolutionError(
+          `stringLoader: module '${name}' has malformed JSON.`,
+          { cause }
+        );
+      }
+    };
+  }
 }
 
-/**
- * *typedef {Promise<(name: string) => Promise<object>>} FileLoaderResult
- * @typedef {Function} FileLoaderResult
-**/
+/* ------------------------------------------------------------------ */
 
 /**
- * Loader basado en sistema de ficheros (solo Node.js).
+ * @typedef {Function} FileLoaderResult
+ * @description
+ * *typedef {Promise<(name: string) => Promise<object>>} FileLoaderResult
+**/
+
+/* ------------------------------------------------------------------ */
+
+/**
+ * @description
+ * Loader based on filesystem, so only on
+ * [Node.js]{@link https://nodejs.org/api/fs.html} applications can be
+ * used, and not as part of client contexts in web browsers.
  *
- * Cada nombre se interpreta como ruta relativa al `baseDir` o absoluta.
- * Importa dinámicamente `node:fs/promises` y `node:path` para no romper
- * en navegador.
+ * Every `name` will be interpreted as a relative path to `baseDir`, or
+ * as an absolute path.
+ *
+ * It dynamically imports `node:fs/promises` and `node:path` modules to
+ * avoid breaks web browser's use context.
  *
  * @param {object} [options]
- * @param {string} [options.baseDir] - Directorio base. Default: process.cwd().
+ * .
+ * @param {string} [options.baseDir]
+ * It specifies the base directory for relative paths.
+ * By default
+ * [process.cwd()]{@link https://nodejs.org/api/process.html#processcwd}
+ * is used.
  * @param {string} [options.encoding="utf8"]
+ * By default, it uses `UTF-8` encoding.
  * @returns {FileLoaderResult}
- */
-export async function createFileLoader(options = {}) {
+ * The just created
+ * [FileLoaderResult]{@link module:jm2mp/modules/loaders.FileLoaderResult}.
+ * @throws {module:jm2mp/modules/LookupAddress.TypeError}
+ * Whenever 'stringMap' is not an object or is null.
+**/
+export async function createFileLoader(options = {})
+{
   let fs, path;
-  try {
+  try
+  {
     fs = await import("node:fs/promises");
     path = await import("node:path");
-  } catch (cause) {
+  }
+  catch (cause)
+  {
     throw new ResolutionError(
-      "createFileLoader requiere Node.js (node:fs/promises y node:path).",
+      "createFileLoader: Node.js is required ('node:fs/promises' and 'node:path').",
       { cause }
     );
   }
   const baseDir = options.baseDir ?? process.cwd();
   const encoding = options.encoding ?? "utf8";
 
-  return async function fileLoader(name) {
-    // path.resolve maneja correctamente nombres absolutos y relativos.
+  /**
+   * @description
+   * It loads (retrieves) the _projection module_ of filename `name`.
+   * @param {string} name
+   * The filename of the loaded _projection module_ to load (retrieve);
+   * it can be absolute or relative to `baseDir`.
+   * @returns {*}
+   * The parsed JSON value of the _module_.
+   * @throws {module:jm2mp/modules/LookupAddress.ResolutionError}
+   * Whenever an error reading filename `name` is raised or its content
+   * is not a valid parseable JSON value.
+  **/
+  return async function fileLoader(name)
+  {
+    // https://nodejs.org/api/path.html#pathresolvepaths
+    // It resolves both absolute and relative paths.
     const fullPath = path.resolve(baseDir, name);
-    let content;
-    try {
-      content = await fs.readFile(fullPath, encoding);
-    } catch (cause) {
+    let file_content;
+    try
+    {
+      file_content = await fs.readFile(fullPath, encoding);
+    }
+    catch (cause)
+    {
       throw new ResolutionError(
-        `No se pudo leer el módulo desde "${fullPath}".`,
+        `fileLoader: error reading file '${fullPath}'.`,
         { cause }
       );
     }
-    try {
-      return JSON.parse(content);
-    } catch (cause) {
+    try
+    {
+      const module_content = JSON.parse(file_content);
+      return module_content;
+    }
+    catch (cause)
+    {
       throw new ResolutionError(
-        `JSON malformado en el fichero "${fullPath}".`,
+        `fileLoader: malformed JSON in file '${fullPath}'.`,
         { cause }
       );
     }
   };
 }
 
+/* ------------------------------------------------------------------ */
+
 /**
- * *typedef {(name: string) => Promise<object>} UrlLoaderResult
  * @typedef {Function} UrlLoaderResult
+ * @description
+ * *typedef {(name: string) => Promise<object>} UrlLoaderResult
 **/
 
+/* ------------------------------------------------------------------ */
+
 /**
- * Loader basado en `fetch` (navegador moderno o Node.js 18+).
+ * @description
+ * Loader based on the
+ * [Fetch API]{@link https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API}
+ * feature, available in modern web browser and as part of
+ * [Node.js v18+]{@link https://nodejs.org/api/fs.html} applications.
  *
- * Cada nombre se interpreta como URL absoluta, o relativa a `baseUrl` si se proporciona.
- *
+ * Every `name` is interpreted as an absolute URL, or relative to `baseUrl`
+ * if provided.
  * @param {object} [options]
- * @param {string} [options.baseUrl] - URL base para resolver nombres relativos.
- * @param {RequestInit} [options.fetchOptions] - Opciones para fetch (headers, credentials, etc.).
+ * .
+ * @param {string} [options.baseUrl]
+ * It specifies the base URL for relative addresses.
+ * @param {RequestInit} [options.fetchOptions]
+ * It allows to specify options for `fetch` (like headers, credentials, ...).
  * @returns {UrlLoaderResult}
- * @see [Mozilla Developer Network (MDN) > Web > APIs > Fetch API]{@link https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API}
- */
-export function createUrlLoader(options = {}) {
-  if (typeof fetch !== "function") {
-    throw new ResolutionError(
-      "createUrlLoader requiere la API global `fetch` (navegador moderno o Node.js 18+)."
+ * The just created
+ * [UrlLoaderResult]{@link module:jm2mp/modules/loaders.UrlLoaderResult}.
+ * @throws {module:jm2mp/modules/LookupAddress.TypeError}
+ * Whenever 'stringMap' is not an object or is null.
+**/
+export function createUrlLoader(options = {})
+{
+  if (typeof fetch !== "function")
+  {
+    throw new TypeError(
+      "createUrlLoader: 'Fetch API' is required (modern web browser or Node.js v18+)."
     );
   }
-  const baseUrl = options.baseUrl ?? null;
-  const fetchOptions = options.fetchOptions ?? {};
-
-  return async function urlLoader(name) {
-    // Construimos la URL absoluta (si baseUrl está, resolvemos contra ella).
-    let url;
-    try {
-      url = baseUrl ? new URL(name, baseUrl).toString() : name;
-    } catch (cause) {
-      throw new ResolutionError(
-        `URL inválida para el módulo "${name}".`,
-        { cause }
-      );
-    }
-
-    // Realizamos la petición.
-    let response;
-    try {
-      response = await fetch(url, fetchOptions);
-    } catch (cause) {
-      throw new ResolutionError(
-        `Fallo de red al cargar el módulo desde "${url}".`,
-        { cause }
-      );
-    }
-
-    // Comprobamos el código de estado HTTP.
-    if (!response.ok) {
-      throw new ResolutionError(
-        `HTTP ${response.status} ${response.statusText} al cargar "${url}".`
-      );
-    }
-
-    // Parseamos como JSON. response.json() ya hace JSON.parse internamente.
-    try {
-      return await response.json();
-    } catch (cause) {
-      throw new ResolutionError(
-        `JSON malformado en la respuesta de "${url}".`,
-        { cause }
-      );
-    }
-  };
+  else
+  {
+    // The configurations for urlLoader.
+    const baseUrl = options.baseUrl ?? null;
+    const fetchOptions = options.fetchOptions ?? {};
+    /**
+     * @description
+     * It loads (retrieves) the _projection module_ with URL `name`.
+     * @param {string} name
+     * The URL of the loaded _projection module_ to load (retrieved via
+     * fetch); it can be absolute or relative to `baseUrl`.
+     * @returns {*}
+     * The parsed JSON value of the _module_.
+     * @throws {module:jm2mp/modules/LookupAddress.ResolutionError}
+     * Whenever an error fetching URL `name` is raised or its content
+     * is not a valid parseable JSON value.
+    **/
+    return async function urlLoader(name)
+    {
+      // It builds an absolute URL (if baseUrl has been defined, it will be used).
+      let url;
+      try
+      {
+        url = ( baseUrl
+                ? new URL(name, baseUrl).toString()
+                : name );
+      }
+      catch (cause)
+      {
+        throw new ResolutionError(
+          `urlLoader: invalid URL for module '${name}'.`,
+          { cause }
+        );
+      }
+      // It invokes the actual fetch.
+      let response;
+      try
+      {
+        response = await fetch(url, fetchOptions);
+      }
+      catch (cause)
+      {
+        throw new ResolutionError(
+          `urlLoader: error fetching module '${name}' from URL '${url}'.`,
+          { cause }
+        );
+      }
+      // It tests the received HTTP status code.
+      if (!response.ok)
+      {
+        throw new ResolutionError(
+          `urlLoader: HTTP error '${response.status}' '${response.statusText}' loading module '${name}' from ULR '${url}'.`
+        );
+      }
+      // It tries to parse fetched content as JSON.
+      try
+      {
+        // Invoking JSON.parse internally.
+        const module_content = await response.json();
+        return module_content;
+      }
+      catch (cause)
+      {
+        throw new ResolutionError(
+          `urlLoader: malformed JSON content for module '${name}' from URL '${url}'.`,
+          { cause }
+        );
+      }
+    };
+  }
 }
+
+/* ------------------------------------------------------------------ */
+/* ------------------------------------------------------------------ */
+/* End of file: ${JM2MP.JS}/src/modules/loaders.js                    */

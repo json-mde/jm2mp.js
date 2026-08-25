@@ -2,16 +2,26 @@
  * @author Luis Maria CAMARA ROSSI
  * @copyright Universidad Nacional de Educación a Distancia (U.N.E.D.) 2026
  * @license BSD-3-Clause
- * @file Funciones auxiliares relacionadas con los módulos.
- * @description Funciones auxiliares relacionadas con los módulos.
+ * @file
+ * The file `helpers.js` contains the module
+ * [helpers]{@link module:jm2mp/modules/helpers}, which implements
+ * helper functions related with `JM2MP` _projection modules_.
 **/
 
 /**
  * @module jm2mp/modules/helpers
- * @description Funciones auxiliares relacionadas con los módulos.
+ * @description
+ * The module [helpers]{@link module:jm2mp/modules/helpers} implements
+ * helper functions related with `JM2MP` _projection modules_.
 **/
 
+/* ------------------------------------------------------------------ */
+/* ------------------------------------------------------------------ */
+
 import { ValidationError } from "../errors.js";
+
+/* ------------------------------------------------------------------ */
+/* ------------------------------------------------------------------ */
 
 /**
  * @constant {string}
@@ -21,14 +31,26 @@ import { ValidationError } from "../errors.js";
  */
 export const ROOT_TEMPLATE_NAME = '$' ;
 
+/* ------------------------------------------------------------------ */
+
 /**
- * Construye un módulo simple a partir de una proyección raíz, sin opciones
- * ni plantillas auxiliares. Útil para tests rápidos.
- *
- * @param {*} module - Valor a comprobar si puede ser (o no) un módulo.
- * @returns {boolean} Indica si puede ser (o no) un módulo.
+ * @description
+ * It tests if the `module` JSON value can be used (considered) as a
+ * _projection module_ or not.
+ * 
+ * A JSON value can be used as a _projection module_ if:
+ * - It is an object.
+ * - It is not `null`.
+ * - It is not an array.
+ * 
+ * @param {*} module
+ * The actual JSON value to test as a valid _projection module_.
+ * @returns {boolean}
+ * `true` whenever `module` is valid as a _projection module_;
+ * `false` otherwise.
  */
-export function isModule(module) {
+export function isModule(module)
+{
   return (
     (typeof module === "object") &&
     (module !== null) &&
@@ -36,56 +58,101 @@ export function isModule(module) {
   );
 }
 
+/* ------------------------------------------------------------------ */
+
 /**
- * Construye un módulo simple a partir de una proyección raíz, sin opciones
- * ni plantillas auxiliares. Útil para tests rápidos.
- *
- * @param {*} module - Valor a comprobar si puede ser (o no) un módulo.
- * @returns {boolean} Indica si puede ser (o no) un módulo.
+ * @description
+ * It throws an [ValidationError]{@link module:jm2mp/errors.ValidationError}
+ * whenever `module` is not a valid module.
+ * @param {*} module
+ * The actual JSON value to test as a valid _projection module_.
+ * @throws {module:jm2mp/errors.ValidationError}
+ * Raised whenever `module` is not a valid module.
+ * @see {@link module:jm2mp/modules/helpers.isModule}
  */
-export function ThrowsValidationErrorWhenIsNotAModule(module) {
+export function ThrowsValidationErrorWhenIsNotAModule(module)
+{
   if ( ! isModule(module) )
   {
     throw new ValidationError("A module must be a non-null JSON object.");
   }
 }
 
+/* ------------------------------------------------------------------ */
+
 /**
- * Construye un módulo simple a partir de una proyección raíz, sin opciones
- * ni plantillas auxiliares. Útil para tests rápidos.
+* It builds a simple _projection module_ starting from the _root
+ * template_, neither adding _options_, _schema_ nor _named templates_.
  *
- * @param {*} rootProjection - Proyección a usar como plantilla raíz.
- * @returns {object} Módulo válido.
+ * It is usually used as part of unit and integrations tests.
+ *
+ * @param {*} rootProjection
+ * The JSON value for the _root projection_ of the _projection module_
+ * built by this function.
+ * @returns {object}
+ * The _projection module_ built using `rootProjection`'s value as its
+ * _root projection_.
  */
-export function moduleOf(rootProjection) {
+export function moduleOf(rootProjection)
+{
   const result = new Object();
   result[ROOT_TEMPLATE_NAME] = rootProjection ;
   return result ;
 }
 
-/**
- * Construye un módulo con plantilla raíz y plantillas auxiliares.
- *
- * @param {*} rootProjection - Plantilla raíz.
- * @param {object} [namedTemplates] - Plantillas con nombre.
- * @returns {object}
- */
-export function moduleWith(rootProjection, namedTemplates = {}) {
-  return { ...moduleOf(rootProjection), ...namedTemplates };
-}
+/* ------------------------------------------------------------------ */
 
 /**
- * Detecta si un módulo de Node se puede importar dinámicamente.
- * Útil para skipear tests cuando una dependencia opcional no está instalada.
+ * @description
+ * It builds a _projection module_ using `rootProjection`'s value as its
+ * _root projection_ and `namedTemplates` as the rest of templates.
+ * 
+ * If `namedTemplates` also contains a _root projection_ it will be
+ * lost, overriden by `rootProjection`.
+ *
+ * @param {*} rootProjection
+ * The JSON value for the _root projection_ of the _projection module_
+ * built by this function.
+ * @param {object} [namedTemplates]
+ * Other _named templates_ to be added to the resulting _projection
+ * module_.
+ * @returns {object}
+ * The _projection module_ built using `rootProjection`'s value as its
+ * _root projection_ and `namedTemplates` as the rest of templates.
+**/
+export function moduleWith(rootProjection, namedTemplates = {})
+{
+  return { ...namedTemplates, ...moduleOf(rootProjection) };
+}
+
+/* ------------------------------------------------------------------ */
+
+/**
+ * @description
+ * It detects if a package (ESM module) can be imported dynamically.
+ *
+ * It is usefull for skip tests whenever an optional dependency is not
+ * installed.
  *
  * @param {string} moduleName
  * @returns {Promise<boolean>}
- */
-export async function isModuleAvailable(moduleName) {
-  try {
+ * `true` whenever `moduleName` can be
+ * [import]{@link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/import}'ed;
+ * `false` otherwise.
+**/
+export async function isPackagedEsmModuleAvailable(moduleName)
+{
+  try
+  {
     await import(moduleName);
     return true;
-  } catch {
+  }
+  catch
+  {
     return false;
   }
 }
+
+/* ------------------------------------------------------------------ */
+/* ------------------------------------------------------------------ */
+/* End of file: ${JM2MP.JS}/src/modules/helpers.js                    */

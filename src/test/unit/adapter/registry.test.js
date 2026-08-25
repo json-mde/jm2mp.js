@@ -47,7 +47,7 @@ describe("AdapterRegistry", () => {
     const r = new AdapterRegistry();
     assert.throws(
       () => r.get("x"),
-      (err) => err instanceof AdapterError && /\(ninguno\)/.test(err.message)
+      (err) => err instanceof AdapterError && /\(none\)/.test(err.message)
     );
   });
 

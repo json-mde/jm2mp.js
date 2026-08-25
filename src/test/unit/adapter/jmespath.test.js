@@ -32,9 +32,9 @@
 import { describe, it } from "node:test";
 import { strict as assert } from "node:assert";
 import { ValidationError, EvaluationError } from "../../../errors.js";
-import { isModuleAvailable } from "../../../modules/helpers.js";
+import { isPackagedEsmModuleAvailable } from "../../../modules/helpers.js";
 
-const jmespathAvailable = await isModuleAvailable("jmespath");
+const jmespathAvailable = await isPackagedEsmModuleAvailable("jmespath");
 
 if (!jmespathAvailable) {
   describe("Adaptador JMESPath", () => {

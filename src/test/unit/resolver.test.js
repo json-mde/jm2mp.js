@@ -45,7 +45,7 @@ describe("resolve: caso simple sin dependencias", () => {
     });
     await assert.rejects(
       resolve("main", loader),
-      (err) => err instanceof ResolutionError && /raíz "\$"/.test(err.message)
+      (err) => err instanceof ResolutionError && /root template/.test(err.message)
     );
   });
 
@@ -60,7 +60,7 @@ describe("resolve: caso simple sin dependencias", () => {
     const loader = async (_name) => { throw new Error("falla I/O"); };
     await assert.rejects(
       resolve("main", loader),
-      (err) => err instanceof ResolutionError && /No se pudo cargar/.test(err.message)
+      (err) => err instanceof ResolutionError && /resolver~load: unable to load module/.test(err.message)
     );
   });
 
@@ -119,7 +119,7 @@ describe("resolve: detección de ciclos", () => {
     });
     await assert.rejects(
       resolve("A", loader),
-      (err) => err instanceof ResolutionError && /[Cc]iclo/.test(err.message)
+      (err) => err instanceof ResolutionError && /cycle/.test(err.message)
     );
   });
 
@@ -130,7 +130,7 @@ describe("resolve: detección de ciclos", () => {
     });
     await assert.rejects(
       resolve("A", loader),
-      (err) => err instanceof ResolutionError && /[Cc]iclo/.test(err.message)
+      (err) => err instanceof ResolutionError && /cycle/.test(err.message)
     );
   });
 
@@ -143,7 +143,7 @@ describe("resolve: detección de ciclos", () => {
     });
     await assert.rejects(
       resolve("A", loader),
-      (err) => err instanceof ResolutionError && /[Cc]iclo/.test(err.message)
+      (err) => err instanceof ResolutionError && /cycle/.test(err.message)
     );
   });
 });

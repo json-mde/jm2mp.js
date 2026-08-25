@@ -2,9 +2,19 @@
  * @author Luis Maria CAMARA ROSSI
  * @copyright Universidad Nacional de Educación a Distancia (U.N.E.D.) 2026
  * @license BSD-3-Clause
- * @file Resolución de módulos: carga, detección de ciclos, normalización
- *       por módulo, fusión por importación.
+ * @file
+ * The file `resolver.js` contains the module
+ * [normaresolverlizer]{@link module:jm2mp/modules/resolver}, which
+ * implements the standardization process over the `JM2MP` _projection modules_
+ * content in the stage of resolution, before it will be evaluated.
+**/
+
+/**
+ * @module module:jm2mp/modules/resolver
  * @description
+ * Resolución de módulos: carga, detección de ciclos, normalización por
+ * módulo, fusión por importación.
+ * 
  * PROTECCIÓN CONTRA CARGA EXCESIVA:
  *  - Detección de ciclos (DFS con conjunto 'visiting').
  *  - Cache de módulos ya cargados (clave normalizada a minúsculas).
@@ -29,192 +39,237 @@
  * módulos con sintaxis distintas.
 **/
 
-/**
- * @module module:jm2mp/modules/resolver
- * @description
- * Resolución de módulos: carga, detección de ciclos, normalización por
- * módulo, fusión por importación.
-**/
+/* ------------------------------------------------------------------ */
+/* ------------------------------------------------------------------ */
 
 import { ResolutionError } from "../errors.js";
-import { ROOT_TEMPLATE_NAME } from "./helpers.js";
-import { normalizeModule } from "./normalizer.js";
+import { isModule, ROOT_TEMPLATE_NAME } from "./helpers.js";
+import { normalizeModule, MODULE_METADATA_KEYS } from "./normalizer.js";
+
+/* ------------------------------------------------------------------ */
+/* ------------------------------------------------------------------ */
+
+/**
+ * @constant {integer}
+ * @description
+ * Default value for `maxModules`: `1000`.
+**/
+export const DEFAULT_MAX_MODULES = 1000;
+
+/* ------------------------------------------------------------------ */
 
 /**
  * @description
- * Valor por defecto para maxModules.
- * @type {integer}
+ * It imports an `m2` _projection module_ into the accumulated
+ * `m1` _projection module.
+ *
+ * All keys from `m2` overwrites keys from `m1`.
+ * 
+ * All meta-data properties ($options and $schema) are discarded
+ * from the resultant module, so only named templates are preserved.
+ * @param {object} dependencies
+ * The _accumulated module_ (lower dependency, to the leafs).
+ * @param {object} dependant
+ * The new _module_ to import (higher dependency, to the root).
+ * @returns {object}
+ * Resultant _projection module_ with only _named templates_ and
+ * no meta-data.
 **/
-const DEFAULT_MAX_MODULES = 1000;
-
-/**
- * Importa un módulo m2 sobre un módulo acumulado m1.
- *
- * Las claves de plantillas de m2 sobrescriben las de m1.
- * Las claves $options y $schema (metadata del módulo) se descartan
- * del resultado: el módulo final solo contiene plantillas.
- *
- * @param {object} m1 - Módulo acumulado.
- * @param {object} m2 - Módulo nuevo a importar.
- * @returns {object} Módulo resultante.
- */
-function importInto(m1, m2) {
-  // Construimos un nuevo objeto con todas las plantillas de m1.
-  const result = { ...m1 };
-  // Para cada clave de m2 que no sea metadata, la copiamos al resultado, sobrescribiendo.
-  for (const key of Object.keys(m2)) {
-    if (key === "$options" || key === "$schema") continue;
-    result[key] = m2[key];
-  }
-  // Aseguramos que las claves de metadata no queden en el resultado, incluso si venían de m1.
-  delete result.$options;
-  delete result.$schema;
+function importInto(dependencies, dependant)
+{
+  // It combines both modules, with right-to-left precedence.
+  const result = { ...dependencies, ...dependant };
+  // It ensures that meta-data keys are deleted.
+  MODULE_METADATA_KEYS.forEach( (key) => { delete result[key] ; } ) ;
+  // It returns the (just created) combined module.
   return result;
 }
+
+/* ------------------------------------------------------------------ */
 
 /**
  * *typedef {(name: string) => Promise<object>} LoaderFunction
  * @typedef {Function} LoaderFunction
 **/
 
+/* ------------------------------------------------------------------ */
+
 /**
- * Resuelve un módulo a partir de su nombre raíz, usando un loader inyectado.
- *
- * @param {string} rootName - Nombre del módulo raíz.
- * @param {LoaderFunction} loader - Función que carga
- *   un módulo por nombre. El loader recibe el nombre ORIGINAL (no normalizado)
- *   tal y como apareció en $depends-on.
+ * @description
+ * It resolves a _projection module_ since its root name using `loader`.
+ * @param {string} rootName
+ * The name of the root _projection module_.
+ * @param {LoaderFunction} loader
+ * The function that loads a module by its name.
+ * The loader receives the original (not normalized) name, as declared
+ * in `$.$options.$depends-on` (path) clause.
  * @param {object} [options]
- * @param {number} [options.maxModules=1000] - Límite máximo de módulos
- *   únicos cargables en esta resolución. Protege contra cadenas de
- *   dependencias accidentalmente o maliciosamente largas.
- * @returns {Promise<object>} Módulo final resuelto y normalizado.
- * @throws {ResolutionError} Si hay ciclos, módulos no cargables, o falta plantilla raíz.
- */
-export async function resolve(rootName, loader, options = {}) {
+ * An optional configuration object.
+ * @param {number} [options.maxModules=1000]
+ * Maximum number of unique _projection modules_ that must be loaded by
+ * `loader` in this resolution stage (threshold).
+ *
+ * Its purpose is to protect against extremely long dependency chains,
+ * whether accidental or malicious.
+ * @returns {Promise<object>}
+ * The final resultant _projection module_ already normalized and
+ * resolved.
+ * @throws {ResolutionError}
+ * Whenever a cycle, not loadable modules or undefined root template
+ * is found during this resolution stage.
+**/
+export async function resolve(rootName, loader, options = {})
+{
+  // Maximum loadable modules (threshold).
   const maxModules = options.maxModules ?? DEFAULT_MAX_MODULES;
-
-  // Cache de módulos cargados (clave normalizada a minúsculas).
+  // Loaded modules cache (with names normalized to lowercase).
   const loadedCache = new Map();
-
-  // Conjuntos para detectar ciclos y evitar reprocesar (claves normalizadas).
+  // Sets used to detect cycles and avoid reprocess several times
+  // the same module (with name normalized to lowercase).
   const visiting = new Set();
   const visited = new Set();
-
-  // Acumulador del módulo final.
+  // The resultant module.
   let result = {};
+  // It starts resolution from the root module.
+  await visit(rootName);
+  // It validates that the final resultant projection document
+  // must contain the root template.
+  if (!Object.hasOwn(result, ROOT_TEMPLATE_NAME))
+  {
+    throw new ResolutionError(
+      `resolve: the projection document must contain the root template ` +
+      `'${ROOT_TEMPLATE_NAME}', but '${rootName}' does not contain it.`
+    );
+  }
+  return result;
 
   /**
+   * @description
    * Carga un módulo a través del loader, con cache, y lo normaliza inmediatamente.
-   *
-   * @param {string} name - Nombre tal como aparece en $depends-on (sin normalizar).
+   * @param {string} name
+   * Nombre tal como aparece en $depends-on (sin normalizar).
    * @returns {Promise<object>}
+   * .
+   * @throws {ResolutionError}
+   * - Whenever module `name` cannot be loaded.
+   * - Whenever ...
    */
-  async function load(name) {
-    // ¿Se pueden/deben normalizar todos los nombres a, por ejemplo, minúsculas?
-    // Esto podría provocar colisiones cuando la única distinción sean mayúsculas, minúsculas y tildes.
+  async function load(name)
+  {
+    // The resultant module.
+    let load_result ;
+    // It normalizes the module's name.
+    // Must, can or should all names be normalized to, for example, lowercase?
+    // This could cause conflicts when the only distinctions are: uppercase, lowercase, and accents.
+    // Some file systems distinguish between uppercase and lowercase letters; others do not.
+    // What about URLs?
+    // What about plain text?
     //// const cacheKey = name;
     const cacheKey = name.toLowerCase();
-    // Si ya está en cache, devolver directamente.
-    if (loadedCache.has(cacheKey)) {
-      return loadedCache.get(cacheKey);
+    // It tests if the module is cached.
+    if (loadedCache.has(cacheKey))
+    {
+      load_result = loadedCache.get(cacheKey);
     }
-
-    // Comprobamos el límite de módulos ANTES de cargar.
-    if (loadedCache.size >= maxModules) {
+    // It tests the threshold before loading any other dependency (module).
+    else if (loadedCache.size >= maxModules)
+    {
       throw new ResolutionError(
-        `Se ha excedido el límite de módulos cargables (maxModules=${maxModules}). ` +
-        `Esta protección evita cadenas de dependencias excesivamente largas.`
+        `resolver~load: loaded modules threshold exceeded (maxModules='${maxModules}').`
       );
     }
-
-    let mod;
-    try {
-      mod = await loader(name);
-    } catch (cause) {
-      throw new ResolutionError(
-        `No se pudo cargar el módulo "${name}".`,
-        { cause }
-      );
+    else
+    {
+      // It tries to load the dependency (module).
+      let loaded_module;
+      try
+      {
+        loaded_module = await loader(name);
+      }
+      catch (cause)
+      {
+        throw new ResolutionError(
+          `resolver~load: unable to load module '${name}'.`,
+          { cause }
+        );
+      }
+      // It test if the loaded modules is a valid one.
+      if ( ! isModule(loaded_module) )
+      {
+        throw new ResolutionError(
+          `resolver~load: named value '${name}' is not a valid module.`
+        );
+      }
+      else
+      {
+        // It normalizes every loaded module (get.$syntax vs $default-query-language).
+        load_result = normalizeModule(loaded_module);
+        // It saves the normalized version of each module in the cache.
+        loadedCache.set(cacheKey, load_result);
+      }
     }
-    // Comprobamos que sea un objeto.
-    if (typeof mod !== "object" || mod === null || Array.isArray(mod)) {
-      throw new ResolutionError(
-        `El módulo "${name}" no es un objeto JSON válido.`
-      );
-    }
-
-    // NORMALIZACIÓN POR MÓDULO: añadimos $syntax a los $get que lo omitan,
-    // según el $default-query-language declarado en ESTE módulo.
-    const normalized = normalizeModule(mod);
-
-    // Guardamos en cache y devolvemos.
-    loadedCache.set(cacheKey, normalized);
-    return normalized;
+    // It returns the result.
+    return load_result;
   }
 
   /**
-   * Visita recursivamente un módulo y sus dependencias.
-   *
+   * @description
+   * It traverses the dependency tree, visiting recursively every module
+   * and all its dependencies.
    * @param {string} name
-   */
-  async function visit(name) {
-    const normalized = name.toLowerCase();
-
-    // Detección de ciclos: si lo estamos visitando ahora, hay ciclo.
-    if (visiting.has(normalized)) {
+   * The `name` of the _projection module_.
+  **/
+  async function visit(name)
+  {
+    // It normalizes its module's name.
+    const normalized_name = name.toLowerCase();
+    // It detects cycles in the dependency tree.
+    if (visiting.has(normalized_name))
+    {
       throw new ResolutionError(
-        `Ciclo de importación detectado en "${name}".`
+        `resolver~visit: dependency cycle detected on '${name}'.`
       );
     }
-    // Si ya lo procesamos completamente, lo omitimos.
-    if (visited.has(normalized)) {
+    // If already processed, this module is just ommited...
+    if (visited.has(normalized_name))
+    {
       return;
     }
-
-    // Marcamos como "en visita".
-    visiting.add(normalized);
-
-    // Cargamos el módulo (con cache).
-    const mod = await load(name);
-
-    // Extraemos la lista de dependencias de $options.$depends-on, si existe.
-    const opts = mod.$options;
+    // ...otherwise, it is marked as "visiting".
+    visiting.add(normalized_name);
+    // Then, it loads the module (using the cache) that we are visiting right now.
+    const visiting_module = await load(name);
+    // It detects the declaration of the full list of dependencies
+    // ($.$options.$depends-on) and extracts them.
+    const opts = visiting_module.$options;
     const deps = (opts && Array.isArray(opts["$depends-on"]))
-      ? opts["$depends-on"]
-      : [];
-
-    // Validamos que las entradas sean strings no vacíos.
-    for (const dep of deps) {
-      if (typeof dep !== "string" || dep.length === 0) {
+                  ? opts["$depends-on"]
+                  : [];
+    // It validates every dependency declared (as non-empty strings).
+    for (const dep of deps)
+    {
+      if (typeof dep !== "string" || dep.length === 0)
+      {
         throw new ResolutionError(
-          `$depends-on en "${name}" contiene una entrada inválida (debe ser string no vacío).`
+          `resolve~visit: invalid dependency in module '${name}'.`
         );
       }
     }
-
-    // Visitamos las dependencias en orden de izquierda a derecha.
-    for (const dep of deps) {
+    // It visits every dependency in same declaration order (left to right).
+    for (const dep of deps)
+    {
       await visit(dep);
     }
-
-    // Tras procesar dependencias, importamos el propio módulo sobre el acumulado.
-    result = importInto(result, mod);
-
-    // Marcamos como visitado y desmarcamos como "en visita".
-    visiting.delete(normalized);
-    visited.add(normalized);
+    // After all the dependencies, the module itself is imported over its own
+    // dependency (sub)tree, as root (with the highest priority for now).
+    /*outer(resolver).*/result = importInto(result, visiting_module);
+    // It marks this module as "visited", so unchecking it from "visiting".
+    visiting.delete(normalized_name);
+    visited.add(normalized_name);
   }
 
-  // Iniciamos la resolución desde la raíz.
-  await visit(rootName);
-
-  // Validamos que el módulo final tenga la plantilla raíz.
-  if (!Object.hasOwn(result, ROOT_TEMPLATE_NAME)) {
-    throw new ResolutionError(
-      `El módulo final tras la resolución no contiene la plantilla raíz "${ROOT_TEMPLATE_NAME}".`
-    );
-  }
-
-  return result;
 }
+
+/* ------------------------------------------------------------------ */
+/* ------------------------------------------------------------------ */
+/* End of file: ${JM2MP.JS}/src/modules/resolver.js                   */

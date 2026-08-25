@@ -36,12 +36,12 @@
 import { describe, it } from "node:test";
 import { strict as assert } from "node:assert";
 import { ValidationError } from "../../../errors.js";
-import { isModuleAvailable } from "../../../modules/helpers.js";
+import { isPackagedEsmModuleAvailable } from "../../../modules/helpers.js";
 
 /* ------------------------------------------------------------------ */
 /* ------------------------------------------------------------------ */
 
-const jsonquery_is_available = await isModuleAvailable("@jsonquerylang/jsonquery");
+const jsonquery_is_available = await isPackagedEsmModuleAvailable("@jsonquerylang/jsonquery");
 if (jsonquery_is_available)
 {
   const { createJsonQueryAdapter } = await import("../../../adapters/jsonquery.js");
