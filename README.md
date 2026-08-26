@@ -1,8 +1,8 @@
-# JSON Model-to-Model Projections (JM2MP)
+# JSON Model-to-Model Projection (JM2MP)
 
 ## Introduction
 
-**JSON Model-to-Model Projections (JM2MP)** is both a JSON-based syntax
+**JSON Model-to-Model Projection (JM2MP)** is both a JSON-based syntax
 to transform algebraically any input JSON document into another output
 JSON document, and a library to execute such transformations.
 
@@ -17,7 +17,7 @@ The source code for this **JM2MP.JS** library can be retrieved from:
 This documentation about this **JM2MP.JS** library and the **JM2MP**
 syntax can be found at:
 
-- [https://json-mde.tech/jm2mp.js/](https://JSON-MDE.Tech/jm2mp.js/)
+- [https://GitHub.JSON-MDE.Tech/jm2mp.js/](https://GitHub.JSON-MDE.Tech/jm2mp.js/)
 
 Documentation has been generated using a customized version of both
 [JSDoc](https://jsdoc.app/) and
