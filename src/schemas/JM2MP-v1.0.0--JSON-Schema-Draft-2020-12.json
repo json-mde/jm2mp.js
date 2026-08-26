@@ -24,13 +24,30 @@
     "Options": {
       "type": "object",
       "properties": {
-        "$depends-on": {
-          "type": "array",
-          "items": { "type": "string", "minLength": 1 }
+        "$version": {
+          "const": "1.0"
+        },
+        "$annotations": {
+          "anyOf": [
+            { "type": "null"    },
+            { "type": "boolean" },
+            { "type": "number"  },
+            { "type": "string"  },
+            { "type": "array"   },
+            { "type": "object"  }
+          ]
         },
         "$default-query-language": {
           "type": "string",
           "minLength": 1
+        },
+        "$depends-on": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
         }
       },
       "patternProperties": {
@@ -79,7 +96,7 @@
         { "$ref": "#/$defs/Op_pipe" },
         { "$ref": "#/$defs/Op_get" },
         { "$ref": "#/$defs/Op_if" },
-        { "$ref": "#/$defs/Op_fold" },
+        { "$ref": "#/$defs/Op_foldArr" },
         { "$ref": "#/$defs/Op_foldObj" },
         { "$ref": "#/$defs/Op_cons" },
         { "$ref": "#/$defs/Op_insert" },
@@ -194,12 +211,12 @@
       "additionalProperties": false
     },
 
-    "Op_fold": {
+    "Op_foldArr": {
       "description": "FOLDARR template command: catamorphism of arrays.",
       "type": "object",
       "required": ["$op", "$over", "$init", "$step"],
       "properties": {
-        "$op":   { "const": "fold" },
+        "$op":   { "const": "foldArr" },
         "$over": { "$ref": "#/$defs/Projection" },
         "$init": { "$ref": "#/$defs/Projection" },
         "$step": { "$ref": "#/$defs/Projection" }
