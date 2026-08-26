@@ -2,6 +2,9 @@
 # GIT IGNORE #
 ##############
 
+### Git MailMap
+.mailmap
+
 ### Node.JS modules, installed dependencies.
 node_modules/
 
