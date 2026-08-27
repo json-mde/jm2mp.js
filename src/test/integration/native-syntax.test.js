@@ -60,7 +60,7 @@ describe("Integration test: native syntax", () => {
     const root_projection = {
       "$": { "$op":"get", "$syntax":"native", "$path":"$" }
     };
-    const string_loader = JM2MP.createStringLoader({"1":JSON.stringify(root_projection)});
+    const string_loader = await JM2MP.createStringLoader({"1":JSON.stringify(root_projection)});
     const registry_for_query_language_adapters = await JM2MP.createAdapterRegistry();  // native: siempre incluido.
     const r = await JM2MP.project({
       rootName: "1",
@@ -82,7 +82,7 @@ describe("Integration test: native syntax", () => {
     const root_projection = {
       "$": { "$op":"get", "$path":"@" }
     };
-    const string_loader = JM2MP.createStringLoader({"1":JSON.stringify(root_projection)});
+    const string_loader = await JM2MP.createStringLoader({"1":JSON.stringify(root_projection)});
     const registry_for_query_language_adapters = null;  // native: siempre incluido.
     const r = await JM2MP.project({
       rootName: "1",
@@ -104,7 +104,7 @@ describe("Integration test: native syntax", () => {
     const root_projection = {
       "$": { "$op":"get", "$path":"$.SubRootObject" }
     };
-    const string_loader = JM2MP.createStringLoader({"$":JSON.stringify(root_projection)});
+    const string_loader = await JM2MP.createStringLoader({"$":JSON.stringify(root_projection)});
     const resultant_document = await JM2MP.project({
       rootName: "$",
       loader: string_loader,
@@ -120,7 +120,7 @@ describe("Integration test: native syntax", () => {
     const root_projection = {
       "$": { "$op":"get", "$path":['SubRootObject'] }
     };
-    const string_loader = JM2MP.createStringLoader({"$":JSON.stringify(root_projection)});
+    const string_loader = await JM2MP.createStringLoader({"$":JSON.stringify(root_projection)});
     const resultant_document = await JM2MP.project({
       rootName: "$",
       loader: string_loader,
@@ -136,7 +136,7 @@ describe("Integration test: native syntax", () => {
     const root_projection = {
       "$": { "$op":"get", "$path":"$.SubRootObject.RealProperty" }
     };
-    const string_loader = JM2MP.createStringLoader({"$":JSON.stringify(root_projection)});
+    const string_loader = await JM2MP.createStringLoader({"$":JSON.stringify(root_projection)});
     const resultant_document = await JM2MP.project({
       rootName: "$",
       loader: string_loader,
@@ -152,7 +152,7 @@ describe("Integration test: native syntax", () => {
     const root_projection = {
       "$": { "$op":"get", "$path":['SubRootObject','RealProperty'] }
     };
-    const string_loader = JM2MP.createStringLoader({"$":JSON.stringify(root_projection)});
+    const string_loader = await JM2MP.createStringLoader({"$":JSON.stringify(root_projection)});
     const resultant_document = await JM2MP.project({
       rootName: "$",
       loader: string_loader,

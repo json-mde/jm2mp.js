@@ -70,7 +70,7 @@ describe("Integration test: map-reduce", () => {
         }
       }
     };
-    const string_loader = JM2MP.createStringLoader({"$":JSON.stringify(projection_projection)});
+    const string_loader = await JM2MP.createStringLoader({"$":JSON.stringify(projection_projection)});
     const resultant_document = await JM2MP.project({
       rootName: "$",
       loader: string_loader,
@@ -109,7 +109,7 @@ describe("Integration test: map-reduce", () => {
         }
       }
     };
-    const string_loader = JM2MP.createStringLoader({"$":JSON.stringify(projection_projection)});
+    const string_loader = await JM2MP.createStringLoader({"$":JSON.stringify(projection_projection)});
     const resultant_document = await JM2MP.project({
       rootName: "$",
       loader: string_loader,
@@ -182,7 +182,7 @@ describe("Integration test: map-reduce", () => {
         }
       }
     };
-    const string_loader = JM2MP.createStringLoader({"$":JSON.stringify(projection_projection)});
+    const string_loader = await JM2MP.createStringLoader({"$":JSON.stringify(projection_projection)});
     const resultant_document = await JM2MP.project({
       rootName: "$",
       loader: string_loader,

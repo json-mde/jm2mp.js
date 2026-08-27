@@ -17,6 +17,9 @@
 /* ------------------------------------------------------------------ */
 /* ------------------------------------------------------------------ */
 
+import * as fs from "node:fs/promises";
+import * as path from "node:path";
+import * as process from "node:process";
 import { describe, it } from "node:test";
 import { strict as assert } from "node:assert";
 import * as JM2MP from '../../index.js';
@@ -77,7 +80,7 @@ describe("Integration test: ./src/index.js", () => {
     const root_projection = {
       "$": { "$op":"get", "$syntax":"jmespath", "$path":"SubRootObject" }
     };
-    const string_loader = JM2MP.createStringLoader({"1":JSON.stringify(root_projection)});
+    const string_loader = await JM2MP.createStringLoader({"1":JSON.stringify(root_projection)});
     const registry_for_query_language_adapters = await JM2MP.createAdapterRegistry({jmespath:true});
     const r = await JM2MP.project({
       rootName: "1",
@@ -101,7 +104,7 @@ describe("Integration test: ./src/index.js", () => {
     const root_projection = {
       "$": { "$op":"get", "$syntax":"jsonata", "$path":"$" }
     };
-    const string_loader = JM2MP.createStringLoader({"1":JSON.stringify(root_projection)});
+    const string_loader = await JM2MP.createStringLoader({"1":JSON.stringify(root_projection)});
     const registry_for_query_language_adapters = await JM2MP.createAdapterRegistry({jsonata:true, jsonataOptions:{timeout:(60*1000)}});
     const r = await JM2MP.project({
       rootName: "1",
@@ -123,7 +126,7 @@ describe("Integration test: ./src/index.js", () => {
     const root_projection = {
       "$": { "$op":"get", "$syntax":"jsonpath", "$path":"$" }
     };
-    const string_loader = JM2MP.createStringLoader({"1":JSON.stringify(root_projection)});
+    const string_loader = await JM2MP.createStringLoader({"1":JSON.stringify(root_projection)});
     const registry_for_query_language_adapters = await JM2MP.createAdapterRegistry({jsonpath:true});
     const r = await JM2MP.project({
       rootName: "1",
@@ -145,7 +148,7 @@ describe("Integration test: ./src/index.js", () => {
     const root_projection = {
       "$": { "$op":"get", "$syntax":"jsonpointer", "$path":"" }
     };
-    const string_loader = JM2MP.createStringLoader({"1":JSON.stringify(root_projection)});
+    const string_loader = await JM2MP.createStringLoader({"1":JSON.stringify(root_projection)});
     const registry_for_query_language_adapters = await JM2MP.createAdapterRegistry({jsonpointer:true});
     const r = await JM2MP.project({
       rootName: "1",
@@ -167,7 +170,7 @@ describe("Integration test: ./src/index.js", () => {
     const root_projection = {
       "$": { "$op":"get", "$syntax":"jsonquery", "$path":"{SubRootObject:.SubRootObject}" }
     };
-    const string_loader = JM2MP.createStringLoader({"1":JSON.stringify(root_projection)});
+    const string_loader = await JM2MP.createStringLoader({"1":JSON.stringify(root_projection)});
     const registry_for_query_language_adapters = await JM2MP.createAdapterRegistry({jsonquery:true});
     const r = await JM2MP.project({
       rootName: "1",
@@ -189,7 +192,7 @@ describe("Integration test: ./src/index.js", () => {
     const root_projection = {
       "$": { "$op":"get", "$syntax":"native", "$path":"$" }
     };
-    const string_loader = JM2MP.createStringLoader({"1":JSON.stringify(root_projection)});
+    const string_loader = await JM2MP.createStringLoader({"1":JSON.stringify(root_projection)});
     const registry_for_query_language_adapters = await JM2MP.createAdapterRegistry();  // native: siempre incluido.
     const r = await JM2MP.project({
       rootName: "1",
@@ -211,7 +214,7 @@ describe("Integration test: ./src/index.js", () => {
     const root_projection = {
       "$": { "$op":"get", "$path":"@" }
     };
-    const string_loader = JM2MP.createStringLoader({"1":JSON.stringify(root_projection)});
+    const string_loader = await JM2MP.createStringLoader({"1":JSON.stringify(root_projection)});
     const registry_for_query_language_adapters = null;  // native: siempre incluido.
     const r = await JM2MP.project({
       rootName: "1",
@@ -225,6 +228,28 @@ describe("Integration test: ./src/index.js", () => {
     });
     assert.notStrictEqual(r, null, "r === null");
     assert.deepStrictEqual(r, source_document, "r === source_document");
+  });
+
+/* ------------------------------------------------------------------ */
+
+  it("Full integration example: inventory.", async () => {
+    const file_loader = await JM2MP.createFileLoader({
+      baseDir: path.normalize(process.cwd())
+    });
+    const registry_for_query_language_adapters = null;  // native: siempre incluido.
+    const actual_resultant = await JM2MP.project({
+      rootName: path.join(process.cwd(),'../examples/inventory/projection.json'),
+      loader: file_loader,
+      document: JSON.parse(await fs.readFile('../examples/inventory/source.json',{encoding:'utf8'})),
+      registry: registry_for_query_language_adapters,
+      options: {
+        maxDepth:  100,
+        maxModules: 10,
+      }
+    });
+    const expected_resultant = JSON.parse(await fs.readFile('../examples/inventory/expected-resultant.json',{encoding:'utf8'}));
+    assert.notStrictEqual(actual_resultant, null, "r === null");
+    assert.deepStrictEqual(actual_resultant, expected_resultant, "actual === expected");
   });
 
 /* ------------------------------------------------------------------ */

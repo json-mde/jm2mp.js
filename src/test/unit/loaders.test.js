@@ -15,24 +15,27 @@
  * Tests de los tres loaders predefinidos.
 **/
 
+/* ------------------------------------------------------------------ */
+/* ------------------------------------------------------------------ */
+
 import { describe, it } from "node:test";
 import { strict as assert } from "node:assert";
 import { createStringLoader, createFileLoader, createUrlLoader } from "../../modules/loaders.js";
 import { ResolutionError } from "../../errors.js";
 
-// ============================================================================
+/* ------------------------------------------------------------------ */
+/* ------------------------------------------------------------------ */
 // createStringLoader
-// ============================================================================
 
 describe("createStringLoader", () => {
-  it("rechaza argumento no objeto en la fábrica", () => {
-    assert.throws(() => createStringLoader(null), TypeError);
-    assert.throws(() => createStringLoader("string"), TypeError);
-    assert.throws(() => createStringLoader(42), TypeError);
+  it("rechaza argumento no objeto en la fábrica", async () => {
+    await assert.rejects(createStringLoader(null), TypeError);
+    await assert.rejects(createStringLoader("string"), TypeError);
+    await assert.rejects(createStringLoader(42), TypeError);
   });
 
   it("carga un módulo válido", async () => {
-    const loader = createStringLoader({
+    const loader = await createStringLoader({
       "main": JSON.stringify({ '$': "valor" })
     });
     const result = await loader("main");
@@ -40,22 +43,22 @@ describe("createStringLoader", () => {
   });
 
   it("rechaza módulo no encontrado", async () => {
-    const loader = createStringLoader({});
+    const loader = await createStringLoader({});
     await assert.rejects(loader("noExiste"), ResolutionError);
   });
 
   it("rechaza valor no string en el mapa", async () => {
-    const loader = createStringLoader({ "main": 42 });
+    const loader = await createStringLoader({ "main": 42 });
     await assert.rejects(loader("main"), ResolutionError);
   });
 
   it("rechaza JSON malformado", async () => {
-    const loader = createStringLoader({ "main": "{ no es json válido" });
+    const loader = await createStringLoader({ "main": "{ no es json válido" });
     await assert.rejects(loader("main"), ResolutionError);
   });
 
   it("carga múltiples módulos del mismo mapa", async () => {
-    const loader = createStringLoader({
+    const loader = await createStringLoader({
       "a": JSON.stringify({ '$': 1 }),
       "b": JSON.stringify({ '$': 2 })
     });
@@ -64,9 +67,8 @@ describe("createStringLoader", () => {
   });
 });
 
-// ============================================================================
+/* ------------------------------------------------------------------ */
 // createFileLoader (solo Node.js)
-// ============================================================================
 
 const isNode = typeof process !== "undefined" && process.versions?.node;
 
@@ -95,7 +97,7 @@ describe("createFileLoader", () => {
     const os = await import("node:os");
 
     // Creamos un directorio temporal y un fichero JSON dentro.
-    const tmpDir = await fs.mkdtemp(path.join(os.tmpdir(), "proj-test-"));
+    const tmpDir = await fs.mkdtemp(path.join(os.tmpdir(), "jm2mp-tests-"));
     const filePath = path.join(tmpDir, "modulo.json");
     await fs.writeFile(filePath, JSON.stringify({ '$': "ok" }), "utf8");
 
@@ -113,7 +115,7 @@ describe("createFileLoader", () => {
     const path = await import("node:path");
     const os = await import("node:os");
 
-    const tmpDir = await fs.mkdtemp(path.join(os.tmpdir(), "proj-test-"));
+    const tmpDir = await fs.mkdtemp(path.join(os.tmpdir(), "jm2mp-tests-"));
     const filePath = path.join(tmpDir, "malo.json");
     await fs.writeFile(filePath, "{ esto no es json", "utf8");
 
@@ -130,7 +132,7 @@ describe("createFileLoader", () => {
     const path = await import("node:path");
     const os = await import("node:os");
 
-    const tmpDir = await fs.mkdtemp(path.join(os.tmpdir(), "proj-test-"));
+    const tmpDir = await fs.mkdtemp(path.join(os.tmpdir(), "jm2mp-tests-"));
     const sub = path.join(tmpDir, "sub");
     await fs.mkdir(sub);
     await fs.writeFile(path.join(sub, "x.json"), JSON.stringify({ '$': 1 }), "utf8");
@@ -145,18 +147,17 @@ describe("createFileLoader", () => {
   });
 });
 
-// ============================================================================
+/* ------------------------------------------------------------------ */
 // createUrlLoader
-// ============================================================================
 
 describe("createUrlLoader", () => {
   it("requiere fetch en el entorno", () => {
     // Si fetch no está disponible, la fábrica lanza al crear.
     // En Node 18+ y navegador moderno, fetch SÍ está, así que esto pasa.
     if (typeof fetch !== "function") {
-      assert.throws(() => createUrlLoader(), ResolutionError);
+      assert.throws(async () => await createUrlLoader(), ResolutionError);
     } else {
-      assert.doesNotThrow(() => createUrlLoader());
+      assert.doesNotThrow(async () => await createUrlLoader());
     }
   });
 
@@ -166,13 +167,13 @@ describe("createUrlLoader", () => {
   }
 
   it("rechaza URL inválida", async () => {
-    const loader = createUrlLoader();
+    const loader = await createUrlLoader();
     await assert.rejects(loader("no-es-una-url"), ResolutionError);
   });
 
   it("propaga fallo de red como ResolutionError", async () => {
     // Puerto no escuchable: la conexión fallará.
-    const loader = createUrlLoader();
+    const loader = await createUrlLoader();
     await assert.rejects(
       loader("http://127.0.0.1:1/no-existe.json"),
       ResolutionError
@@ -182,12 +183,16 @@ describe("createUrlLoader", () => {
   it("resuelve baseUrl con nombre relativo (sin completar la red)", async () => {
     // Aunque el fetch fallará por red, este test verifica que NO falla por
     // construcción de URL inválida antes de llegar a fetch.
-    const loader = createUrlLoader({ baseUrl: "http://127.0.0.1:1/" });
+    const loader = await createUrlLoader({ baseUrl: "http://127.0.0.1:1/" });
     await assert.rejects(loader("modulo.json"), ResolutionError);
   });
 
   it("acepta baseUrl sin barra final (la normaliza internamente)", async () => {
-    const loader = createUrlLoader({ baseUrl: "http://127.0.0.1:1/api" });
+    const loader = await createUrlLoader({ baseUrl: "http://127.0.0.1:1/api" });
     await assert.rejects(loader("modulo.json"), ResolutionError);
   });
 });
+
+/* ------------------------------------------------------------------ */
+/* ------------------------------------------------------------------ */
+/* End of file: ${JM2MP.JS}/src/test/unit/joaders.test.js */

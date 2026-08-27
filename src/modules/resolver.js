@@ -193,7 +193,7 @@ export async function resolve(rootName, loader, options = {})
           { cause }
         );
       }
-      // It test if the loaded modules is a valid one.
+      // It tests if the loaded modules is a valid one.
       if ( ! isModule(loaded_module) )
       {
         throw new ResolutionError(

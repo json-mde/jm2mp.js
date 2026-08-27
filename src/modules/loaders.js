@@ -66,7 +66,7 @@ import { ResolutionError } from "../errors.js";
  * @throws {module:jm2mp/modules/LookupAddress.TypeError}
  * Whenever 'stringMap' is not an object or is null.
 **/
-export function createStringLoader(stringMap)
+export async function createStringLoader(stringMap)
 {
   if (typeof stringMap !== "object" || stringMap === null)
   {
@@ -248,7 +248,7 @@ export async function createFileLoader(options = {})
  * @throws {module:jm2mp/modules/LookupAddress.TypeError}
  * Whenever 'stringMap' is not an object or is null.
 **/
-export function createUrlLoader(options = {})
+export async function createUrlLoader(options = {})
 {
   if (typeof fetch !== "function")
   {
