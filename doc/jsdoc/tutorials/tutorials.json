@@ -17,7 +17,16 @@
     "06--use-cases" : {
         "title" : "Use Cases"
     },
-    "07--jsdoc" : {
-        "title" : "Documentation Generation Using Tidy-JSDoc"
+    "07--cli" : {
+        "title" : "Use in CLI"
+    },
+    "08--web" : {
+        "title" : "Use in WWW"
+    },
+    "09--express" : {
+        "title" : "Use in Express.js"
+    },
+    "10--jsdoc" : {
+        "title" : "Documentation Generation"
     }
 }

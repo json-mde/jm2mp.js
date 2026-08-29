@@ -6,24 +6,34 @@
 to transform algebraically any input JSON document into another output
 JSON document, and a library to execute such transformations.
 
+
 ## Source code
 
-The source code for this **JM2MP.JS** library can be retrieved from:
+As part of this work, the [JSON-MDE](https://github.com/JSON-MDE/)
+_organization_ has been created on [GitHub](https://github.com/), which
+encompasses numerous projects, the main one
+[JM2MP.JS](https://GitHub.com/JSON-MDE/JM2MP.JS) as well as others for
+illustrative and utility purposes.
 
-- [https://GitHub.com/JSON-MDE/JM2MP.JS](https://GitHub.com/JSON-MDE/JM2MP.JS)
+The source code for all projects related to **JM2MP** can be retrieved
+from there.
+
 
 ## Documentation
 
-This documentation about this **JM2MP.JS** library and the **JM2MP**
-syntax can be found at:
+The documentation about this **JM2MP.JS** library, the **JM2MP**
+syntax, and their related projects, can be found online at:
 
 - [https://GitHub.JSON-MDE.Tech/jm2mp.js/](https://GitHub.JSON-MDE.Tech/jm2mp.js/)
 
-Documentation has been generated using a customized version of both
-[JSDoc](https://jsdoc.app/) and
-[tidy-jsdoc](doc/jsdoc/tmpl/tidy-jsdoc/layout.tmpl).
 It contains several tutorials to help you get started and learn more
 about these topics.
+
+Documentation has been generated using a customized version of both
+[JSDoc](https://jsdoc.app/) and
+[tidy-jsdoc](doc/jsdoc/tmpl/tidy-jsdoc/layout.tmpl) (thanks to the
+authors for their willingness to share they work).
+
 
 ## Authors
 
@@ -45,8 +55,8 @@ about these topics.
 
 ## Licensing
 
-The **JM2MP** syntax and this **JM2MP.JS** library are both licensed
-under the *BSD-3-Clause* license:
+The **JM2MP** syntax, the **JM2MP.JS** library, and all their related
+projects are licensed under the *BSD-3-Clause* license:
 
 - [BSD-3-Clause license](./LICENSE.txt)
 

@@ -39,7 +39,7 @@
 /* ------------------------------------------------------------------ */
 /* ------------------------------------------------------------------ */
 
-import { ThrowsValidationErrorWhenIsNotAModule } from "./helpers.js";
+import { AssertIsModule } from "./helpers.js";
 
 /* ------------------------------------------------------------------ */
 /* ------------------------------------------------------------------ */
@@ -72,7 +72,7 @@ export const MODULE_METADATA_KEYS = new Set(["$options", "$schema"]);
 export function normalizeModule(module)
 {
   // It validates if it is actually a valid module.
-  ThrowsValidationErrorWhenIsNotAModule(module);
+  AssertIsModule(module);
   // It gets the default query language declared for the module.
   const defaultSyntax = getDefaultSyntax(module);
   // It builds a new (resultant) projection module.

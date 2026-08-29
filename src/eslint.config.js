@@ -2,9 +2,11 @@
  * @author Luis Maria CAMARA ROSSI
  * @copyright Universidad Nacional de Educación a Distancia (U.N.E.D.) 2026
  * @license BSD-3-Clause
- * @module index
- * @file API pública del sistema de proyecciones.
+ * @file ESLINT configuration file.
 **/
+
+/* ------------------------------------------------------------------ */
+/* ------------------------------------------------------------------ */
 
 import js from "@eslint/js";
 import globals from "globals";
@@ -14,6 +16,13 @@ import css from "@eslint/css";
 import { defineConfig } from "eslint/config";
 import stylistic from '@stylistic/eslint-plugin'
 
+/* ------------------------------------------------------------------ */
+/* ------------------------------------------------------------------ */
+
+/**
+ * @description
+ * ESLINT configuration file.
+**/
 export default defineConfig([
   {
     name:"JavaScript",
@@ -56,4 +65,6 @@ export default defineConfig([
   */
 ]);
 
-// End of file.
+/* ------------------------------------------------------------------ */
+/* ------------------------------------------------------------------ */
+/* End of file: ${JM2MP.JS-CLI}/eslint.config.js                      */

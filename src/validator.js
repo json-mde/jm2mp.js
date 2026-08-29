@@ -42,7 +42,7 @@
 /* ------------------------------------------------------------------ */
 
 import { ValidationError } from "./errors.js";
-import { ROOT_TEMPLATE_NAME, ThrowsValidationErrorWhenIsNotAModule } from "./modules/helpers.js";
+import { ROOT_TEMPLATE_NAME, AssertIsModule } from "./modules/helpers.js";
 import { parsePath } from "./adapters/native-paths.js";
 
 /* ------------------------------------------------------------------ */
@@ -297,7 +297,7 @@ export function isValidName(name)
 export async function validateModule(module, registry)
 {
   // It checks if it is a valid module.
-  ThrowsValidationErrorWhenIsNotAModule(module) ;
+  AssertIsModule(module) ;
   // All named templates within the module.
   const templateNames = Object.keys(module);
   // It checks whether the projection contains the root template.

@@ -24,19 +24,34 @@ transformations.
 - A JavaScript [EM2024](https://tc39.es/ecma262/2024/) library to execute
   `JM2MP` transformations as part of your applications and services.
 
-- An script `./cli/main.js` to execute transformations (using, for instance,
+  Analyze the [JM2MP Syntax](./tutorial-02--jm2mp-syntax.html) tutorial
+  for information about this format and its library.
+
+- A package `JM2MP.JS-CLI` to execute transformations (using
   [Node.JS](https://NodeJS.ORG/en)) as part of an on-line and interactive
   _command-line interface_ (CLI), or as part of a batch processing in a
   _shell script_.
 
-- A web page `./web/index.html` to test interactively in your own web
-  browser how to use `JM2MP`.
+  Review the [Use in CLI](./tutorial-07--cli.html) tutorial to know how
+  to use this feature.
 
-- Examples of [Express.JS](https://Express.JS/) middleware, written with
-  subtle variations for versions
+- A web page `./web/index.html`, part of this documentation, to test
+  interactively in your own web browser how to use `JM2MP`.
+
+  Consider the [Use in WWW](./tutorial-08--web.html) tutorial to read
+  how to use this web page for stydy and practice your habilities with
+  `JM2MP`.
+
+- Examples of [Express.js](https://ExpressJS.com/) middleware, written
+  with subtle variations for versions
   [4](https://expressjs.com/en/4x/guide/using-middleware/) and
   [5](https://expressjs.com/en/5x/guide/using-middleware/) of this
-  specific framework.
+  specific framework for the development of web applications and
+  services.
+
+  The [Use in Express.js](./tutorial-09--express.html) tutorial shows
+  how to use such examples.
+
 
 ## About
 
@@ -57,6 +72,7 @@ I would also like to thank _María Isabel Cámara_ and _Kulvir Sroy_ for
 their invaluable assistance during the translation of this article and
 other texts I wrote as part of my doctoral studies.
 
+
 ## Licensing
 
 Both `JM2MP` format and `JM2MP.JS` library are licensed under
@@ -64,6 +80,7 @@ Both `JM2MP` format and `JM2MP.JS` library are licensed under
 get the source code and all its products, and derive it for your own
 specific needs. But, please, remember the conditions under such
 license about redistribution, attribution and endorsement.
+
 
 ## Basic concepts
 
@@ -89,6 +106,7 @@ working with a single, large projection.
 The tutorial [JM2MP Syntax](./tutorial-02--jm2mp-syntax.html)
 discusses all of these topics in greater detail.
 
+
 ## Usage
 
 There are several ways to use `JM2MP.JS` directly from any modern web
@@ -101,9 +119,9 @@ NPM).
 #### GitHub Pages
 
 Everyone can access specific files from a GitHub repository using
-[https://raw.githubusercontent.com/lmcamara-aldeas/pixel-aid-connect/main/src/assets/hero-image.jpg](https://raw.githubusercontent.com/lmcamara-aldeas/pixel-aid-connect/main/src/assets/hero-image.jpg)
+[https://raw.githubusercontent.com/json-mde/jm2mp.js/refs/heads/master/src/index.js](https://raw.githubusercontent.com/json-mde/jm2mp.js/refs/heads/master/src/index.js)
 instead of usual
-[https://github.com/lmcamara-aldeas/pixel-aid-connect/blob/main/src/assets/hero-image.jpg](https://github.com/lmcamara-aldeas/pixel-aid-connect/blob/main/src/assets/hero-image.jpg)
+[https://github.com/json-mde/jm2mp.js/blob/master/src/index.js](https://github.com/json-mde/jm2mp.js/blob/master/src/index.js)
 URL.
 
 This way, you can link to specific files of `JM2MP.JS` library to use
@@ -129,7 +147,7 @@ see it working:
 ```
 
 As previuosly mentioned, you can access the full file from
-([https://raw.githubusercontent.com/lmcamara-aldeas/pixel-aid-connect/main/src/assets/hero-image.jpg](https://raw.githubusercontent.com/lmcamara-aldeas/pixel-aid-connect/main/src/assets/hero-image.jpg)) URL.
+[https://raw.githubusercontent.com/json-mde/jm2mp.js/refs/heads/master/src/index.js](https://raw.githubusercontent.com/json-mde/jm2mp.js/refs/heads/master/src/index.js) URL.
 
 ### Installation
 
@@ -137,7 +155,7 @@ As previuosly mentioned, you can access the full file from
 
 Source code of the `JM2MP.JS` library is published in [GitHub](https://github.com/):
 
-- [https://github.com/json-mde/jm2mp.js/](https://github.com/json-mde/jm2mp.js/)
+- [https://github.com/JSON-MDE/JM2MP.JS](https://github.com/JSON-MDE/JM2MP.JS)
 
 You can directly download (only but all) source code as one single ZIP compressed file.
 

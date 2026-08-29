@@ -70,7 +70,7 @@ export function isModule(module)
  * Raised whenever `module` is not a valid module.
  * @see {@link module:jm2mp/modules/helpers.isModule}
  */
-export function ThrowsValidationErrorWhenIsNotAModule(module)
+export function AssertIsModule(module)
 {
   if ( ! isModule(module) )
   {
@@ -140,7 +140,7 @@ export function moduleWith(rootProjection, namedTemplates = {})
  * [import]{@link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/import}'ed;
  * `false` otherwise.
 **/
-export async function isPackagedEsmModuleAvailable(moduleName)
+export async function isPackageAvailable(moduleName)
 {
   try
   {

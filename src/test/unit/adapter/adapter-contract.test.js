@@ -27,7 +27,7 @@
 import { describe, it } from "node:test";
 import { strict as assert } from "node:assert";
 import { createNativeAdapter } from "../../../adapters/native.js";
-import { isPackagedEsmModuleAvailable } from "../../../modules/helpers.js";
+import { isPackageAvailable } from "../../../modules/helpers.js";
 
 /**
  * Ejecuta una batería de tests de contrato para un adaptador dado.
@@ -223,7 +223,7 @@ describe("Contrato extra del nativo: $path como array", () => {
 // Adaptador JSONPath (si jsonpath-plus está instalado).
 // ============================================================================
 
-const jsonpathAvailable = await isPackagedEsmModuleAvailable("jsonpath-plus");
+const jsonpathAvailable = await isPackageAvailable("jsonpath-plus");
 
 if (jsonpathAvailable) {
   const { createJsonPathAdapter } = await import("../../../adapters/jsonpath.js");
@@ -243,7 +243,7 @@ if (jsonpathAvailable) {
 // Adaptador JSONata (si jsonata está instalado).
 // ============================================================================
 
-const jsonataAvailable = await isPackagedEsmModuleAvailable("jsonata");
+const jsonataAvailable = await isPackageAvailable("jsonata");
 
 if (jsonataAvailable) {
   const { createJsonataAdapter } = await import("../../../adapters/jsonata.js");
@@ -283,7 +283,7 @@ if (jsonataAvailable) {
 // Adaptador JSON Query (si la librería está instalada).
 // ============================================================================
 
-const jsonqueryAvailable = await isPackagedEsmModuleAvailable("@jsonquerylang/jsonquery");
+const jsonqueryAvailable = await isPackageAvailable("@jsonquerylang/jsonquery");
 
 if (jsonqueryAvailable) {
   const { createJsonQueryAdapter } = await import("../../../adapters/jsonquery.js");
@@ -303,7 +303,7 @@ if (jsonqueryAvailable) {
 // Adaptador JSON Pointer / RFC 6901 (si json-pointer está instalada).
 // ============================================================================
 
-const jsonpointerAvailable = await isPackagedEsmModuleAvailable("json-pointer");
+const jsonpointerAvailable = await isPackageAvailable("json-pointer");
 
 if (jsonpointerAvailable) {
   const { createJsonPointerAdapter } = await import("../../../adapters/jsonpointer.js");
@@ -333,7 +333,7 @@ if (jsonpointerAvailable) {
 // testea explícitamente.
 // ============================================================================
 
-const jmespathAvailable = await isPackagedEsmModuleAvailable("jmespath");
+const jmespathAvailable = await isPackageAvailable("jmespath");
 
 if (jmespathAvailable) {
   const { createJmesPathAdapter } = await import("../../../adapters/jmespath.js");
