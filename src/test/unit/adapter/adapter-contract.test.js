@@ -33,7 +33,8 @@ import { isPackageAvailable } from "../../../modules/helpers.js";
  * Ejecuta una batería de tests de contrato para un adaptador dado.
  *
  * @param {string} syntaxName - Nombre de la sintaxis (para describe).
- * @param {() => Promise<import("../../../adapters/registry.js").QueryAdapter>} createAdapter
+ * @param {Promise<module:jm2mp/adapters/registry.QueryAdapter>} createAdapter
+ * () => Promise<module:jm2mp/adapters/registry.QueryAdapter>
  * @param {object} pathSelector - Mapa caso lógico → path en esta sintaxis.
  *   Si un caso no tiene path para esta sintaxis, se salta ese caso.
  * @param {string} [pathSelector.simpleField] - Path que accede al campo "campo".

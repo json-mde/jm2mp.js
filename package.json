@@ -31,10 +31,10 @@
   "engines": {
     "node": ">=22.0.0"
   },
-  "main": "./index.js",
+  "main": "./src/index.js",
   "exports": {
-    ".": "./index.js",
-    "./schema": "./schemas/JM2MP-v1.0.0--JSON-Schema-Draft-2020-12.json"
+    ".": "./src/index.js",
+    "./schema": "./src/schemas/JM2MP-v1.0.0--JSON-Schema-Draft-2020-12.json"
   },
   "files": [
     "./README.md",
@@ -51,11 +51,11 @@
     "test:coverage-lcov": "node --test --experimental-test-coverage --test-reporter=lcov --test-reporter-destination=coverage.lcov",
     "eslint": "npx -- eslint",
     "jsdoc": "npm run jsdoc@windows",
-    "jsdoc@windows": "( IF EXIST ..\\doc\\jsdoc-out\\ DEL /Q /F /S ..\\doc\\jsdoc-out\\ ) && ( COPY /B ..\\README.md + ..\\CHANGELOG.md ..\\README_CHANGELOG.md ) && ( .\\node_modules\\.bin\\jsdoc.cmd --configure .\\JSDoc.config.json ) & ( DEL ..\\README_CHANGELOG.md )",
-    "jsdoc@linux": "( rm -rf ../doc/jsdoc-out/ ) && ( cat ../README.md ../CHANGELOG.md > ../README_CHANGELOG.md ) && ( ./node_modules/.bin/jsdoc --configure ./JSDoc.config.json ) && ( rm -f ../README_CHANGELOG.md )",
+    "jsdoc@windows": "( IF EXIST .\\doc\\jsdoc-out\\ DEL /Q /F /S .\\doc\\jsdoc-out\\ ) && ( COPY /B .\\README.md + .\\CHANGELOG.md .\\README_CHANGELOG.md ) && ( .\\node_modules\\.bin\\jsdoc.cmd --configure .\\JSDoc.config.json ) & ( DEL .\\README_CHANGELOG.md )",
+    "jsdoc@linux": "( rm -rf ./doc/jsdoc-out/ ) && ( cat ./README.md ./CHANGELOG.md > ./README_CHANGELOG.md ) && ( ./node_modules/.bin/jsdoc --configure ./JSDoc.config.json ) && ( rm -f ./README_CHANGELOG.md )",
     "ajv": "npm run ajv@windows",
-    "ajv@windows": "( npx -- ajv-cli --spec=draft2020 -s .\\schemas\\JM2MP-v1.0.0--JSON-Schema-Draft-2020-12.json -d ..\\examples\\courses-students\\projection.json ) && ( npx -- ajv-cli --spec=draft2020 -s .\\schemas\\JM2MP-v1.0.0--JSON-Schema-Draft-2020-12.json -d ..\\examples\\inventory\\projection.json )",
-    "ajv@linux": "( npx -- ajv-cli --spec=draft2020 -s ./schemas/JM2MP-v1.0.0--JSON-Schema-Draft-2020-12.json -d ../examples/courses-students/projection.json ) && ( npx -- ajv-cli --spec=draft2020 -s ./schemas/JM2MP-v1.0.0--JSON-Schema-Draft-2020-12.json -d ../examples/inventory/projection.json )"
+    "ajv@windows": "( npx -- ajv-cli --spec=draft2020 -s .\\src\\schemas\\JM2MP-v1.0.0--JSON-Schema-Draft-2020-12.json -d .\\examples\\courses-students\\projection.json ) && ( npx -- ajv-cli --spec=draft2020 -s .\\src\\schemas\\JM2MP-v1.0.0--JSON-Schema-Draft-2020-12.json -d .\\examples\\inventory\\projection.json )",
+    "ajv@linux": "( npx -- ajv-cli --spec=draft2020 -s ./src/schemas/JM2MP-v1.0.0--JSON-Schema-Draft-2020-12.json -d ./examples/courses-students/projection.json ) && ( npx -- ajv-cli --spec=draft2020 -s ./src/schemas/JM2MP-v1.0.0--JSON-Schema-Draft-2020-12.json -d ./examples/inventory/projection.json )"
   },
   "optionalDependencies": {
     "@jsonquerylang/jsonquery": "4.x",

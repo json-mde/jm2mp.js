@@ -149,7 +149,7 @@ There are several approaches about IaC files:
   and tools like [OpenTofu](https://opentofu.org/) are trying to
   fullfill this function.
 
-The [Abstract Behavioral Specification (ABS) Language](#https://abs-models.org/publications-and-workshops.html)
+The [Abstract Behavioral Specification (ABS) Language](https://abs-models.org/publications-and-workshops.html)
 is an example of academic formalization of several aspects linked to IaC,
 combining specification and verification of infrastructure models.
 

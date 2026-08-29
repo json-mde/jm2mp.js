@@ -238,16 +238,16 @@ describe("Integration test: ./src/index.js", () => {
     });
     const registry_for_query_language_adapters = null;  // native: siempre incluido.
     const actual_resultant = await JM2MP.project({
-      rootName: path.join(process.cwd(),'../examples/inventory/projection.json'),
+      rootName: path.join(process.cwd(),'./examples/inventory/projection.json'),
       loader: file_loader,
-      document: JSON.parse(await fs.readFile('../examples/inventory/source.json',{encoding:'utf8'})),
+      document: JSON.parse(await fs.readFile('./examples/inventory/source.json',{encoding:'utf8'})),
       registry: registry_for_query_language_adapters,
       options: {
         maxDepth:  100,
         maxModules: 10,
       }
     });
-    const expected_resultant = JSON.parse(await fs.readFile('../examples/inventory/expected-resultant.json',{encoding:'utf8'}));
+    const expected_resultant = JSON.parse(await fs.readFile('./examples/inventory/expected-resultant.json',{encoding:'utf8'}));
     assert.notStrictEqual(actual_resultant, null, "r === null");
     assert.deepStrictEqual(actual_resultant, expected_resultant, "actual === expected");
   });

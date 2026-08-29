@@ -367,8 +367,8 @@ information about this topic.
 We divide _template commands_ in different families due of the nature
 of its intentions inside `JM2MP` syntax:
 [execution environment](#execution-environment),
-[projections](#projections),
-[predicates](#predicates), and [operators](#operators).
+[projections](#projections), and
+[predicates and operators](#predicates-and-operators).
 
 ### Execution environment
 
@@ -1784,14 +1784,11 @@ will be fully ignored.
 
 An optional `$default-query-language` property can be declared to
 specify which [available query language](#available-query-languages)
-will be used by default by the `JM2MP.JS` processor (that is,
-`JM2MP.JS`) whenever a
-[text literal query language expression](#text-literal-query-language-syntax)
-was used instead of a
-[JSON query language expression](#json-query-language-syntax),
-as part of any [query language syntax](#query-language-syntaxes) used in
-the _projection document or module_. If it is not declared, its value will be
-considered as `"native"` (see [native query language](#native)).
+will be used by default by the `JM2MP` format processor (that is,
+`JM2MP.JS`) whenever a [query language expression](#query-languages)
+was used as part of any _projection document or module_. If this option
+is not declared, by default the [native query language](#native) will be
+considered.
 
 ### Depends On
 

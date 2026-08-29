@@ -54,7 +54,7 @@
   --member-name-signature-display: none;
   --base-font-size: 16px;
   --base-line-height: 1.7;
-  --body-font: -apple-system, system-ui, "Segoe UI", Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+  --body-font: -apple-system, system-ui, "Segoe UI", Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", sans-serif;
   --code-font: Consolas, Monaco, "Andale Mono", monospace;
 }
 

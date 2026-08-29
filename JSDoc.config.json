@@ -15,19 +15,19 @@
     "template": "./node_modules/tidy-jsdoc",
     "prism-theme": "prism-default",
     "encoding": "utf8",
-    "destination": "../doc/jsdoc-out/",
+    "destination": "./doc/jsdoc-out/",
     "recurse": true,
-    "tutorials": "../doc/jsdoc/tutorials/",
-    "readme": "../README_CHANGELOG.md",
+    "tutorials": "./doc/jsdoc/tutorials/",
+    "readme": "./README_CHANGELOG.md",
     "package": "./package.json",
     "verbose": true
   },
   "recurseDepth": 100,
   "source": {
-    "include": [ "./" ],
-    "exclude": [ "node_modules/", "test/", "json-pointer-rfc6901--processor.js" ],
+    "include": [ "./src/" ],
+    "exclude": [ "node_modules/", "./src/test/", "json-pointer-rfc6901--processor.js" ],
     "includePattern": ".+\\.(c|m)?js(doc|x)?$",
-    "excludePattern": "(node_modules/)|(test/)|(json-pointer-rfc6901--processor\\.js)|((^|\\/|\\\\)_)"
+    "excludePattern": "(node_modules/)|(test/)|(json-pointer-rfc6901--processor\\.js)|((^|\\/|\\\\)_)|(\\.test\\.)"
   },
   "tags": {
     "allowUnknownTags": true,
@@ -37,13 +37,13 @@
     "cleverLinks": false,
     "monospaceLinks": false,
     "default": {
-      "___layoutFile": "../doc/layout.tmpl",
+      "___layoutFile": "./doc/layout.tmpl",
       "includeDate": true,
       "LCamara8_Footer": true,
       "staticFiles": {
         "include": [
-          "../doc/jsdoc/static/",
-          "../LICENSE.txt"
+          "./doc/jsdoc/static/",
+          "./LICENSE.txt"
         ]
       }
     }

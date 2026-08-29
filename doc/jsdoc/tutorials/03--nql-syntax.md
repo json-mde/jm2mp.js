@@ -2,7 +2,7 @@
 
 - [Introduction](#introduction)
 - [Basic Capabilities](#basic-capabilities)
-- [JSON Variant](#json-version)
+- [JSON Variant](#json-variant)
 - [Textual String Variant](#textual-string-variant)
 - [Combining Operations](#combining-operations)
   - [Filtering](#filtering)

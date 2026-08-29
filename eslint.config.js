@@ -8,12 +8,13 @@
 /* ------------------------------------------------------------------ */
 /* ------------------------------------------------------------------ */
 
+import { fileURLToPath } from "node:url";
 import js from "@eslint/js";
 import globals from "globals";
 import json from "@eslint/json";
 import markdown from "@eslint/markdown";
 import css from "@eslint/css";
-import { defineConfig } from "eslint/config";
+import { defineConfig, includeIgnoreFile } from "eslint/config";
 import stylistic from '@stylistic/eslint-plugin'
 
 /* ------------------------------------------------------------------ */
@@ -24,9 +25,15 @@ import stylistic from '@stylistic/eslint-plugin'
  * ESLINT configuration file.
 **/
 export default defineConfig([
+  includeIgnoreFile(
+    fileURLToPath(new URL(".gitignore", import.meta.url)),
+    { gitignoreResolution: true,
+      name: "Imported .gitignore patterns." }
+  ),
   {
     name:"JavaScript",
     files: ["**/*.{js,mjs,cjs}"],
+    ignores: [ "./doc/**" ],
     plugins: { js },
     extends: ["js/recommended"],
     languageOptions: {
@@ -38,7 +45,7 @@ export default defineConfig([
   {
     name: "JSON",
     files: ["**/*.json"],
-    ignores: ["./package-lock.json"],
+    ignores: [ "./package-lock.json" ],
     plugins: { json },
     language: "json/json",
     extends: ["json/recommended"]
@@ -46,7 +53,7 @@ export default defineConfig([
   { name: "JSONC",    files: ["**/*.jsonc"], plugins: { json },     language: "json/jsonc",   extends: ["json/recommended"]     },
   { name: "JSON5",    files: ["**/*.json5"], plugins: { json },     language: "json/json5",   extends: ["json/recommended"]     },
   { name: "MarkDown", files: ["**/*.md"],    plugins: { markdown }, language: "markdown/gfm", extends: ["markdown/recommended"] },
-  { name: "CSS",      files: ["**/*.css"],   plugins: { css },      language: "css/css",      extends: ["css/recommended"]      },
+  { name: "CSS",      files: ["**/*.css"],   plugins: { css },      language: "css/css",      extends: ["css/recommended"],     ignores: [ "**/jsdoc/**" ] },
   {
     name: "linterOptions", 
     linterOptions: {

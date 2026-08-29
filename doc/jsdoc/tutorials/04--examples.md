@@ -1,7 +1,7 @@
 ## Table of Contents
 
 - [Introduction](#introduction)
-- [Courses and Students](#courses-and-studentss)
+- [Courses and Students](#courses-and-students)
   - [Source Document](#source-document-cs)
   - [Projection Document](#projection-document-cs)
   - [Resultant Document](#resultant-document-cs)
