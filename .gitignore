@@ -5,6 +5,9 @@
 ### Git MailMap
 .mailmap
 
+### Node.JS package publishing.
+_pkg/
+
 ### Node.JS modules, installed dependencies.
 node_modules/
 

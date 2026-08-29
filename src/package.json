@@ -32,11 +32,17 @@
     "node": ">=22.0.0"
   },
   "main": "./index.js",
-  "browser": "./web/index.html",
   "exports": {
     ".": "./index.js",
     "./schema": "./schemas/JM2MP-v1.0.0--JSON-Schema-Draft-2020-12.json"
   },
+  "files": [
+    "./README.md",
+    "./LICENSE.txt",
+    "./CHANGELOG.md",
+    "./src/errors.js", "./src/evaluator.js", "./src/index.js", "./src/validator.js",
+    "./src/adapters/*.js", "./src/modules/*.js", "./src/schemas/*.json"
+  ],
   "scripts": {
     "all": "npm run test:coverage && npm run eslint && npm run jsdoc",
     "test": "node --test",
