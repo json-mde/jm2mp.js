@@ -9,6 +9,8 @@ GOTO Error
 :Deploy
 DEL /F /S /Q ..\JSON-MDE.GitHub.IO\jm2mp.js\
 XCOPY /E /V /I /H /Y /Z .\doc\jsdoc-out\@json-mde\jm2mp\1.0.0\ ..\JSON-MDE.GitHub.IO\jm2mp.js\
+MOVE /Y ..\JSON-MDE.GitHub.IO\jm2mp.js\jm2mp.js-www\*.* ..\JSON-MDE.GitHub.IO\jm2mp.js-www\
+DEL /F /S /Q ..\JSON-MDE.GitHub.IO\jm2mp.js\jm2mp.js-www\
 MOVE /Y ..\JSON-MDE.GitHub.IO\jm2mp.js\humans.txt ..\JSON-MDE.GitHub.IO\
 MOVE /Y ..\JSON-MDE.GitHub.IO\jm2mp.js\robots.txt ..\JSON-MDE.GitHub.IO\
 MOVE /Y ..\JSON-MDE.GitHub.IO\jm2mp.js\LICENSE.txt ..\JSON-MDE.GitHub.IO\

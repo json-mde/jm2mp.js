@@ -1,0 +1,109 @@
+<!--
+    @author       Luis Maria CAMARA ROSSI
+    @copyright    Universidad Nacional de Educación a Distancia (U.N.E.D.) 2026
+    @license      BSD-3-Clause
+    @description  Use of JM2MP in WWW via CDN.
+-->
+<!DOCTYPE html>
+<html version="5" lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Use of JM2MP in WWW via CDN</title>
+    <style type="text/css">
+      body {
+        color: darkgreen;
+        background-color: lightgray;
+        font-family: "Verdana", "Arial", sans-serif;
+        font-size: medium;
+      }
+      pre {
+        font-family: "Consolas", "Courier New", monospace;
+        font-size: smaller;
+        color: lightgray;
+        background-color: navy;
+      }
+      hr {
+        display: none;
+      }
+    </style>
+    <script type="module">
+      import * as JM2MP from 'https://cdn.jsdelivr.net/npm/@json-mde/jm2mp@1.0.0/+esm' ;
+    </script>
+  </head>
+  <body>
+    <header>
+      <h1>JM2MP.JS</h1>
+      <h2>Use in WWW</h2>
+      <h3>CDN Example</h3>
+      <hr />
+    </header>
+    <main>
+      <h3>Source</h3>
+      <script type="module">
+        const source = { "Author": { "Name":"Luis", "Institution":"U.N.E.D." } };
+      </script>
+      <pre>
+        <script type="module">
+          document.write(source);
+        </script>
+      </pre>
+      <hr />
+      <h3>Projection</h3>
+      <script type="module">
+        const projection = {
+          "$" : {
+            "People" : [
+              {
+                "Name" : "$.Author.Name",
+                "University" : "$.Author.Institution"
+              }
+            ]
+          }
+        }
+      </script>
+      <pre>
+        <script type="module">
+          document.write(projection);
+        </script>
+      </pre>
+      <hr />
+      <h3>Resultant</h3>
+      <pre>
+        <script type="module">
+        const string_loader = JM2MP.createStringLoader(
+          { "$" : JSON.stringify(projection) }
+        );
+        document.write(
+          JSON.stringify(
+            JM2MP.project({
+              rootName: "$",
+              loader: string_loader,
+              document: source,
+              registry: undefined,
+              options: {}
+            }),
+            undefined,
+            '    '
+          )
+        );
+        </script>
+      </pre>
+    </main>
+    <footer>
+      <hr />
+      <div>
+        Copyright &copy; 2026 Luis Mar&iacute;a C&Aacute;MARA ROSSI.<br>
+        Trademark &trade; Copyright &copy; 2026 <a href="https://www.uned.es/" target="UNED" title="U.N.E.D.">Universidad Nacional de Educaci&oacute;n a Distancia (U.N.E.D.).<br>
+        The <strong><code>JM2MP</code></strong> syntax, the <strong><code>JM2MP.JS</code></strong> library,
+        and all their related projects are licensed under the <code>BSD-3-Clause</code>
+        <sup>
+          <a target="BSD1" href="https://opensource.org/license/bsd-3-clause">[1]</a>
+          <a target="BSD2" href="https://spdx.org/licenses/BSD-3-Clause.html">[2]</a>
+        </sup> license.
+        <br>
+        See <a href="/LICENSE.txt" target="LICENSE">LICENSE.txt</a> for more information.
+      </div>
+      <br>
+    </footer>
+  </body>
+</html>

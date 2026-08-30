@@ -11,6 +11,7 @@
   - [Installation](#installation)
     - [GitHub download](#github-download)
     - [Node.JS and Node Package Manager (NPM)](#nodejs-and-node-package-manager-npm)
+  - [Running in CLI](#running-in-cli)
 
 ## Introduction
 
@@ -36,7 +37,7 @@ transformations.
   Review the [Use in CLI](./tutorial-07--cli.html) tutorial to know how
   to use this feature.
 
-- An static web page `./JM2MP.JS-WWW/index.html`, part of this
+- A set of static web pages `./JM2MP.JS-WWW/`, part of this
   documentation, to test interactively in your own web browser how to
   use `JM2MP`.
 
@@ -134,13 +135,20 @@ them from your own applications and services.
 
 Using [CDN](https://www.akamai.com/glossary/what-is-a-cdn) services like
 [jsDelivr](https://www.jsdelivr.com/) allows the `JM2MP.JS` library to
-be used in web applications without the need for prior installation, <span style="background:yellow">
-thanks to the use of [WebPack](https://webpack.js.org/concepts/) as a
-code _bundler_</span>.
+be used in web applications without the need for prior installation.
 
-Next, you can see an extract from file `./web/jm2mp-cdn.html`. You can
-save it to your hard disk drive and open it with any modern browser to
-see it working:
+They offer more efficient ways to directly use complex JavaScript
+libraries, such as `JM2MP.JS`, by embedding them in web pages (both
+static and dynamic), which saves developers from having to download and
+install the libraries beforehand.
+
+In addition, they optimize content delivery by combining everything into
+a single download and even compressing the content to speed up the
+transmission of code over the Wolrd Wide Web.
+
+Next, you can see an extract from file
+[./jm2mp.js-www/cdn.html](./jm2mp.js-www/cdn.html). You can save it to
+your hard disk drive and open it with any modern browser to see it working:
 
 ```html
 <script type="module">
@@ -148,8 +156,6 @@ see it working:
 </script>
 ```
 
-As previuosly mentioned, you can access the full file from
-[https://raw.githubusercontent.com/json-mde/jm2mp.js/refs/heads/master/src/index.js](https://raw.githubusercontent.com/json-mde/jm2mp.js/refs/heads/master/src/index.js) URL.
 
 ### Installation
 
@@ -167,9 +173,11 @@ tagged as `1.0.0` has also been published; it consists of several files
 to make it easier to download the desired content: everything, only the
 source code, or only this documentation.
 
+
 #### Node.JS and Node Package Manager (NPM)
 
-You can install `JM2MP.JS` using [Node Package Manager (NPM)](https://npmjs.org/) for [Node.JS](https://nodejs.org/en/download) (version 22, at least) runtime.
+You can install `JM2MP.JS` using [Node Package Manager (NPM)](https://npmjs.org/)
+for [Node.JS](https://nodejs.org/en/download) (version 22, at least) runtime.
 
 ```bash
 npm install --save @json-mde/jm2mp
@@ -177,3 +185,14 @@ npm install --save @json-mde/jm2mp
 
 This is the way how to use `JM2MP.JS` library as part of a project that
 isn't just a simple web page, such as complex applications or services.
+
+
+### Running in CLI
+
+Using [NPX](https://docs.npmjs.com/cli/v12/commands/npx) it is even
+possible to run directly `JM2MP.JS` through `JM2MP.JS-CLI` without a
+previous download.
+
+Please, refer to the [Use in CLI](./tutorial-07--cli.html) tutorial for
+more information and implications about this option.
+

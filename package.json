@@ -1,7 +1,7 @@
 {
   "name": "@json-mde/jm2mp",
   "version": "1.0.0",
-  "description": "JSON Mode-to-Model Projections (JM2MP).",
+  "description": "JSON Model-to-Model Projection (JM2MP) JavaScript library (JM2MP.JS).",
   "license": "BSD-3-Clause",
   "author": {
     "name": "Luis Maria CAMARA ROSSI",
