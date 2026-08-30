@@ -21,11 +21,12 @@ transformations.
 
 `JM2MP.JS` offers you:
 
-- A JavaScript [EM2024](https://tc39.es/ecma262/2024/) library to execute
-  `JM2MP` transformations as part of your applications and services.
+- A JavaScript ([EM2024](https://tc39.es/ecma262/2024/)) library to
+  execute `JM2MP` transformations as part of your applications and
+  services.
 
-  Analyze the [JM2MP Syntax](./tutorial-02--jm2mp-syntax.html) tutorial
-  for information about this format and its library.
+  Please, analyze the [JM2MP Syntax](./tutorial-02--jm2mp-syntax.html)
+  tutorial for information about this format and its library.
 
 - A package `JM2MP.JS-CLI` to execute transformations (using
   [Node.JS](https://NodeJS.ORG/en)) as part of an on-line and interactive
@@ -35,8 +36,9 @@ transformations.
   Review the [Use in CLI](./tutorial-07--cli.html) tutorial to know how
   to use this feature.
 
-- A web page `./web/index.html`, part of this documentation, to test
-  interactively in your own web browser how to use `JM2MP`.
+- An static web page `./JM2MP.JS-WWW/index.html`, part of this
+  documentation, to test interactively in your own web browser how to
+  use `JM2MP`.
 
   Consider the [Use in WWW](./tutorial-08--web.html) tutorial to read
   how to use this web page for stydy and practice your habilities with

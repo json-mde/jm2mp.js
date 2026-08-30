@@ -6,16 +6,16 @@
   - [Version](#version)
   - [Verbose](#verbose)
   - [Source Encoding](#source-encoding)
-  - [STDIN as Source](#stdin-as-source)
-  - [CLI Argument as Source](#cli-argument-as-source)
-  - [File as Source](#file-as-source)
+  - [Source from STDIN](#source-from-stdin)
+  - [Source from CLI Argument](#source-from-cli-argument)
+  - [Source from File](#source-from-file)
   - [Projection Encoding](#projection-encoding)
-  - [File as Projection](#file-as-projection)
+  - [Projection Location](#projection-location)
   - [Projection Base URL (Fetch)](#projection-base-url-fetch)
   - [Projection Base Directory (FileSystem)](#projection-base-directory-filesystem)
   - [Resultant Encoding](#resultant-encoding)
-  - [Resultant as STDOUT](#resultant-as-stdout)
-  - [Resultant as File](#resultant-as-file)
+  - [Resultant to STDOUT](#resultant-to-stdout)
+  - [Resultant to File](#resultant-to-file)
   - [Overwrite Resultant File If Exists](#overwrite-resultant-file-if-exists)
   - [Maximum Number of Modules](#maximum-number-of-modules)
   - [Maximum Depth of Nesting](#maximum-depth-of-nesting)
@@ -46,6 +46,31 @@ command line interface:
 - [commander@15.0.x](https://www.npmjs.com/package/commander)
 
 
+## Installation
+
+To install the project `JM2MP.JS-CLI`, you can download or clone the
+_source code_ from its repository on
+[GitHub](https://github.com/json-mde/jm2mp.js-cli):
+
+```bash
+git clone "https://github.com/json-mde/jm2mp.js-cli" "jm2mp.js-cli"
+```
+
+To use it in any _shell_, it is also possible to install this program as a
+[global tool](https://docs.npmjs.com/downloading-and-installing-packages-globally)
+from its
+[NPM package](https://www.npmjs.com/package/@json-mde/jm2mp-cli), or just
+executing it directy from the [NPX](https://docs.npmjs.com/cli/v12/commands/npx)
+command:
+
+```bash
+# Install it as a global tool...
+npm install --global @json-mde/jm2mp-cli
+# ...or just download and execute it!
+npx @json-mde/jm2mp-cli -- --help
+```
+
+
 ## Options and Arguments
 
 Execution of the following command line will show the help information
@@ -56,17 +81,17 @@ node ./index.js --help
 ```
 
 It is mandatory to use one and only one option to specify the _source
-document_ ([stdin](#stdin-as-source), [content](#cli-argument-as-source),
-or [source](#file-as-source)).
+document_ ([stdin](#source-from-stdin), [content](#source-from-cli-argument),
+or [source](#source-from-file)).
 
-It is mandatory to specify a [projection document](#file-as-projection),
+It is mandatory to specify a [projection document](#projection-location),
 that will be loaded using the specified URL of filename; optionally, the
 corresponding [base URL](#projection-base-url-fetch) or
 [base directory](#projection-base-directory-filesystem) can also be
 specified (but not both).
 
 For the _resultant document_, if no output mechanism is specified
-([stdout](#resultant-as-stdout) or [resultant](#resultant-as-file)) then
+([stdout](#resultant-to-stdout) or [resultant](#resultant-to-file)) then
 by default a new file `name--resultant--YYYYMMDDThhmmss.json` will be
 created at the _working directory_, where `name` will be `stdin`,
 `content`, or `basename(file)` depending on the specified input
@@ -109,12 +134,14 @@ By default: `false`.
 
 It specifies the encoding character set of the _source document_.
 
-The available choices come from the `Node.js` platform: `ascii`, `latin1`, `utf8`, `utf-8`, `ucs2`, `ucs-2`, `utf16le`, `utf-16le`, `utf16be`, `utf-16be`, `hex`, `base64`, and `base64url`.
+The available choices come from the `Node.js` platform:
+`ascii`, `latin1`, `utf8`, `utf-8`, `ucs2`, `ucs-2`, `utf16le`,
+`utf-16le`, `utf16be`, `utf-16be`, `hex`, `base64`, and `base64url`.
 
 By default: `utf8`.
 
 
-### STDIN as Source
+### Source from STDIN
 
 - `-i`
 - `--stdin`
@@ -122,7 +149,7 @@ By default: `utf8`.
 It uses the _standard input_ `STDIN` as the _source document_.
 
 
-### CLI Argument as Source
+### Source from CLI Argument
 
 - `-c`
 - `--content <content>`
@@ -131,7 +158,7 @@ It uses the command line option argument to express the JSON content of
 the _source document_.
 
 
-### File as Source
+### Source from File
 
 - `-s`
 - `--source <source>`
@@ -151,7 +178,7 @@ It offers the same choices as the [source encoding](#source-encoding) option.
 By default: `utf8`.
 
 
-### File as Projection
+### Projection Location
 
 - `-p`
 - `--projection <projection>`
@@ -194,7 +221,7 @@ It offers the same choices as the [source encoding](#source-encoding) option.
 By default: `utf8`.
 
 
-### Resultant as STDOUT
+### Resultant to STDOUT
 
 - `-o`
 - `--stdout`
@@ -203,7 +230,7 @@ It writes the resultant document into the _standard output_ `STDOUT`
 (like `console.log`).
 
 
-### Resultant as File
+### Resultant to File
 
 - `-r`
 - `--resultant <resultant>`

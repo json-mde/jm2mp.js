@@ -5,6 +5,7 @@
 - [Customization of the generation template](#customization-of-the-generation-template)
 - [Generation and releasing](#generation-and-releasing)
 
+
 ## Introduction
 
 The original repository for the `JM2MP` document format and this `JM2MP.JS` library,
@@ -14,6 +15,7 @@ contains not only  the source code but also a complete set of documentation.
 This tutorial will guide you through the process of generating that
 documentation, combining comments from the original source code with
 additional material like all existing tutorials.
+
 
 ## Dependencies
 
@@ -29,7 +31,9 @@ found in the library's source code.
 In addition, several tutorials have been written using
 [Markdown](https://daringfireball.net/projects/markdown/) (such as this
 one), to introduce, guide you through, and document all aspects
-of the `JM2MP` document format and this `JM2MP.JS` JavaScript library.
+of the `JM2MP` document format, the `JM2MP.JS` JavaScript library and
+several related projects for illustrative and utility purposes.
+
 
 ## Customization of the generation template
 
@@ -66,6 +70,7 @@ The file `./src/JSDoc.config.json` contains the _configuration_ for both
 [tidy-jsdoc (customize the template)](https://github.com/julie-ng/tidy-jsdoc/blob/main/README.md#customize-the-template),
 in order to properly generate the desired final documentation.
 
+
 ## Generation and releasing
 
 The `JM2MP.JS` project file, `./src/package.json`, defines several
@@ -82,7 +87,7 @@ to completely generate the project documentation:
   },
 ```
 
-As you can read, by default documentation generation will execute the
+As you can read, by default, documentation generation will execute the
 _Windows_ version but it is easy to change such configuration to execute
 by default the _Linux/UNIX_ variation. Note that these changes can be
 applied to both
@@ -99,3 +104,15 @@ a few) and released as desired.
 The original source code repository
 [https://github.com/JSON-MDE/JM2MP.JS](https://github.com/JSON-MDE/JM2MP.JS)
 contains a copy of all releases made, including both source code and documentation.
+
+The repository
+[https://github.com/json-mde/json-mde.github.io](https://github.com/json-mde/json-mde.github.io)
+contains a copy of the static web site published to
+[https://GitHub.JSON-MDE.Tech/](https://github.json-mde.tech/) using
+[GitHub Pages](http://pages.github.com/),
+resulting from [JSDoc](https://jsdoc.app/) and
+[tidy-jsdoc](https://github.com/julie-ng/tidy-jsdoc)
+_document generation_. The _batch script_ `${JM2MP.JS}/doc/jsdoc/_Deploy.cmd`
+can help you to update just newer files when any kind of documentation
+upgrade is made.
+

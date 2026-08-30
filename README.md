@@ -9,11 +9,11 @@ JSON document, and a library to execute such transformations.
 
 ## Source code
 
-As part of this work, the [JSON-MDE](https://github.com/JSON-MDE/)
-_organization_ has been created on [GitHub](https://github.com/), which
-encompasses numerous projects, the main one
-[JM2MP.JS](https://GitHub.com/JSON-MDE/JM2MP.JS) as well as others for
-illustrative and utility purposes.
+As part of this work, the `JSON-MDE` _organization_ has been created
+both on [GitHub](https://github.com/JSON-MDE/) and
+[NPM](https://www.npmjs.com/org/json-mde), to encompass several related
+projects, the main one [JM2MP.JS](https://GitHub.com/JSON-MDE/JM2MP.JS),
+as well as others for illustrative and utility purposes.
 
 The source code for all projects related to **JM2MP** can be retrieved
 from there.
@@ -22,7 +22,7 @@ from there.
 ## Documentation
 
 The documentation about this **JM2MP.JS** library, the **JM2MP**
-syntax, and their related projects, can be found online at:
+syntax, and all their related projects, can be found online at:
 
 - [https://GitHub.JSON-MDE.Tech/jm2mp.js/](https://GitHub.JSON-MDE.Tech/jm2mp.js/)
 
