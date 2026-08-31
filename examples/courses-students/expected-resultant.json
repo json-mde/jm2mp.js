@@ -1,5 +1,5 @@
 {
-  "university": "Universidad Nacional de Educación a Distancia (U.N.E.D.)",
+  "university": "Universidad Nacional de EducaciÃ³n a Distancia (U.N.E.D.)",
   "period": "2026-Q1",
   "students": {
     "Elena": {
@@ -8,19 +8,19 @@
       "enrolled_courses":  3,
       "average_grade":     6
     },
-    "Inés": {
+    "InÃ©s": {
       "passing_credits":   9,
       "sum_of_grades":    11,
       "enrolled_courses":  2,
       "average_grade":     5.5
     },
-    "Luis María": {
+    "Luis MarÃ­a": {
       "passing_credits":  10,
       "sum_of_grades":    16.5,
       "enrolled_courses":  2,
       "average_grade":     8.25
     },
-    "José Antonio": {
+    "JosÃ© Antonio": {
       "passing_credits":  15,
       "sum_of_grades":    13.5,
       "enrolled_courses":  2,

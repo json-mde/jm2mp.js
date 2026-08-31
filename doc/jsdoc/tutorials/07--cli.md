@@ -67,7 +67,7 @@ command:
 # Install it as a global tool...
 npm install --global @json-mde/jm2mp-cli
 # ...or just download and execute it!
-npx @json-mde/jm2mp-cli -- --help
+npx -- @json-mde/jm2mp-cli --help
 ```
 
 

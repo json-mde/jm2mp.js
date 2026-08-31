@@ -1,8 +1,8 @@
 <!--
-    @author       Luis Maria CAMARA ROSSI
-    @copyright    Universidad Nacional de Educación a Distancia (U.N.E.D.) 2026
-    @license      BSD-3-Clause
-    @description  Use of JM2MP in WWW via CDN.
+  @author       Luis Maria CAMARA ROSSI
+  @copyright    Universidad Nacional de Educación a Distancia (U.N.E.D.) 2026
+  @license      BSD-3-Clause
+  @description  Use of JM2MP in WWW via CDN.
 -->
 <!DOCTYPE html>
 <html version="5" lang="en">
@@ -12,23 +12,24 @@
     <style type="text/css">
       body {
         color: darkgreen;
-        background-color: lightgray;
+        background-color: whitesmoke;
         font-family: "Verdana", "Arial", sans-serif;
         font-size: medium;
       }
       pre {
+        border: 1px solid limegreen;
+        border-radius: 25px;
+        padding: 1em;
         font-family: "Consolas", "Courier New", monospace;
         font-size: smaller;
-        color: lightgray;
-        background-color: navy;
+        color: navy;
+        background-color: antiquewhite;
       }
       hr {
         display: none;
       }
     </style>
-    <script type="module">
-      import * as JM2MP from 'https://cdn.jsdelivr.net/npm/@json-mde/jm2mp@1.0.0/+esm' ;
-    </script>
+    <script id="CDN" type="module" blocking="render" src="./cdn.mjs"></script>
   </head>
   <body>
     <header>
@@ -38,62 +39,46 @@
       <hr />
     </header>
     <main>
+      <h3>Instructions</h3>
+      <p>
+        This example shows how to integrate and use <code>JM2MP</code> and
+        <code>JM2MP.JS</code> in any static or dynamic web page without installing
+        the corresponding package, just linking to a <em>Content Delivery Network (CDN)</em>
+        like <a href="https://jsdelivr.com/" target="_blank">jsDelivr</a> or
+        <a href="https://docs.github.com/en/repositories/working-with-files/using-files/viewing-and-understanding-files" target="_blank">GitHub's raw user content</a>.
+      </p>
+      <p>
+        Please, inspect the <strong>source code</strong> of <em>this
+        page</em> to better understand the mechanism involved. You will
+        see a <code>&lt;script&gt;</code> HTML element that reference a
+        <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Modules" target="_blank">JavaScript file containing an ESM module</a>
+        where all the code resides.
+      </p>
+      <p>
+        Below, you can see a <em>source JSON document</em>, a <em>projection JM2MP document</em>
+        and then, the <em>resultant JSON document</em> transformed directly in your browser.
+      </p>
+      <p>
+        Please, refer to the <a href="../jm2mp.js/tutorial-08--web.html">Use in WWW</a>
+        <em>tutorial</em> for more information about this example.
+      </p>
       <h3>Source</h3>
-      <script type="module">
-        const source = { "Author": { "Name":"Luis", "Institution":"U.N.E.D." } };
-      </script>
-      <pre>
-        <script type="module">
-          document.write(source);
-        </script>
+      <pre id="source_placeholder">
       </pre>
       <hr />
       <h3>Projection</h3>
-      <script type="module">
-        const projection = {
-          "$" : {
-            "People" : [
-              {
-                "Name" : "$.Author.Name",
-                "University" : "$.Author.Institution"
-              }
-            ]
-          }
-        }
-      </script>
-      <pre>
-        <script type="module">
-          document.write(projection);
-        </script>
+      <pre id="projection_placeholder">
       </pre>
       <hr />
       <h3>Resultant</h3>
-      <pre>
-        <script type="module">
-        const string_loader = JM2MP.createStringLoader(
-          { "$" : JSON.stringify(projection) }
-        );
-        document.write(
-          JSON.stringify(
-            JM2MP.project({
-              rootName: "$",
-              loader: string_loader,
-              document: source,
-              registry: undefined,
-              options: {}
-            }),
-            undefined,
-            '    '
-          )
-        );
-        </script>
+      <pre id="resultant_placeholder">
       </pre>
     </main>
     <footer>
       <hr />
       <div>
-        Copyright &copy; 2026 Luis Mar&iacute;a C&Aacute;MARA ROSSI.<br>
-        Trademark &trade; Copyright &copy; 2026 <a href="https://www.uned.es/" target="UNED" title="U.N.E.D.">Universidad Nacional de Educaci&oacute;n a Distancia (U.N.E.D.).<br>
+        Copyright &copy; 2026 <a href="mailto:LCamara8@Alumno.UNED.ES">Luis Mar&iacute;a C&Aacute;MARA ROSSI</a>.<br>
+        Trademark &trade; Copyright &copy; 2026 <a href="https://www.uned.es/" target="UNED" title="U.N.E.D.">Universidad Nacional de Educaci&oacute;n a Distancia (U.N.E.D.)</a>.<br>
         The <strong><code>JM2MP</code></strong> syntax, the <strong><code>JM2MP.JS</code></strong> library,
         and all their related projects are licensed under the <code>BSD-3-Clause</code>
         <sup>

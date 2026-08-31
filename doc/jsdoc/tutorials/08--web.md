@@ -2,7 +2,7 @@
 
 - [Introduction](#introduction)
 - [Software Architecture and Components](#software-architecture-and-components)
-- [Example of Use](#example-of-use)
+- [Examples of Use](#examples-of-use)
 
 ## Introduction
 
@@ -12,8 +12,7 @@
 
 ...
 
-## Example of Use
+## Examples of Use
 
-...
-
+- [JM2MP-JS-WWW](../jm2mp.js-www/index.html)
 

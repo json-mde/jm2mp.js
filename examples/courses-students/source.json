@@ -1,5 +1,5 @@
 {
-  "university": "Universidad Nacional de Educación a Distancia (U.N.E.D.)",
+  "university": "Universidad Nacional de EducaciÃ³n a Distancia (U.N.E.D.)",
   "period": "2026-Q1",
   "passing_grade": 5.0,
   "courses": {
@@ -7,28 +7,28 @@
       "title": "Linear Algebra",
       "credits": 4,
       "enrollments": [
-        { "student": "Luis María",   "grade": 7.5 },
-        { "student": "Inés",         "grade": 4.0 },
+        { "student": "Luis MarÃ­a",   "grade": 7.5 },
+        { "student": "InÃ©s",         "grade": 4.0 },
         { "student": "Elena",        "grade": 8.5 },
-        { "student": "José Antonio", "grade": null }
+        { "student": "JosÃ© Antonio", "grade": null }
       ]
     },
     "FPROG-201": {
       "title": "Functional Programming",
       "credits": 6,
       "enrollments": [
-        { "student": "Luis María",   "grade": 9.0 },
+        { "student": "Luis MarÃ­a",   "grade": 9.0 },
         { "student": "Elena",        "grade": 6.5 },
-        { "student": "José Antonio", "grade": 5.5 }
+        { "student": "JosÃ© Antonio", "grade": 5.5 }
       ]
     },
     "DB-301": {
       "title": "Databases",
       "credits": 9,
       "enrollments": [
-        { "student": "Inés",         "grade": 7.0 },
+        { "student": "InÃ©s",         "grade": 7.0 },
         { "student": "Elena",        "grade": 3.0 },
-        { "student": "José Antonio", "grade": 8.0 }
+        { "student": "JosÃ© Antonio", "grade": 8.0 }
       ]
     }
   }

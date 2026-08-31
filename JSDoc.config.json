@@ -43,6 +43,8 @@
       "staticFiles": {
         "include": [
           "./doc/jsdoc/static/",
+          "./examples/",
+          "./src/schemas/",
           "./LICENSE.txt"
         ]
       }
