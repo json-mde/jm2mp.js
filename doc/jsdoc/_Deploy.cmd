@@ -32,6 +32,8 @@ XCOPY /E /V /I /H /Y /R /K "..\JSON-MDE.GitHub.IO\jm2mp.js\courses-students\" ".
 RMDIR /S /Q "..\JSON-MDE.GitHub.IO\jm2mp.js\courses-students\"
 XCOPY /E /V /I /H /Y /R /K "..\JSON-MDE.GitHub.IO\jm2mp.js\inventory\" "..\JSON-MDE.GitHub.IO\examples\inventory\"
 RMDIR /S /Q "..\JSON-MDE.GitHub.IO\jm2mp.js\inventory\"
+XCOPY /E /V /I /H /Y /R /K "..\JSON-MDE.GitHub.IO\jm2mp.js\Gregory-Liebniz--Pi\" "..\JSON-MDE.GitHub.IO\examples\Gregory-Liebniz--Pi\"
+RMDIR /S /Q "..\JSON-MDE.GitHub.IO\jm2mp.js\Gregory-Liebniz--Pi\"
 REM _root
 XCOPY /E /V /I /H /Y /R /K "..\JSON-MDE.GitHub.IO\jm2mp.js\_root\" "..\JSON-MDE.GitHub.IO\"
 RMDIR /S /Q "..\JSON-MDE.GitHub.IO\jm2mp.js\_root\"

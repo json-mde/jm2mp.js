@@ -1,3 +1,10 @@
+/**
+ * @author Luis Maria CAMARA ROSSI
+ * @copyright Universidad Nacional de Educaci�n a Distancia (U.N.E.D.) 2026
+ * @license BSD-3-Clause
+ * @file ${json-mde.github.io}/jm2mp.js-www/index.html
+**/
+
 @media (width < 600px) {
   h1 {
     display: none;
@@ -50,3 +57,12 @@ div.Ace9
     font-family: 'Consolas', 'Courier New', Courier, monospace;
     font-size : 16px;
 }
+
+div#ResultDocument_ContentText_CopyToClipboard
+{
+  display: none;
+}
+
+/* ------------------------------------------------------------------ */
+/* ------------------------------------------------------------------ */
+/* End of file: ${JM2MP.JS}/doc/jsdoc/static/jm2mp.js-www/interactive.css */

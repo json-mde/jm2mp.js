@@ -71,6 +71,7 @@
 - [JSON Schema](#json-schema)
 - [Examples](#examples)
 
+
 ## Introduction
 
 In this tutorial, we will explain the syntax of the `JSON Model-to-Model
@@ -82,6 +83,7 @@ standards.
 
 You can find more information about the JSON format at
 [JSON.org](https://www.json.org/).
+
 
 ## Basic Terminology
 
@@ -131,6 +133,7 @@ The following concepts are important terms defined as part of `JM2MP`:
   The section [execution environment](#execution-environment) below
   offers more information about this concept.
 
+
 ## Notation
 
 We denote &#x1D541; as the complete set of all possible JSON values.
@@ -149,6 +152,7 @@ list of arguments, we will represent the entire operation as
 <span style="background-color:whitesmoke;">&#x27E6;Operator&#x27E7;(arguments,&hellip;)</span>.
 When the operation is a composition of several operators, we will represent it as
 <span style="background-color:whitesmoke;">&#x27E6;MainOperator(Op<sub>1</sub>,&hellip;,Op<sub>n</sub>)&#x27E7;(arguments,&hellip;)</span>.
+
 
 ## Overview of JM2MP
 
@@ -297,6 +301,7 @@ combination of both declarative and functional paradigms for transforming
 JSON documents, while also achieving a level of interoperability that a
 simple script or application might not provide.
 
+
 ## Data types
 
 The [JSON](https://www.json.org/json-en.html) standard only considers
@@ -316,6 +321,7 @@ types, providing a function to identify the type of a value (see
 [typeof projection](#typeof) below) but not providing functions to
 implictly cast neither explicitly convert values from one type to
 another.
+
 
 ## Steps and Paths
 
@@ -359,6 +365,7 @@ querying by simply using text string literals prefixed in a specific way.
 
 See below the [query languages](#query-languages) section for more
 information about this topic.
+
 
 ## Template Commands
 
@@ -1438,6 +1445,7 @@ Its JSON form is:
 Note that JSON data types are a subset of JavaScript's data types. In
 the above [data types](#data-types) section, you can examine them all.
 
+
 ## Named Templates
 
 **Named templates** are all properties of the _root object_ from the
@@ -1482,7 +1490,7 @@ in a recursive manner:
 <math xmlns="http://www.w3.org/1998/Math/MathML" display="block">
   <mrow>
     <mi>&pi;</mi>
-    <mo>=</mo>
+    <mo>&#x2248;</mo>
     <mrow>
       <mn>4</mn>
       <mo>&middot;</mo>
@@ -1573,6 +1581,7 @@ approximation for such number of iterations:
 ```JSON
 3.33968253968254
 ```
+
 
 ## Query Languages
 
@@ -1669,6 +1678,7 @@ different than `native`, needs to declare its usage as part of
 [$options](#options) _root property_ or as part of any [$get](#get)
 _template command_.
 
+
 ## Modularization
 
 In order to simplify large or complex _projection documents_,
@@ -1740,6 +1750,7 @@ _document_.
   Please, refear to [$options](#options) and [$schema](#json-schema)
   sections for more information.
 
+
 ## Options
 
 The `$options` property of the _root object_ of any _projection_ is always
@@ -1807,6 +1818,7 @@ document_ performing the import will take precedence, overriding
 (substituting) any _named templates_ with the same name that may exist
 in the imported _documents_.
 
+
 ## JSON Schema
 
 The `$schema` property of the _root object_ of any _projection_ is always
@@ -1818,9 +1830,11 @@ property in any _projection document_, in order to comply with the
 `JM2MP.JS` library neither uses nor validates against this schema, it
 was considered useful to reserve such possibility from the outset.
 
-The URL `https://json-mde.tech/schemas/json-schema/draft--2020-12/jm2mp--1-0-0.json`
+The URL
+[https://github.json-mde.tech/schemas/jm2mp/1.0.0/JM2MP-v1.0.0--JSON-Schema-Draft-2020-12.json](https://github.json-mde.tech/schemas/jm2mp/1.0.0/JM2MP-v1.0.0--JSON-Schema-Draft-2020-12.json)
 can be used to specifify the current version of `JM2MP` using
 [JSON Schema (Draft 2020-12)](https://json-schema.org/draft/2020-12).
+
 
 ## Examples
 

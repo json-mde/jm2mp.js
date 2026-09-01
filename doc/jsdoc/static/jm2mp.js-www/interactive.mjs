@@ -16,7 +16,7 @@ import * as JM2MP from 'https://cdn.jsdelivr.net/npm/@json-mde/jm2mp@1.0.0/+esm'
 
 var source_editor = null;
 var projection_editor = null;
-var result_editor = null;
+var resultant_editor = null;
 
 /* ------------------------------------------------------------------ */
 /* ------------------------------------------------------------------ */
@@ -26,16 +26,19 @@ var result_editor = null;
  * It shows an `alert` dialog about the specified `error`.
  * @param {Error} error
  * The `error` to show.
- * @param {*} site
+ * @param {string} [site]
  * The site where the error is detected.
+ * @param {boolean} [just_alert=false] 
+ * When `true`, then the message text is written to the `result_editor`;
+ * when `false`, an `alert` is shown.
 **/
-function ShowError (error, site="")
+function ShowError (error, site="", just_alert=false)
 {
     if(error instanceof Error)
     {
         const at = (site ? `at ${site}`:'');
         const message =`ERROR ${at}!\r\n${error.name} ${error.message}\r\n\r\n${error}`;
-        if (result_editor) { result_editor.session.setValue(message); }
+        if ( (!just_alert) && resultant_editor ) { resultant_editor.session.setValue(message); }
         else { alert(message); }
     }
 }
@@ -43,16 +46,25 @@ function ShowError (error, site="")
 /* ------------------------------------------------------------------ */
 
 /**
- * @constant {Function}
- * It injects the "on click" event listener to the "Project" action
- * button, using unobtrusive JavaScript technique.
+ * @description
+ * It injects the "on click" event listener to the "Load C+S Example"
+ * action button, using unobtrusive JavaScript technique.
+ * @param {string} id_button_for_load_example
+ * The HtmlElement.ID where inject such event listener.
+ * @returns {boolean}
+ * Always `false`, t avoid any kind of navigation from just pressing
+ * such button.
 **/
-const InjectFunction_LoadCoursesAndStudentsExample = function ( id_button_for_load_example ) {
+function InjectFunction_LoadCoursesAndStudentsExample( id_button_for_load_example )
+{
     //// alert( "Injecting projection event handler: " + id_button_for_projection + ".onclick" );
-    let button_for_load_example = document.getElementById( id_button_for_load_example );
+    const button_for_load_example = document.getElementById( id_button_for_load_example );
     if ( button_for_load_example )
     {
-        button_for_load_example.addEventListener('click', async function SourceDocument_LoadCoursesAndStudentsExample__OnClick(event) {
+       button_for_load_example.addEventListener(
+          'click',
+          async function SourceDocument_LoadCoursesAndStudentsExample__OnClick(event)
+          {
             /* */
             event.preventDefault();
             /* */
@@ -84,13 +96,14 @@ const InjectFunction_LoadCoursesAndStudentsExample = function ( id_button_for_lo
                 }
             }
             /* */
-            if ( result_editor )
+            if ( resultant_editor )
             {
-                result_editor.session.setValue("");
+                resultant_editor.session.setValue("");
             }
             /* It avoids any kind of navigation from just pressing this button. */
             return false;
-        });
+          }
+       );
     }
 };
 
@@ -98,16 +111,25 @@ const InjectFunction_LoadCoursesAndStudentsExample = function ( id_button_for_lo
 /* ------------------------------------------------------------------ */
 
 /**
- * @constant {Function}
- * It injects the "on click" event listener to the "Project" action
- * button, using unobtrusive JavaScript technique.
+ * @description
+ * It injects the "on click" event listener to the "Load IM Example"
+ * action button, using unobtrusive JavaScript technique.
+ * @param {string} id_button_for_load_example
+ * The HtmlElement.ID where inject such event listener.
+ * @returns {boolean}
+ * Always `false`, t avoid any kind of navigation from just pressing
+ * such button.
 **/
-const InjectFunction_LoadInventoryExample = function ( id_button_for_load_example ) {
+function InjectFunction_LoadInventoryExample( id_button_for_load_example )
+{
     //// alert( "Injecting projection event handler: " + id_button_for_projection + ".onclick" );
     let button_for_load_example = document.getElementById( id_button_for_load_example );
     if ( button_for_load_example )
     {
-        button_for_load_example.addEventListener('click', async function SourceDocument_LoadInventoryExample__OnClick(event) {
+       button_for_load_example.addEventListener(
+          'click',
+          async function SourceDocument_LoadInventoryExample__OnClick(event)
+          {
             /* */
             event.preventDefault();
             /* */
@@ -139,13 +161,14 @@ const InjectFunction_LoadInventoryExample = function ( id_button_for_load_exampl
                 }
             }
             /* */
-            if ( result_editor )
+            if ( resultant_editor )
             {
-                result_editor.session.setValue("");
+                resultant_editor.session.setValue("");
             }
             /* It avoids any kind of navigation from just pressing this button. */
             return false;
-        });
+          }
+       );
     }
 };
 
@@ -154,11 +177,78 @@ const InjectFunction_LoadInventoryExample = function ( id_button_for_load_exampl
 
 
 /**
- * @constant {Function}
+ * @description
+ * It injects the "on click" event listener to the
+ * "Load Gregory-Liebniz (Pi) Example" action button,
+ * using unobtrusive JavaScript technique.
+ * @param {string} id_button_for_load_example
+ * The HtmlElement.ID where inject such event listener.
+ * @returns {boolean}
+ * Always `false`, t avoid any kind of navigation from just pressing
+ * such button.
+**/
+function InjectFunction_LoadGregoryLiebnizPiExample( id_button_for_load_example )
+{
+    //// alert( "Injecting projection event handler: " + id_button_for_projection + ".onclick" );
+    let button_for_load_example = document.getElementById( id_button_for_load_example );
+    if ( button_for_load_example )
+    {
+       button_for_load_example.addEventListener(
+          'click',
+          async function SourceDocument_LoadInventoryExample__OnClick(event)
+          {
+            /* */
+            event.preventDefault();
+            /* */
+            if ( source_editor )
+            {
+                try
+                {
+                    const example_source_file = await import("../examples/Gregory-Liebniz--Pi/source.json", { with: { type: "json" } });
+                    const example_source_content = JSON.stringify(example_source_file.default,undefined,2);
+                    source_editor.session.setValue(example_source_content);
+                }
+                catch (error)
+                {
+                    ShowError(error, 'LoadGregoryLiebnizPiExample/source');
+                }
+            }
+            /* */
+            if ( projection_editor )
+            {
+                try
+                {
+                    const example_projection_file = await import("../examples/Gregory-Liebniz--Pi/projection.json", { with: { type: "json" } });
+                    const example_projection_content = JSON.stringify(example_projection_file.default,undefined,2);
+                    projection_editor.session.setValue(example_projection_content);
+                }
+                catch (error)
+                {
+                    ShowError(error, 'LoadGregoryLiebnizPiExample/projection');
+                }
+            }
+            /* */
+            if ( resultant_editor )
+            {
+                resultant_editor.session.setValue("");
+            }
+            /* It avoids any kind of navigation from just pressing this button. */
+            return false;
+          }
+       );
+    }
+};
+
+
+/* ------------------------------------------------------------------ */
+
+
+/**
+ * @description
  * It injects the "on click" event listener to the "Validate" action
  * button, using unobtrusive JavaScript technique.
 **/
-const InjectValidationFunction = function (id_button_for_validation)
+function InjectValidationFunction(id_button_for_validation)
 {
     //// alert( "Injecting validation event handler: " + id_button_for_validation + ".onclick" );
     let button_for_validation = document.getElementById( id_button_for_validation );
@@ -197,7 +287,7 @@ const InjectValidationFunction = function (id_button_for_validation)
                 }
             }
             /* */
-            if ( result_editor && source_document_object_model && projection_object_model )
+            if ( resultant_editor && source_document_object_model && projection_object_model )
             {
                 try
                 {
@@ -212,7 +302,7 @@ const InjectValidationFunction = function (id_button_for_validation)
                     const resolvedModule = await JM2MP.resolve(rootName, loader, {maxModules:1000,});
                     // Stage 2/3: validate the final module.
                     await JM2MP.validateModule(resolvedModule, actualRegistry);
-                    result_editor.session.setValue("OK... projection is valid!");
+                    resultant_editor.session.setValue("OK... projection is valid!");
                 }
                 catch ( error )
                 {
@@ -234,7 +324,8 @@ const InjectValidationFunction = function (id_button_for_validation)
  * It injects the "on click" event listener to the "Project" action
  * button, using unobtrusive JavaScript technique.
 **/
-const InjectProjectionFunction = function ( id_button_for_projection ) {
+function InjectProjectionFunction( id_button_for_projection )
+{
     //// alert( "Injecting projection event handler: " + id_button_for_projection + ".onclick" );
     let button_for_projection = document.getElementById( id_button_for_projection );
     if ( button_for_projection )
@@ -272,7 +363,7 @@ const InjectProjectionFunction = function ( id_button_for_projection ) {
                 }
             }
             /* */
-            if ( result_editor && source_document_object_model && projection_object_model )
+            if ( resultant_editor && source_document_object_model && projection_object_model )
             {
                 try
                 {
@@ -287,7 +378,7 @@ const InjectProjectionFunction = function ( id_button_for_projection ) {
                             options: {}
                     });
                     const result_document_json_text = JSON.stringify( result_document_object_model, undefined, 2 );
-                    result_editor.session.setValue( result_document_json_text );
+                    resultant_editor.session.setValue( result_document_json_text );
                 }
                 catch ( error )
                 {
@@ -305,18 +396,58 @@ const InjectProjectionFunction = function ( id_button_for_projection ) {
 
 
 /**
+ * @constant {Function}
+ * It injects the "on click" event listener to the "Project" action
+ * button, using unobtrusive JavaScript technique.
+**/
+function InjectCopyToClipboardFunction( id_button_for_projection )
+{
+    //// alert( "Injecting projection event handler: " + id_button_for_projection + ".onclick" );
+    const button_for_projection = document.getElementById( id_button_for_projection );
+    if ( button_for_projection )
+    {
+        button_for_projection.addEventListener(
+            'click',
+            async function ResultantDocument_CopyToClipboard__OnClick(event)
+            {
+                /* */
+                event.preventDefault();
+                /* */
+                if ( resultant_editor )
+                {
+                    try
+                    {
+                        const resultant_text = resultant_editor.session.getValue();
+                        await navigator.clipboard.writeText(resultant_text);
+                    }
+                    catch ( error )
+                    {
+                        ShowError(error, 'Resultant/copy-to-clipboard');
+                    }
+                }
+                /* It avoids any kind of navigation from just pressing this button. */
+                return false;
+            }
+        );
+    }
+};
+
+
+/* ------------------------------------------------------------------ */
+
+/**
  * @description
  * Ace Cloud9 initialization.
  * @param {string} id_source_editor
  * The HtmlElement.ID of the _source document_ `Ace9` editor.
  * @param {string} id_projection_editor
  * The...
- * @param {string} id_result_editor
+ * @param {string} id_resultant_editor
  * The...
  * @returns {boolean}
  * Always `false` to prevent default action (avoids navigation).
 **/
-function AceCloud9_Initialization( id_source_editor, id_projection_editor, id_result_editor )
+function AceCloud9_Initialization( id_source_editor, id_projection_editor, id_resultant_editor )
 {
     /* Source. */
     source_editor = ace.edit( id_source_editor );
@@ -339,14 +470,14 @@ function AceCloud9_Initialization( id_source_editor, id_projection_editor, id_re
         projection_editor.setHighlightActiveLine( true );
     }
     /* Result. */
-    result_editor = ace.edit( id_result_editor );
-    if ( result_editor )
+    resultant_editor = ace.edit( id_resultant_editor );
+    if ( resultant_editor )
     {
-        result_editor.setTheme( "ace/theme/sqlserver" );
-        result_editor.session.setMode( "ace/mode/json" );
-        result_editor.setOptions( { enableBasicAutocompletion: true, enableSnippets: true } );
-        result_editor.setShowPrintMargin( true );
-        result_editor.setHighlightActiveLine( true );
+        resultant_editor.setTheme( "ace/theme/sqlserver" );
+        resultant_editor.session.setMode( "ace/mode/json" );
+        resultant_editor.setOptions( { enableBasicAutocompletion: true, enableSnippets: true } );
+        resultant_editor.setShowPrintMargin( true );
+        resultant_editor.setHighlightActiveLine( true );
     }
     /* It avoids any kind of navigation from just pressing this button. */
     return false;
@@ -363,13 +494,16 @@ window.addEventListener('DOMContentLoaded', function() {
     /* */
     InjectFunction_LoadCoursesAndStudentsExample("SourceDocument_LoadCoursesAndStudentsExample");
     InjectFunction_LoadInventoryExample("SourceDocument_LoadInventoryExample");
+    InjectFunction_LoadGregoryLiebnizPiExample("SourceDocument_LoadGregoryLiebnizPiExample");
     /* */
     InjectValidationFunction("ProjectionDocument_Validate");
     InjectProjectionFunction("ProjectionDocument_Project");
     /* */
+    InjectCopyToClipboardFunction("ResultantDocument_CopyToClipboard");
+    /* */
     AceCloud9_Initialization("SourceDocument_ContentText",
                              "ProjectionDocument_ContentText",
-                             "ResultDocument_ContentText");
+                             "ResultantDocument_ContentText");
 });
 
 

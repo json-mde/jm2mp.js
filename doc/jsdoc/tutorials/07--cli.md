@@ -358,5 +358,4 @@ You can view this complete example of an
 [inventory](./tutorial-04--examples.html#inventory-management)
 in the corresponding tutorial.
 
-![JM2MP.JS-CLI screen capture](./images/JM2MP.JS-CLI--ScreenCapture.png)
-
+![JM2MP.JS-CLI screen capture](./images/JM2MP.JS-CLI--ScreenCapture-01--ArgumentsAndExecution.png)
